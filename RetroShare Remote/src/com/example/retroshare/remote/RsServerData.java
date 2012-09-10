@@ -8,7 +8,8 @@ import java.io.Serializable;
 
 import net.lag.jaramiko.PKey;
 
-// todo: test serialise hostkey
+// todo: test test serialise hostkey
+// todo: implement cloneable
 // http://java.sun.com/developer/technicalArticles/Programming/serialization/
 public class RsServerData implements Serializable {
 	private static final long serialVersionUID = 0;

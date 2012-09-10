@@ -1,4 +1,5 @@
 package com.example.retroshare.remote;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,124 +9,74 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import rsctrl.chat.Chat.ResponseMsgIds;
-import rsctrl.core.Core;
-
 import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.Handler;
-import android.os.IBinder;
-import android.util.Log;
+/**
+ * Platform independent RsCtrlService
+ * @author till
+ *
+ */
 
-
-public class RsService extends Service implements Runnable {
-	private static final String TAG="RsService";
-	private static final int MAGIC_CODE = 0x137f0001;
+public class RsCtrlService implements Runnable{
+	private static final boolean DEBUG=true;
 	
-	//private Handler mHandler;
-	@Override
-	public void onCreate(){
-		int RESPONSE=(0x01<<24);
-		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
-		registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
+	public static final int MAGIC_CODE = 0x137f0001;
+	
+	public static class RsMessage{
+		public int msgId;
+		public int reqId;
+		public byte[] body;
 	}
 	
-	//---------------------------------------------
-	// Binder
-	private final IBinder mBinder=new RsBinder();
-	@Override
-	public IBinder onBind(Intent arg0) {
-		/*
-		// tut
-		String ns = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-		
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = "Hello";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		
-		Context context = getApplicationContext();
-		CharSequence contentTitle = "My notification";
-		CharSequence contentText = "Hello World!";
-		Intent notificationIntent = new Intent(this, RsService.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-		
-		int HELLO_ID = 1;
-
-		mNotificationManager.notify(HELLO_ID, notification);
-		*/
-		
-		
-		// tut auch, macht die benachrichtigung aber wegen startForeground() unlöschbar
-		Notification notification = new Notification(R.drawable.ic_launcher, "blubber",System.currentTimeMillis());
-		
-		Intent notificationIntent = new Intent(this, RsService.class);
-		
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		
-		notification.setLatestEventInfo(this, "rsremote","rs remote wurde gestartet", pendingIntent);
-		
-		//first param has to be greater 0, dont know why
-		startForeground(1, notification);
-		
-		
-		return mBinder;
+	// todo
+	public interface RsCtrlServiceCallback{
+		public void onConnectionStateChanged();
 	}
 	
-	public class RsBinder extends Binder {
-		RsService getService(){
-			return RsService.this;
-		}
-	}
-	//--------------------------------------------
-	
-	private Socket socket;
-	private ClientTransport transport;
-	private Channel channel;
-	private InputStream mInputStream;
-	private OutputStream outputStream;
-	
-	private enum ConnectState{
+	public enum ConnectState{
 		ONLINE,OFFLINE
 	}
-	private enum ConnectAction{
+	
+	public enum ConnectAction{
 		CONNECT,DISCONNECT,NONE
 	}
 	
-	// use with synchronized
-	private ConnectState connectState=ConnectState.OFFLINE;
-	private ConnectAction connectAction=ConnectAction.NONE;
-	
-	public void connect(){
-		Log.v(TAG, "connect");
-		synchronized(connectAction){
-			connectAction=ConnectAction.CONNECT;
-		}
+	public enum ConnectError{
+		NONE
 	}
 	
-	// use with synchronized
+	/*************************************/
+	// accessed from worker and ui thread, so we have to use synchronized()
+	private ConnectState mConnectState=ConnectState.OFFLINE;
+	private ConnectAction mConnectAction=ConnectAction.NONE;
+	private ConnectError mLastConnectError=ConnectError.NONE;
 	
-	//is totaler quatsch, weil das object auch außerhalb verändert werden könnte
-	// lösung: serverliste innerhalb RsService verwalten -> ist auch gut wegen PKey in serverdata
-	// addServer
-	// deleteServer
-	// bzw setServerData(hostname,user,passwd ...)
+	private UiThreadHandlerInterface mUiThreadHandler;
+	private Thread mThread;
+	volatile static boolean runThread=false;
 	
-	// init, because of lock, without init, locking is impossible
-	private RsServerData mServerData=new RsServerData();;
+	private RsServerData mServerData=new RsServerData();
+	
+	/*************************************/
+	// accessed from worker thread only
+	private Socket mSocket;
+	private ClientTransport mTransport;
+	private Channel mChannel;
+	private InputStream mInputStream;
+	private OutputStream mOutputStream;
+	/*************************************/
+	
+	RsCtrlService(UiThreadHandlerInterface h){
+		mUiThreadHandler=h;
+		mThread=new Thread(this);
+		runThread=true;
+		mThread.start();
+	}
+	
+	// **************************
+	// todo: clone the server data, so outside thread 
+	// can't change our serverdata which is used in our workerthread
 	public void setServerData(RsServerData d){
-		Log.v(TAG, "setServerData");
 		synchronized(mServerData){
 			mServerData=d;
 		}
@@ -135,74 +86,20 @@ public class RsService extends Service implements Runnable {
 			return mServerData;
 		}
 	}
+	// **************************
 	
-	private RsServerData[] mServers;
-	public RsServerData[] getServers(){
-		synchronized(mServers){
-			return mServers;
+	public void connect(){
+		if(DEBUG){System.err.println("RsCtrlService: connect()");}
+		
+		synchronized(mConnectAction){
+			mConnectAction=ConnectAction.CONNECT;
 		}
 	}
 	
-	
-	
-	
-	
-	
-	// neu neu nicht löschen
-	private class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
-		@Override
-		public void postToUiThread(Runnable r) {
-			post(r);
-		}	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	private void _connect(){
-		try {
-			synchronized(mServerData){
-				Log.v(TAG, "_connect()");
-				socket=new Socket();
-				socket.connect(new InetSocketAddress(mServerData.hostname,mServerData.port), 2000);
-				transport=new ClientTransport(socket);
-				transport.start(mServerData.hostkey, 2000);
-				transport.authPassword(mServerData.user, mServerData.password, 2000);
-				channel=transport.openSession(2000);
-				channel.invokeShell(2000);
-				mInputStream=channel.getInputStream();
-				outputStream=channel.getOutputStream();
-				
-				connectState=ConnectState.ONLINE;
-				connectAction=ConnectAction.NONE;
-								Log.v(TAG, "_connect(): success");
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG,Log.getStackTraceString(e));
-			connectState=ConnectState.OFFLINE;
-			connectAction=ConnectAction.NONE;
-			
-			//noch zu händeln: Java.net.SocketEception Network unreachable
+	public boolean isOnline(){
+		synchronized(mConnectState){
+			return (mConnectState==ConnectState.ONLINE);
 		}
-	}
-	
-	public class RsMessage{
-		public int msgId;
-		public int reqId;
-		public byte[] body;
 	}
 	
 	// use with synchronized()
@@ -238,51 +135,43 @@ public class RsService extends Service implements Runnable {
 		return msgHandlersById.get(msgId);
 	}
 	
-	volatile static boolean running=false;
-	public void startThread(){
-		if(running==false){
-			Log.v(TAG,"startThread: starting Thread");
-			Thread t=new Thread(this);
-			t.start();
-			running=true;
-		}
-		else{
-			Log.v(TAG,"startThread: already running");
-		}
-	}
+	/**
+	 * 
+	 */
 	@Override
 	public void run() {
-		while(running){
+		while(runThread){
 			
 			try {
 				Thread.sleep(50);
 				//Thread.sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				Log.v(TAG,Log.getStackTraceString(e));
+				System.err.print(e);
 			}
-			//Log.v(TAG, "run()");
+			
+			boolean connect=false;
+			boolean isonline=false;
 			
 			// check if we have to connect
-			boolean connect=false;
-			synchronized(connectAction){
-				//if(connectState==ConnectState.OFFLINE){
-					if(connectAction==ConnectAction.CONNECT){
-						connect=true;
-					}
-				//}
+			synchronized(mConnectAction){
+				connect=(mConnectAction==ConnectAction.CONNECT);
 			}
+			
+			synchronized(mConnectState){
+				isonline=(mConnectState==ConnectState.ONLINE);
+			}
+			
 			if(connect){
 				_connect();
 			}
-			if(connectState==ConnectState.ONLINE){
+			if(isonline){
 				// handle outgoing
 				{
 					RsMessage msg=null;
 					synchronized(outMsgList){
 						if(!outMsgList.isEmpty()){
-							msg=outMsgList.get(0);
-							outMsgList.remove(0);
+							msg=outMsgList.remove(0);
 						}
 					}
 					if(msg != null){
@@ -302,7 +191,7 @@ public class RsService extends Service implements Runnable {
 							h=msgHandlers.remove(msg.reqId);
 						}
 						if(h!=null){
-							Log.v(TAG,"run(): received Msg with reqId Handler, will now post Msg to UI Thread");
+							if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with reqId Handler, will now post Msg to UI Thread");}
 							h.setMsg(msg);
 							// post to ui thread
 							h.post(h);
@@ -312,19 +201,53 @@ public class RsService extends Service implements Runnable {
 								h=msgHandlersById.get(msg.msgId);
 							}
 							if(h!=null){
-								Log.v(TAG,"run(): received Msg with msgId Handler, will now post Msg to UI Thread");
+								if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with msgId Handler, will now post Msg to UI Thread");}
 								h.setMsg(msg);
 								// post to ui thread
 								h.post(h);
 							}
 							else{
-								System.err.print("Error: msgHandler not found");
+								if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}
 							}
 						}
 					}
 				}
 				
 			}
+		}
+		
+	}
+
+	
+	private void _connect(){
+		try {
+			synchronized(mServerData){
+				if(DEBUG){System.err.println("RsCtrlService: _connect() ...");}
+				
+				mSocket=new Socket();
+				mSocket.connect(new InetSocketAddress(mServerData.hostname,mServerData.port), 2000);
+				mTransport=new ClientTransport(mSocket);
+				mTransport.start(mServerData.hostkey, 2000);
+				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
+				mChannel=mTransport.openSession(2000);
+				mChannel.invokeShell(2000);
+				mInputStream=mChannel.getInputStream();
+				mOutputStream=mChannel.getOutputStream();
+				
+				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
+				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+				
+				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			if(DEBUG){System.err.println(e);}
+			
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			
+			//noch zu händeln: Java.net.SocketEception Network unreachable
+			// und noch weitere
 		}
 	}
 	
@@ -343,17 +266,16 @@ public class RsService extends Service implements Runnable {
 		bb.putInt(msg.body.length);
 		bb.put(msg.body);
 		try {
-			Log.v(TAG,"_sendMsg()");
-			outputStream.write(bb.array());
-			System.out.println("sendRpc:");
-			System.out.println(util.byteArrayToHexString(bb.array()));
-			Log.v(TAG,"_sendMsg: success");
+			if(DEBUG){System.err.println("RsCtrlService: _sendMsg() ...");}
+			mOutputStream.write(bb.array());
+			
+			//System.out.println("sendRpc:");
+			//System.out.println(util.byteArrayToHexString(bb.array()));
+				
+			if(DEBUG){System.err.println("RsCtrlService: _sendMsg(): success");}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.e(TAG,Log.getStackTraceString(e));
-			//Log.e(TAG,"Stopping Thread");
-			//running=false;
-			//Thread.currentThread().interrupt();
+			if(DEBUG){System.err.println(e);}
 		}
 	}
 	
@@ -369,6 +291,10 @@ public class RsService extends Service implements Runnable {
 	private int curBodySize;
 	private byte[] curBody;
 	
+	/**
+	 * 
+	 * @return 
+	 */
 	private int _recvMsg(){
 		try {
 			switch(inputState){
@@ -461,9 +387,9 @@ public class RsService extends Service implements Runnable {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.e(TAG,Log.getStackTraceString(e));
+			if(DEBUG){System.err.println(e);}
 		}
 		return -1;
 	}
-
+	
 }

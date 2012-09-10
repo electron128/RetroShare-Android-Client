@@ -39,7 +39,7 @@
 		<link>
 			<name>protobuf</name>
 			<type>2</type>
-			<location>D:/protobuf-2.4.1/java/src/main/java</location>
+			<location>D:/Java_Dev/protobuf-2.4.1/java/src/main/java</location>
 		</link>
 		<link>
 			<name>rsctrl</name>
