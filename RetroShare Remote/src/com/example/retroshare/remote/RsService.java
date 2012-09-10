@@ -25,16 +25,18 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-public class RsService extends Service implements Runnable {
+public class RsService extends Service /*implements Runnable */{
 	private static final String TAG="RsService";
 	private static final int MAGIC_CODE = 0x137f0001;
 	
 	//private Handler mHandler;
 	@Override
 	public void onCreate(){
+		mRsCtrlService=new RsCtrlService(new UiThreadHandler());
+		
 		int RESPONSE=(0x01<<24);
 		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
-		registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
+		mRsCtrlService.registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
 	}
 	
 	//---------------------------------------------
@@ -88,8 +90,39 @@ public class RsService extends Service implements Runnable {
 			return RsService.this;
 		}
 	}
+	
+	
+	// neu neu nicht löschen
+	private class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
+		@Override
+		public void postToUiThread(Runnable r) {
+			post(r);
+		}	
+	}
+	
+	public RsCtrlService mRsCtrlService;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//--------------------------------------------
 	
+	/*
 	private Socket socket;
 	private ClientTransport transport;
 	private Channel channel;
@@ -102,8 +135,10 @@ public class RsService extends Service implements Runnable {
 	private enum ConnectAction{
 		CONNECT,DISCONNECT,NONE
 	}
+	*/
 	
 	// use with synchronized
+	/*
 	private ConnectState connectState=ConnectState.OFFLINE;
 	private ConnectAction connectAction=ConnectAction.NONE;
 	
@@ -113,6 +148,7 @@ public class RsService extends Service implements Runnable {
 			connectAction=ConnectAction.CONNECT;
 		}
 	}
+	
 	
 	// use with synchronized
 	
@@ -143,33 +179,7 @@ public class RsService extends Service implements Runnable {
 		}
 	}
 	
-	
-	
-	
-	
-	
-	// neu neu nicht löschen
-	private class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
-		@Override
-		public void postToUiThread(Runnable r) {
-			post(r);
-		}	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	private void _connect(){
 		try {
@@ -465,5 +475,7 @@ public class RsService extends Service implements Runnable {
 		}
 		return -1;
 	}
+	
+	*/
 
 }

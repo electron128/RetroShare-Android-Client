@@ -28,7 +28,7 @@ public class RsCtrlService implements Runnable{
 		public byte[] body;
 	}
 	
-	// todo
+	// TODO: callbacks
 	public interface RsCtrlServiceCallback{
 		public void onConnectionStateChanged();
 	}
@@ -246,8 +246,9 @@ public class RsCtrlService implements Runnable{
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			
-			//noch zu händeln: Java.net.SocketEception Network unreachable
-			// und noch weitere
+			//noch zu händeln:
+			// WLAN aus: Java.net.SocketException: Network unreachable
+			// Java.net.SocketTimeoutException: Transport endpoint is not connected 
 		}
 	}
 	

@@ -20,7 +20,8 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
 
-import com.example.retroshare.remote.RsService.RsMessage;
+import com.example.retroshare.remote.RsCtrlService.RsMessage;
+//import com.example.retroshare.remote.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatlobbyChatActivity extends RsActivityBase {
@@ -52,10 +53,10 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 			reqb.setLobbyId(lobbyId);
 			reqb.setAction(RequestJoinOrLeaveLobby.LobbyAction.JOIN_OR_ACCEPT);
 			
-	    	RsMessage msg=mRsService.new RsMessage();
+	    	RsMessage msg=new RsMessage();
 	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
 	    	msg.body=reqb.build().toByteArray();
-	    	mRsService.sendMsg(msg, null);
+	    	mRsService.mRsCtrlService.sendMsg(msg, null);
 		}
 		
 		// Register for Events
@@ -71,7 +72,7 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 			//is now done in RsService::onCreate()
 			//->so it happens only once, and even if ChatlobbyChatActivity is not started
 			//only get the handler from RsService here
-			mChatHandler=(ChatHandler)mRsService.getHandler(MsgId_EventChatMessage);
+			mChatHandler=(ChatHandler)mRsService.mRsCtrlService.getHandler(MsgId_EventChatMessage);
 			//register at handler
 			mChatHandler.addListener(lobbyId,this);
 			//get data from handler and update views
@@ -108,10 +109,10 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 				RequestRegisterEvents.Builder reqb= RequestRegisterEvents.newBuilder();
 				reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
 				
-		    	RsMessage msg=mRsService.new RsMessage();
+		    	RsMessage msg=new RsMessage();
 		    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
 		    	msg.body=reqb.build().toByteArray();
-		    	mRsService.sendMsg(msg, null);
+		    	mRsService.mRsCtrlService.sendMsg(msg, null);
 			}
 			
 		}
@@ -216,10 +217,10 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 				.setMsg(s)
 		);
 		
-    	RsMessage msg=mRsService.new RsMessage();
+    	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
     	msg.body=reqb.build().toByteArray();
-    	mRsService.sendMsg(msg, null);
+    	mRsService.mRsCtrlService.sendMsg(msg, null);
 	}
 	
 

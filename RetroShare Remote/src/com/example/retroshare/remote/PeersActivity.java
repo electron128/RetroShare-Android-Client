@@ -5,7 +5,8 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import com.example.retroshare.remote.RsService.RsMessage;
+import com.example.retroshare.remote.RsCtrlService.RsMessage;
+//import com.example.retroshare.remote.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.os.Bundle;
@@ -38,10 +39,10 @@ public class PeersActivity extends RsActivityBase {
     		byte[] b;
     		b=req.toByteArray();
     		//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
-        	RsMessage msg=mRsService.new RsMessage();
+        	RsMessage msg= new RsMessage();
         	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
         	msg.body=b;
-        	mRsService.sendMsg(msg, new PeersHandler());
+        	mRsService.mRsCtrlService.sendMsg(msg, new PeersHandler());
         	//EditText text=(EditText) findViewById(R.id.editText1);
         	//text.setText("Bound");
         }

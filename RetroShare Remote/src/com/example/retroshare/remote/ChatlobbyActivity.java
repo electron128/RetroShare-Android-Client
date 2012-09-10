@@ -22,7 +22,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.retroshare.remote.RsService.RsMessage;
+import com.example.retroshare.remote.RsCtrlService.RsMessage;
+//import com.example.retroshare.remote.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatlobbyActivity extends RsActivityBase {
@@ -69,10 +70,10 @@ public class ChatlobbyActivity extends RsActivityBase {
     private void getChatLobbies(){
     	RequestChatLobbies.Builder reqb=RequestChatLobbies.newBuilder();
     	reqb.setLobbySet(RequestChatLobbies.LobbySet.LOBBYSET_ALL);
-    	RsMessage msg=mRsService.new RsMessage();
+    	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestChatLobbies_VALUE;
     	msg.body=reqb.build().toByteArray();
-    	mRsService.sendMsg(msg, new ChatHandler());
+    	mRsService.mRsCtrlService.sendMsg(msg, new ChatHandler());
     }
     
     private static final int RESPONSE=(0x01<<24);

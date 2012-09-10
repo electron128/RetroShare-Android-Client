@@ -117,7 +117,7 @@ public class MainActivity extends RsActivityBase {
     public void connect(View v){
     	Log.v(TAG, "connect");
         if(mBound){
-        	mRsService.startThread();
+        	//mRsService.startThread();
         	
         	RsServerData d=new RsServerData();
         	//d.hostname="192.168.16.2";
@@ -138,8 +138,8 @@ public class MainActivity extends RsActivityBase {
         	
         	Log.v(TAG,"connecting to Server: \""+d.user+":"+d.password+"@"+d.hostname+":"+Integer.toString(d.port)+"\"");
         	
-        	mRsService.setServerData(d);
-        	mRsService.connect();
+        	mRsService.mRsCtrlService.setServerData(d);
+        	mRsService.mRsCtrlService.connect();
             //EditText text2=(EditText) findViewById(R.id.editText1);
             //text2.setText(output.toString());
         }

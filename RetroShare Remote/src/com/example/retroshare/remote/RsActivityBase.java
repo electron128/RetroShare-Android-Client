@@ -1,7 +1,7 @@
 package com.example.retroshare.remote;
 
 import com.example.retroshare.remote.RsService.RsBinder;
-import com.example.retroshare.remote.RsService.RsMessage;
+//import com.example.retroshare.remote.RsService.RsMessage;
 
 import android.app.Activity;
 import android.content.ComponentName;

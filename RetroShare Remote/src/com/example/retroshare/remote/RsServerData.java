@@ -7,11 +7,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import net.lag.jaramiko.PKey;
+import net.lag.jaramiko.SSHException;
 
-// todo: test test serialise hostkey
-// todo: implement cloneable
+// TODO: test serialization and clone()
 // http://java.sun.com/developer/technicalArticles/Programming/serialization/
-public class RsServerData implements Serializable {
+public class RsServerData implements Serializable, Cloneable{
 	private static final long serialVersionUID = 0;
 	
 	public String user;
@@ -22,7 +22,7 @@ public class RsServerData implements Serializable {
 	
 	@Override
 	public String toString(){
-		return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+hostkey+"\"";
+		return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
 		
 	}
 	
@@ -47,5 +47,20 @@ public class RsServerData implements Serializable {
 		else{
 			hostkey=null;
 		}
+	}
+	
+	protected RsServerData clone(){
+		RsServerData d=new RsServerData();
+		d.user=user;
+		d.password=password;
+		d.hostname=hostname;
+		d.port=port;
+		try {
+			d.hostkey=PKey.createFromData(hostkey.toByteArray());
+		} catch (SSHException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return d;
 	}
 }
