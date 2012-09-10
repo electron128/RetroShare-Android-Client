@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">RetroShare Remote</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">RetroShare Remote</string>
+    <string name="connect">Connect</string>
+
+</resources>

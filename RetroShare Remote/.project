@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>RetroShare Remote</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.PreCompilerBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.android.ide.eclipse.adt.ApkBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>jaramiko</name>
+			<type>2</type>
+			<location>D:/Java_Dev/jaramiko-151/java</location>
+		</link>
+		<link>
+			<name>protobuf</name>
+			<type>2</type>
+			<location>D:/protobuf-2.4.1/java/src/main/java</location>
+		</link>
+		<link>
+			<name>rsctrl</name>
+			<type>2</type>
+			<location>D:/Retroshare_Dev/v0.5-gxs-b1/rsctrl/src/genjava</location>
+		</link>
+	</linkedResources>
+</projectDescription>
