@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
@@ -29,8 +32,21 @@ public class RsCtrlService implements Runnable{
 	}
 	
 	// TODO: callbacks
-	public interface RsCtrlServiceCallback{
+	public interface RsCtrlServiceListener{
 		public void onConnectionStateChanged();
+	}
+	
+	private Set<RsCtrlServiceListener> mListeners=new HashSet<RsCtrlServiceListener>();
+	public void registerListener(RsCtrlServiceListener l){
+		mListeners.add(l);
+	}
+	public void unregisterListener(RsCtrlServiceListener l){
+		mListeners.remove(l);
+	}
+	private void notifyListeners(){
+		for(RsCtrlServiceListener l:mListeners){
+			l.onConnectionStateChanged();
+		}
 	}
 	
 	public enum ConnectState{
@@ -224,10 +240,18 @@ public class RsCtrlService implements Runnable{
 			synchronized(mServerData){
 				if(DEBUG){System.err.println("RsCtrlService: _connect() ...");}
 				
+				boolean newHostKey=false;
+				if(mServerData.hostkey==null){
+					newHostKey=true;
+				}
+				
 				mSocket=new Socket();
 				mSocket.connect(new InetSocketAddress(mServerData.hostname,mServerData.port), 2000);
 				mTransport=new ClientTransport(mSocket);
 				mTransport.start(mServerData.hostkey, 2000);
+				if(newHostKey){
+					mServerData.hostkey=mTransport.getRemoteServerKey();
+				}
 				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
 				mChannel=mTransport.openSession(2000);
 				mChannel.invokeShell(2000);
@@ -236,6 +260,13 @@ public class RsCtrlService implements Runnable{
 				
 				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
 				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+				
+				mUiThreadHandler.postToUiThread(new Runnable(){
+					@Override
+					public void run(){
+						notifyListeners();
+					}
+				});
 				
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
 			}

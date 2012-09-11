@@ -26,15 +26,21 @@ public class RsServerData implements Serializable, Cloneable{
 		
 	}
 	
-	private void writeObject(ObjectOutputStream out) throws IOException{
-		out.defaultWriteObject();
-		if(hostkey!=null){
-			out.writeBoolean(true);
-			out.writeObject(hostkey.toByteArray());
+	private void writeObject(ObjectOutputStream out){
+		try {
+				out.defaultWriteObject();
+				if(hostkey!=null){
+				out.writeBoolean(true);
+				out.writeObject(hostkey.toByteArray());
+			}
+			else{
+				out.writeBoolean(false);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		else{
-			out.writeBoolean(false);
-		}
+
 		
 	}
 	

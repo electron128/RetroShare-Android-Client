@@ -31,7 +31,7 @@ public class MainActivity extends RsActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        
+        /*
     	RsServerData[] d=new RsServerData[2];
     	d[0]=new RsServerData();
     	d[0].hostname="192.168.16.2";
@@ -40,12 +40,13 @@ public class MainActivity extends RsActivityBase {
     	d[0].password="ubuntu123";
     	RsServerData[] x=new RsServerData[2];
     	x=d.clone();
-    	Log.v(TAG,"d[0]\""+d[0].user+":"+d[0].password+"@"+d[0].hostname+":"+Integer.toString(d[0].port)+"\"");
-    	Log.v(TAG,"x[0]\""+d[0].user+":"+x[0].password+"@"+x[0].hostname+":"+Integer.toString(x[0].port)+"\"");
+    	Log.v(TAG,"d[0]"+d[0]);
+    	Log.v(TAG,"x[0]"+d[0]);
+    	*/
     	
         
     	EditText text=(EditText) findViewById(R.id.editTextHostname);
-    	text.setText("192.168.16.2");
+    	text.setText("192.168.137.1");
     	
     	text=(EditText) findViewById(R.id.editTextPort);
     	text.setText("7022");
@@ -114,6 +115,25 @@ public class MainActivity extends RsActivityBase {
         
     }
     
+    @Override
+    protected void onServiceConnected(){
+    	Log.v(TAG,"Saved ServerData: "+mRsService.mRsCtrlService.getServerData());
+    	/*
+    	EditText text=(EditText) findViewById(R.id.editTextHostname);
+    	text.setText("192.168.16.2");
+    	
+    	text=(EditText) findViewById(R.id.editTextPort);
+    	text.setText("7022");
+    	
+    	text=(EditText) findViewById(R.id.editTextUser);
+    	text.setText("user");
+    	
+    	text=(EditText) findViewById(R.id.editTextPassword);
+    	text.setText("ubuntu123");
+    	*/
+        
+    }
+    
     public void connect(View v){
     	Log.v(TAG, "connect");
         if(mBound){
@@ -136,7 +156,7 @@ public class MainActivity extends RsActivityBase {
         	text=(EditText) findViewById(R.id.editTextPassword);
         	d.password=text.getText().toString();
         	
-        	Log.v(TAG,"connecting to Server: \""+d.user+":"+d.password+"@"+d.hostname+":"+Integer.toString(d.port)+"\"");
+        	Log.v(TAG,"connecting to Server: "+d);
         	
         	mRsService.mRsCtrlService.setServerData(d);
         	mRsService.mRsCtrlService.connect();

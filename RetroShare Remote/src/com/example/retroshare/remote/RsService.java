@@ -1,12 +1,21 @@
 package com.example.retroshare.remote;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.io.StreamCorruptedException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
 
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
@@ -25,18 +34,61 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-public class RsService extends Service /*implements Runnable */{
+public class RsService extends Service implements RsCtrlServiceListener{
 	private static final String TAG="RsService";
 	private static final int MAGIC_CODE = 0x137f0001;
+	
+	
+	private static class Datapack implements Serializable{
+		RsServerData serverData=new RsServerData();
+	}
+	private Datapack mDatapack;
 	
 	//private Handler mHandler;
 	@Override
 	public void onCreate(){
+		try {
+			ObjectInputStream i=new ObjectInputStream(openFileInput("RsService"));
+			mDatapack=(Datapack) i.readObject();
+			
+			Log.v(TAG, "read Datapack, Datapack.serverData="+mDatapack.serverData);
+		} catch (StreamCorruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(mDatapack==null){mDatapack=new Datapack();}
+		
 		mRsCtrlService=new RsCtrlService(new UiThreadHandler());
+		mRsCtrlService.setServerData(mDatapack.serverData);
+		mRsCtrlService.registerListener(this);
 		
 		int RESPONSE=(0x01<<24);
 		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
 		mRsCtrlService.registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
+	}
+	
+	public void saveData(){
+		try {
+			mDatapack.serverData=mRsCtrlService.getServerData();
+			Log.v(TAG, "trying to save Datapack, Datapack.serverData="+mDatapack.serverData);
+			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService", 0));
+			o.writeObject(mDatapack);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	//---------------------------------------------
@@ -101,6 +153,12 @@ public class RsService extends Service /*implements Runnable */{
 	}
 	
 	public RsCtrlService mRsCtrlService;
+
+	@Override
+	public void onConnectionStateChanged() {
+		saveData();
+		
+	}
 	
 	
 	
