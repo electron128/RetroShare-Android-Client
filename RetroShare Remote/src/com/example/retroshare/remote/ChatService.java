@@ -91,11 +91,14 @@ public class ChatService implements ServiceInterface{
 		
 		// response ChatMessage
 		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE)){
-			System.out.println("received Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE");
+			System.err.println("received Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE");
 			try {
 				EventChatMessage resp=EventChatMessage.parseFrom(msg.body);
 				_addChatMessageToHistory(resp.getMsg());
 				//_addChatMessageToHistory() will notify Listeners
+				
+				//System.err.println(resp.getMsg());
+				
 			} catch (InvalidProtocolBufferException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

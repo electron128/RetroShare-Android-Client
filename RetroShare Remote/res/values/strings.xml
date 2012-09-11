@@ -8,5 +8,7 @@
     <string name="leave_lobby">leave lobby (TODO)</string>
     <string name="send_chat">send chat</string>
     <string name="insert_message_here">insert message here</string>
+    <string name="peers">peers</string>
+    <string name="chat">chat</string>
 
 </resources>

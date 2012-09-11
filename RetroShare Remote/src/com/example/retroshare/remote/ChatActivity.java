@@ -15,6 +15,7 @@ import rsctrl.chat.Chat.RequestRegisterEvents;
 import rsctrl.chat.Chat.RequestSendMessage;
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
+import rsctrl.core.Core.Person;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -66,10 +67,22 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 		}
 		
 		if(mChatLobbyInfo!=null){
+			//chatlobby
 			mRsService.mRsCtrlService.chatService.joinChatLobby(mChatLobbyInfo);
 			TextView tv=(TextView) findViewById(R.id.textView1);
 			tv.setText(mChatLobbyInfo.getLobbyName());
+		} else{
+			//private chat
+			TextView tv=(TextView) findViewById(R.id.textView1);
+			Person p=mRsService.mRsCtrlService.peersService.getPersonFromSslId(mChatId.getChatId());
+			String name="Error: no Person found";
+			if(p!=null){
+				name=p.getName();
+			}
+			tv.setText(name);
 		}
+		
+		updateViews();
 		
 		mRsService.mRsCtrlService.chatService.registerListener(this);
 		

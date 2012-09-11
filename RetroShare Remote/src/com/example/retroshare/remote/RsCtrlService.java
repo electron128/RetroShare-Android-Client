@@ -85,6 +85,7 @@ public class RsCtrlService implements Runnable{
 	
 	private Set<ServiceInterface> Services=new HashSet<ServiceInterface>();
 	public ChatService chatService;
+	public PeersService peersService;
 	
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
@@ -94,6 +95,8 @@ public class RsCtrlService implements Runnable{
 		
 		chatService=new ChatService(this);
 		Services.add(chatService);
+		peersService=new PeersService(this);
+		Services.add(peersService);
 	}
 	
 	// **************************

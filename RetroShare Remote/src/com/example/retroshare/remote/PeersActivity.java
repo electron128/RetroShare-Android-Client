@@ -1,37 +1,182 @@
 package com.example.retroshare.remote;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import rsctrl.chat.Chat;
+import rsctrl.chat.Chat.ChatId;
+import rsctrl.chat.Chat.ChatLobbyInfo;
+import rsctrl.chat.Chat.ChatType;
 import rsctrl.core.Core;
+import rsctrl.core.Core.Location;
+import rsctrl.core.Core.Person;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
-//import com.example.retroshare.remote.RsService.RsMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.example.retroshare.remote.PeersService.PeersServiceListener;
 
+import android.content.Context;
+import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class PeersActivity extends RsActivityBase {
 	private static final String TAG="PeersActivity";
+	
+	private PeersListAdapterListener adapter;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_peers);
+        //setContentView(R.layout.activity_peers);
+        
+        adapter=new PeersListAdapterListener(this);
+        ListView lv=new ListView(this);
+        lv.setAdapter(adapter);
+        lv.setOnItemClickListener(adapter);
+        setContentView(lv);
     }
     
     @Override
     protected void onServiceConnected(){
-    	showPeers();
+        mRsService.mRsCtrlService.peersService.registerListener(adapter);
+        mRsService.mRsCtrlService.peersService.updatePeersList();
+    	
+    	
+    	//showPeers();
     }
     
     //Button Handler
-    public void showPeers(View view){showPeers();}
+    public void showPeers(View view){
+    	//showPeers();}
+    }
     
+    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, PeersServiceListener{
+    	
+    	private List<Person> personList=new ArrayList<Person>();
+    	private List<Location> locationList=new ArrayList<Location>();
+    	private Map<Location,Person> mapLocationToPerson=new HashMap<Location,Person>();
+    	private List<DataSetObserver> observerList=new ArrayList<DataSetObserver>();
+    	
+    	private LayoutInflater mInflater;
+    	
+    	public PeersListAdapterListener(Context context) {
+    		 mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	}
+    	
+    	public void setData(List<Person> pl){
+    		personList=pl;
+    		mapLocationToPerson.clear();
+    		for(Person p:personList){
+    			for(Location l:p.getLocationsList()){
+    				locationList.add(l);
+    				mapLocationToPerson.put(l, p);
+    			}
+    		}
+    		for(DataSetObserver obs:observerList){
+    			obs.onChanged();
+    		}
+    	}
+    	
+    	@Override
+    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
+    		Location loc=locationList.get(position);
+    		
+    		Intent i=new Intent(PeersActivity.this,ChatActivity.class);
+    		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
+    		// keine lobby info
+    		//i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
+    		startActivity(i);
+    		
+    	}
+
+		@Override
+		public int getCount() {
+			return locationList.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return locationList.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
+	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
+	        //TextView textView2 = (TextView) view.findViewById(R.id.textView2);
+	        Location l=locationList.get(position);
+	        Person p=mapLocationToPerson.get(l);
+	        textView1.setText(p.getName()+" ("+l.getLocation()+") "+Integer.toBinaryString(l.getState()));
+	        //textView2.setText("Thema:"+LobbyList.get(position).getLobbyTopic()+"\rLobbyId:"+LobbyList.get(position).getLobbyId());
+	        return view;
+		}
+
+		@Override
+		public int getViewTypeCount() {
+			return 1;
+		}
+
+		@Override
+		public boolean hasStableIds() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return locationList.isEmpty();
+		}
+
+		@Override
+		public void registerDataSetObserver(DataSetObserver observer) {
+			observerList.add(observer);
+		}
+
+		@Override
+		public void unregisterDataSetObserver(DataSetObserver observer) {
+			observerList.remove(observer);
+		}
+
+		@Override public boolean areAllItemsEnabled() {return true;}
+		@Override public boolean isEnabled(int position) {return true;}
+		
+		// called by ChatService
+		@Override
+		public void update() {
+			setData(mRsService.mRsCtrlService.peersService.getPeersList());
+		}
+    	
+    }
+    
+    /*
     public void showPeers(){
         if(mBound){
+        	
     		RequestPeers.Builder reqb= RequestPeers.newBuilder();
     		reqb.setSet(RequestPeers.SetOption.FRIENDS);
     		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
@@ -51,6 +196,7 @@ public class PeersActivity extends RsActivityBase {
         	text.setText("Error: not bound");
         }
     }
+ 
     
     private static final int RESPONSE=(0x01<<24);
     
@@ -74,7 +220,7 @@ public class PeersActivity extends RsActivityBase {
     		}
     	}
     }
-    
+    */
     
     
     
