@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rsctrl.chat.Chat;
+import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatLobbyInfo;
+import rsctrl.chat.Chat.ChatType;
 import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.chat.Chat.ResponseChatLobbies;
 import rsctrl.core.Core;
@@ -138,10 +140,18 @@ public class ChatlobbyActivity extends RsActivityBase {
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
     		ChatLobbyInfo lobbyInfo=LobbyList.get(position);
+    		
+    		Intent i=new Intent(ChatlobbyActivity.this,ChatActivity.class);
+    		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(lobbyInfo.getLobbyId()).build().toByteArray());
+    		i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
+    		startActivity(i);
+    		
+    		/*
     		Intent i=new Intent(ChatlobbyActivity.this,ChatlobbyChatActivity.class);
     		i.putExtra("lobbyId", lobbyInfo.getLobbyId());
     		i.putExtra("lobbyName", lobbyInfo.getLobbyName());
     		startActivity(i);
+    		*/
     		
     	}
 

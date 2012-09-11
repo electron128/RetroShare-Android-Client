@@ -32,7 +32,7 @@
 	    </activity>ChatlobbyActivityChatlobbyActivity
 	    <service android:name=".RsService"></service>
 	    <activity android:name=".ChatlobbyActivity"></activity>
-	    <activity android:name=".ChatlobbyChatActivity"></activity>
+	    <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>

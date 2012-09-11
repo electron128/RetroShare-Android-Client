@@ -1,10 +1,12 @@
 package com.example.retroshare.remote;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rsctrl.chat.Chat;
 import rsctrl.chat.Chat.ChatId;
+import rsctrl.chat.Chat.ChatLobbyInfo;
 import rsctrl.chat.Chat.ChatMessage;
 import rsctrl.chat.Chat.ChatType;
 import rsctrl.chat.Chat.EventChatMessage;
@@ -18,30 +20,60 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.retroshare.remote.ChatService.ChatServiceListener;
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 //import com.example.retroshare.remote.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class ChatlobbyChatActivity extends RsActivityBase {
+public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 	private static final String TAG="ChatlobbyChatActivity";
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_chatlobbychat);
+	    
+	    Button b=(Button) findViewById(R.id.button2);
+	    b.setVisibility(View.GONE);
 	}
 	
-	private ChatHandler mChatHandler=null;
+	//private ChatHandler mChatHandler=null;
 	
 	// set to true once, to prevent multiple registration
 	// rs-nogui will send events twice if we register twice
-	private static boolean haveRegisteredEventsOnServer=false;
+	//private static boolean haveRegisteredEventsOnServer=false;
+	
+	private ChatId mChatId;
+	private ChatLobbyInfo mChatLobbyInfo;
 	
 	protected void onServiceConnected(){
+		
+		mRsService.mRsCtrlService.chatService.registerForEventsAtServer();
+		
+		try {
+			mChatId=ChatId.parseFrom(getIntent().getByteArrayExtra("ChatId"));
+			if(getIntent().hasExtra("ChatLobbyInfo")){
+				mChatLobbyInfo=ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra("ChatLobbyInfo"));
+			}
+		} catch (InvalidProtocolBufferException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(mChatLobbyInfo!=null){
+			mRsService.mRsCtrlService.chatService.joinChatLobby(mChatLobbyInfo);
+			TextView tv=(TextView) findViewById(R.id.textView1);
+			tv.setText(mChatLobbyInfo.getLobbyName());
+		}
+		
+		mRsService.mRsCtrlService.chatService.registerListener(this);
+		
+		/*
 		// Join Lobby
 		{
 			Intent i=getIntent();
@@ -60,7 +92,8 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 	    	msg.body=reqb.build().toByteArray();
 	    	mRsService.mRsCtrlService.sendMsg(msg, null);
 		}
-		
+		*/
+		/*
 		// Register for Events
 		{
 			int RESPONSE=(0x01<<24);
@@ -79,7 +112,7 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 			mChatHandler.addListener(lobbyId,this);
 			//get data from handler and update views
 			updateViews();
-			
+			*/
 			/*
 			mRsService.registerMsgHandler(MsgId_EventChatMessage, new RsMessageHandler(){
 				private static final int RESPONSE=(0x01<<24);
@@ -103,7 +136,7 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 				}
 			});
 			*/
-			
+			/*
 			//at Server
 			if(haveRegisteredEventsOnServer==false){
 				haveRegisteredEventsOnServer=true;
@@ -116,22 +149,27 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 		    	msg.body=reqb.build().toByteArray();
 		    	mRsService.mRsCtrlService.sendMsg(msg, null);
 			}
-			
-		}
+			*/
+		
+	//	}
 		
 		//_sendChatMsg("<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==' alt='Red dot'>");
 	}
 	
+		
+		
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
+		/*
 		Intent i=getIntent();
 		String lobbyId=i.getStringExtra("lobbyId");
 		//remove from handler, so activity can get garbage collected
 		mChatHandler.removeListener(lobbyId);
+		*/
 	}
 	
-	
+	/*
 	public static class ChatHandler extends RsMessageHandler{
 		private static final String TAG="ChatHandler";
 		
@@ -182,13 +220,25 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 			}
 		}
 	}
+	*/
 	
 	public void updateViews(){
-		Intent i=getIntent();
-		String lobbyId=i.getStringExtra("lobbyId");
-		String history=mChatHandler.ChatHistories.get(lobbyId);
-		if(history==null){history=TAG+".updateViews(): mChatHandler.ChatHistories.get("+lobbyId+")returned null";}
-		String base64 = android.util.Base64.encodeToString(history.getBytes(), android.util.Base64.DEFAULT);
+		//Intent i=getIntent();
+		//String lobbyId=i.getStringExtra("lobbyId");
+		//String history=mChatHandler.ChatHistories.get(lobbyId);
+		List<ChatMessage> ChatHistory=mRsService.mRsCtrlService.chatService.getChatHistoryForChatId(mChatId);
+		
+		String historyString="";
+		//ad meta to define encoding, needed to display צהü
+		historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">";
+		
+		for(ChatMessage msg:ChatHistory){
+			historyString+="<span style=\"color:dodgerblue;\">"+msg.getPeerNickname()+":</span> "+msg.getMsg()+"</br>";
+		}
+		
+		//if(history==null){history=TAG+".updateViews(): mChatHandler.ChatHistories.get("+lobbyId+")returned null";}
+		String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
+		
 		//ScrollView sv=(ScrollView) findViewById(R.id.scrollView1);
 		//sv.
 		((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64"); 
@@ -196,9 +246,13 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 	
 	public void sendChatMsg(View v){
 		EditText et=(EditText) findViewById(R.id.editText1);
-		_sendChatMsg(et.getText().toString());
+		//_sendChatMsg(et.getText().toString());
+		
+		ChatMessage msg=ChatMessage.newBuilder().setId(mChatId).setMsg((et.getText().toString())).build();
+		
+		mRsService.mRsCtrlService.chatService.sendChatMessage(msg);
 	}
-	
+	/*
 	private void _sendChatMsg(String s){
 		Intent i=getIntent();
 		String lobbyId=i.getStringExtra("lobbyId");
@@ -226,10 +280,10 @@ public class ChatlobbyChatActivity extends RsActivityBase {
     	msg.body=reqb.build().toByteArray();
     	mRsService.mRsCtrlService.sendMsg(msg, null);
 	}
-	
+	*/
 
 	
-	private void _sayHi(){
+	//private void _sayHi(){
 /*************************************
 		  \___/
 		  /o o\       |_| '
@@ -241,6 +295,13 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 		   | |
 **************************************/   
 		
-		_sendChatMsg("<pre>  \\___/\n  /o o\\       |_| '\n '-----'      | | |\n||     ||\n||     ||\n||     ||\n '-----'\n   | |</pre>");
+//		_sendChatMsg("<pre>  \\___/\n  /o o\\       |_| '\n '-----'      | | |\n||     ||\n||     ||\n||     ||\n '-----'\n   | |</pre>");
+//	}
+	
+	// will be called by ChatService
+	@Override
+	public void update() {
+		updateViews();
+		
 	}
 }

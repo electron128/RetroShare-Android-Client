@@ -9,10 +9,15 @@ import java.util.Set;
 
 import rsctrl.chat.Chat;
 import rsctrl.chat.Chat.ChatId;
+import rsctrl.chat.Chat.ChatLobbyInfo;
 import rsctrl.chat.Chat.ChatMessage;
+import rsctrl.chat.Chat.EventChatMessage;
 import rsctrl.chat.Chat.RequestChatLobbies;
+import rsctrl.chat.Chat.RequestJoinOrLeaveLobby;
+import rsctrl.chat.Chat.RequestRegisterEvents;
 import rsctrl.chat.Chat.RequestSendMessage;
 import rsctrl.chat.Chat.ResponseChatLobbies;
+import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
 
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
@@ -84,16 +89,59 @@ public class ChatService implements ServiceInterface{
 			}
 		}
 		
+		// response ChatMessage
+		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE)){
+			System.out.println("received Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE");
+			try {
+				EventChatMessage resp=EventChatMessage.parseFrom(msg.body);
+				_addChatMessageToHistory(resp.getMsg());
+				//_addChatMessageToHistory() will notify Listeners
+			} catch (InvalidProtocolBufferException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
 	}
 	
-
+	// set to true once, to prevent multiple registration
+	// rs-nogui will send events twice if we register twice
+	private boolean haveRegisteredEventsOnServer=false;
+	public void registerForEventsAtServer(){
+		//at Server
+		if(haveRegisteredEventsOnServer==false){
+			haveRegisteredEventsOnServer=true;
+			
+			RequestRegisterEvents.Builder reqb= RequestRegisterEvents.newBuilder();
+			reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
+			
+	    	RsMessage msg=new RsMessage();
+	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
+	    	msg.body=reqb.build().toByteArray();
+	    	mRsCtrlService.sendMsg(msg);
+		}
+	}
 	
+	
+
+	public void joinChatLobby(ChatLobbyInfo li){
+		
+		RequestJoinOrLeaveLobby.Builder reqb= RequestJoinOrLeaveLobby.newBuilder();
+		reqb.setLobbyId(li.getLobbyId());
+		reqb.setAction(RequestJoinOrLeaveLobby.LobbyAction.JOIN_OR_ACCEPT);
+		
+    	RsMessage msg=new RsMessage();
+    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
+    	msg.body=reqb.build().toByteArray();
+    	mRsCtrlService.sendMsg(msg);
+	}
 	
 	public void sendChatMessage(ChatMessage m){
     	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
     	msg.body=RequestSendMessage.newBuilder().setMsg(m).build().toByteArray();
-    	mRsCtrlService.sendMsg(msg, null);
+    	mRsCtrlService.sendMsg(msg);
     	_addChatMessageToHistory(m);
 	}
 	
