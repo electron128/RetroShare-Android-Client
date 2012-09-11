@@ -24,6 +24,7 @@ public class RsCtrlService implements Runnable{
 	private static final boolean DEBUG=true;
 	
 	public static final int MAGIC_CODE = 0x137f0001;
+	public static final int RESPONSE=(0x01<<24);
 	
 	public static class RsMessage{
 		public int msgId;
@@ -82,11 +83,17 @@ public class RsCtrlService implements Runnable{
 	private OutputStream mOutputStream;
 	/*************************************/
 	
+	private Set<ServiceInterface> Services=new HashSet<ServiceInterface>();
+	public ChatService chatService;
+	
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
 		mThread=new Thread(this);
 		runThread=true;
 		mThread.start();
+		
+		chatService=new ChatService(this);
+		Services.add(chatService);
 	}
 	
 	// **************************
@@ -126,6 +133,10 @@ public class RsCtrlService implements Runnable{
 	private HashMap<Integer,RsMessageHandler> msgHandlers= new HashMap<Integer,RsMessageHandler>();
 	//holds pairs of <msgId,handler>
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
+	
+	public int sendMsg(RsMessage msg){
+		return sendMsg(msg,null);
+	}
 	
 	public int sendMsg(RsMessage msg, RsMessageHandler h){
 		int reqId=0;
@@ -198,7 +209,7 @@ public class RsCtrlService implements Runnable{
 				{
 					int msgType=_recvMsg();
 					if(msgType != -1){
-						RsMessage msg=new RsMessage();
+						final RsMessage msg=new RsMessage();
 						msg.msgId=curMsgId;
 						msg.reqId=curReqId;
 						msg.body=curBody;
@@ -226,6 +237,14 @@ public class RsCtrlService implements Runnable{
 								if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}
 							}
 						}
+						// tell every service about the message
+						mUiThreadHandler.postToUiThread(new Runnable(){
+							@Override public void run(){
+								for(ServiceInterface service:Services){
+									service.handleMessage(msg);
+								}
+							}
+						});
 					}
 				}
 				

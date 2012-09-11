@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 //import com.example.retroshare.remote.RsService.RsMessage;
@@ -46,8 +48,8 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 			String lobbyId=i.getStringExtra("lobbyId");
 			String lobbyName=i.getStringExtra("lobbyName");
 			
-			//TextView tv=(TextView) findViewById(R.id.textView1);
-			//tv.setText(tv.getText()+"Lobby Id: "+lobbyId+"\nLobby Name:"+lobbyName);
+			TextView tv=(TextView) findViewById(R.id.textView1);
+			tv.setText(lobbyName);
 			
 			RequestJoinOrLeaveLobby.Builder reqb= RequestJoinOrLeaveLobby.newBuilder();
 			reqb.setLobbyId(lobbyId);
@@ -187,6 +189,8 @@ public class ChatlobbyChatActivity extends RsActivityBase {
 		String history=mChatHandler.ChatHistories.get(lobbyId);
 		if(history==null){history=TAG+".updateViews(): mChatHandler.ChatHistories.get("+lobbyId+")returned null";}
 		String base64 = android.util.Base64.encodeToString(history.getBytes(), android.util.Base64.DEFAULT);
+		//ScrollView sv=(ScrollView) findViewById(R.id.scrollView1);
+		//sv.
 		((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64"); 
 	}
 	

@@ -22,6 +22,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.retroshare.remote.ChatService.ChatServiceListener;
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 //import com.example.retroshare.remote.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -64,9 +65,21 @@ public class ChatlobbyActivity extends RsActivityBase {
     
     @Override
     protected void onServiceConnected(){
-    	getChatLobbies();
+    	//getChatLobbies();
+    	
+        mRsService.mRsCtrlService.chatService.registerListener(mclla);
+        mRsService.mRsCtrlService.chatService.updateChatLobbies();
     }
     
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	if(mRsService!=null){
+    		mRsService.mRsCtrlService.chatService.updateChatLobbies();
+    	}
+    }
+    
+    /*
     private void getChatLobbies(){
     	RequestChatLobbies.Builder reqb=RequestChatLobbies.newBuilder();
     	reqb.setLobbySet(RequestChatLobbies.LobbySet.LOBBYSET_ALL);
@@ -75,7 +88,8 @@ public class ChatlobbyActivity extends RsActivityBase {
     	msg.body=reqb.build().toByteArray();
     	mRsService.mRsCtrlService.sendMsg(msg, new ChatHandler());
     }
-    
+    */
+    /*
     private static final int RESPONSE=(0x01<<24);
     
     private class ChatHandler extends RsMessageHandler{
@@ -88,9 +102,9 @@ public class ChatlobbyActivity extends RsActivityBase {
     			//mText.setText(mText.getText()+"received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE"+"\n");
     			try {
     				ResponseChatLobbies resp=Chat.ResponseChatLobbies.parseFrom(msg.body);
-    				/*for(Chat.ChatLobbyInfo li:resp.getLobbiesList()){
-    					mText.setText(mText.getText()+li.getLobbyName()+"\n");
-    				}*/
+    				//for(Chat.ChatLobbyInfo li:resp.getLobbiesList()){
+    				//	mText.setText(mText.getText()+li.getLobbyName()+"\n");
+    				//}
     				mclla.setData(resp.getLobbiesList());
     				
     			} catch (InvalidProtocolBufferException e) {
@@ -100,8 +114,9 @@ public class ChatlobbyActivity extends RsActivityBase {
     		}
     	}
     }
+    */
     
-    private class ChatLobbyListAdapterListener implements ListAdapter , OnItemClickListener{
+    private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener{
     	
     	private List<Chat.ChatLobbyInfo> LobbyList=new ArrayList<Chat.ChatLobbyInfo>();
     	private List<DataSetObserver> ObserverList=new ArrayList<DataSetObserver>();
@@ -189,6 +204,12 @@ public class ChatlobbyActivity extends RsActivityBase {
 
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
+		
+		// called by ChatService
+		@Override
+		public void update() {
+			setData(mRsService.mRsCtrlService.chatService.getChatLobbies());
+		}
     	
     }
 }

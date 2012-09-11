@@ -22,8 +22,12 @@ public class RsServerData implements Serializable, Cloneable{
 	
 	@Override
 	public String toString(){
-		return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
-		
+		try{
+			return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
+		} catch(NullPointerException e){
+			//System.err.println("NullPointerException in RsServerData.toString()");
+			return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key=Error in RsServerData.toString() \"";
+		}
 	}
 	
 	private void writeObject(ObjectOutputStream out){

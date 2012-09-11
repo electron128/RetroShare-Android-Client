@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
+import com.example.retroshare.remote.RsCtrlService.RsMessage;
 
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
@@ -145,11 +146,11 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	
 	
 	// neu neu nicht löschen
-	private class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
+	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
 		@Override
 		public void postToUiThread(Runnable r) {
 			post(r);
-		}	
+		}
 	}
 	
 	public RsCtrlService mRsCtrlService;
