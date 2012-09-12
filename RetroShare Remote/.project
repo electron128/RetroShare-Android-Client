@@ -34,17 +34,17 @@
 		<link>
 			<name>jaramiko</name>
 			<type>2</type>
-			<location>D:/Java_Dev/jaramiko-151/java</location>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/jaramiko-151/java</locationURI>
 		</link>
 		<link>
 			<name>protobuf</name>
 			<type>2</type>
-			<location>D:/Java_Dev/protobuf-2.4.1/java/src/main/java</location>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/protobuf-2.4.1/java/src/main/java</locationURI>
 		</link>
 		<link>
 			<name>rsctrl</name>
 			<type>2</type>
-			<location>D:/Retroshare_Dev/v0.5-gxs-b1/rsctrl/src/genjava</location>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/rsctrl</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
