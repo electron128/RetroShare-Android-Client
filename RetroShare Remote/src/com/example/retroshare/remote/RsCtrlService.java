@@ -49,6 +49,14 @@ public class RsCtrlService implements Runnable{
 			l.onConnectionStateChanged();
 		}
 	}
+	private void postNotifyListenersToUiThread(){
+		mUiThreadHandler.postToUiThread(new Runnable(){
+			@Override
+			public void run(){
+				notifyListeners();
+			}
+		});
+	}
 	
 	public enum ConnectState{
 		ONLINE,OFFLINE
@@ -104,12 +112,13 @@ public class RsCtrlService implements Runnable{
 	// can't change our serverdata which is used in our workerthread
 	public void setServerData(RsServerData d){
 		synchronized(mServerData){
-			mServerData=d;
+			mServerData=d.clone();
 		}
+		notifyListeners();
 	}
 	public RsServerData getServerData(){
 		synchronized(mServerData){
-			return mServerData;
+			return mServerData.clone();
 		}
 	}
 	// **************************
@@ -269,7 +278,12 @@ public class RsCtrlService implements Runnable{
 				
 				mSocket=new Socket();
 				mSocket.connect(new InetSocketAddress(mServerData.hostname,mServerData.port), 2000);
+				// try to find when crai in jaramiko is constructed
+				// error here
+				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport=new ClientTransport(mSocket);
+				// no more error here
+				System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport.start(mServerData.hostkey, 2000);
 				if(newHostKey){
 					mServerData.hostkey=mTransport.getRemoteServerKey();
@@ -283,12 +297,14 @@ public class RsCtrlService implements Runnable{
 				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
 				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 				
-				mUiThreadHandler.postToUiThread(new Runnable(){
+				postNotifyListenersToUiThread();
+				
+				/*mUiThreadHandler.postToUiThread(new Runnable(){
 					@Override
 					public void run(){
 						notifyListeners();
 					}
-				});
+				});*/
 				
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
 			}

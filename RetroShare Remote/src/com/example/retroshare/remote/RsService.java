@@ -75,6 +75,8 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		int RESPONSE=(0x01<<24);
 		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
 		//mRsCtrlService.registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
+		
+		
 	}
 	
 	public void saveData(){
@@ -158,7 +160,6 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	@Override
 	public void onConnectionStateChanged() {
 		saveData();
-		
 	}
 	
 	

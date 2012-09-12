@@ -10,5 +10,6 @@
     <string name="insert_message_here">insert message here</string>
     <string name="peers">peers</string>
     <string name="chat">chat</string>
+    <string name="chat_lobbies">chat lobbies</string>
 
 </resources>

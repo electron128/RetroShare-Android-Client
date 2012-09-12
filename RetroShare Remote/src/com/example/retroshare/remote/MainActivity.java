@@ -10,27 +10,45 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
+import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends RsActivityBase {
+public class MainActivity extends RsActivityBase implements RsCtrlServiceListener {
 	private static final String TAG="MainActivity";
 	
 	ByteArrayOutputStream output=new ByteArrayOutputStream();
+	
+   	EditText editTextHostname;
+   	EditText editTextPort;
+   	EditText editTextUser;
+   	EditText editTextPassword;
+	TextView textViewConnectionState;
+	Button buttonConnect;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        editTextHostname=(EditText) findViewById(R.id.editTextHostname);
+        editTextPort=(EditText) findViewById(R.id.editTextPort);
+    	editTextUser=(EditText) findViewById(R.id.editTextUser);
+    	editTextPassword=(EditText) findViewById(R.id.editTextPassword);
+        textViewConnectionState=(TextView) findViewById(R.id.textViewConnectionState);
+        buttonConnect=(Button) findViewById(R.id.buttonConnect);
+        
+        textViewConnectionState.setVisibility(View.GONE);
         /*
     	RsServerData[] d=new RsServerData[2];
     	d[0]=new RsServerData();
@@ -44,7 +62,7 @@ public class MainActivity extends RsActivityBase {
     	Log.v(TAG,"x[0]"+d[0]);
     	*/
     	
-        
+        /*
     	EditText text=(EditText) findViewById(R.id.editTextHostname);
     	text.setText("192.168.137.1");
     	
@@ -56,7 +74,7 @@ public class MainActivity extends RsActivityBase {
     	
     	text=(EditText) findViewById(R.id.editTextPassword);
     	text.setText("ubuntu123");
-        
+        */
         
        // PrintStream printStream =new PrintStream(output);
         //System.setOut(printStream);
@@ -114,24 +132,59 @@ public class MainActivity extends RsActivityBase {
         //text.setText(output.toString());
         
     }
+   private RsServerData mServerData;
     
     @Override
     protected void onServiceConnected(){
-    	Log.v(TAG,"Saved ServerData: "+mRsService.mRsCtrlService.getServerData());
-    	/*
-    	EditText text=(EditText) findViewById(R.id.editTextHostname);
-    	text.setText("192.168.16.2");
+    	mServerData=mRsService.mRsCtrlService.getServerData();
+    	mRsService.mRsCtrlService.registerListener(this);
+    	updateViews();
+    }
+    
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	if(mRsService!=null){
+        	mServerData=mRsService.mRsCtrlService.getServerData();
+        	updateViews();
+    	}
+    }
+    
+    private void updateViews(){
+    	//Log.v(TAG,"Saved ServerData: "+mServerData);
+    	//if(mServerData!=null){
+	    	editTextHostname.setText(mServerData.hostname);
+	    	editTextPort.setText(Integer.toString(mServerData.port));
+	    	editTextUser.setText(mServerData.user);
+	    	editTextPassword.setText(mServerData.password);
+	    	
+	    	TextView textViewServerKey=(TextView) findViewById(R.id.textViewServerKey);
+	    	try{
+	    		textViewServerKey.setText("Server Key:"+mServerData.hostkey);
+	    	}catch(NullPointerException e){
+	    		textViewServerKey.setText("Server Key: Error in sd.hostkey.toString");
+	    	}
+    	//}
     	
-    	text=(EditText) findViewById(R.id.editTextPort);
-    	text.setText("7022");
-    	
-    	text=(EditText) findViewById(R.id.editTextUser);
-    	text.setText("user");
-    	
-    	text=(EditText) findViewById(R.id.editTextPassword);
-    	text.setText("ubuntu123");
-    	*/
-        
+    	if(mBound){
+    		if(mRsService.mRsCtrlService.isOnline()){
+            	buttonConnect.setVisibility(View.GONE);
+            	
+            	textViewConnectionState.setTextColor(Color.GREEN);            	
+            	textViewConnectionState.setText("  connected");
+            	textViewConnectionState.setVisibility(View.VISIBLE);
+    		}else{
+    			buttonConnect.setVisibility(View.VISIBLE);
+    			textViewConnectionState.setVisibility(View.GONE);
+    		}
+    	}else{
+    		Log.e(TAG,"Error: MainActivity.updateViews(): not bound");
+    	}
+    }
+    
+    public void deleteServerKey(View v){
+    	mServerData.hostkey=null;
+    	mRsService.mRsCtrlService.setServerData(mServerData);
     }
     
     public void connect(View v){
@@ -139,27 +192,23 @@ public class MainActivity extends RsActivityBase {
         if(mBound){
         	//mRsService.startThread();
         	
-        	RsServerData d=new RsServerData();
-        	//d.hostname="192.168.16.2";
-        	EditText text=(EditText) findViewById(R.id.editTextHostname);
-        	d.hostname=text.getText().toString();
+        	//RsServerData mServerData=new RsServerData();
         	
-        	//d.port=7022;
-        	text=(EditText) findViewById(R.id.editTextPort);
-        	d.port=Integer.parseInt(text.getText().toString());
+        	mServerData.hostname=editTextHostname.getText().toString();
+        	mServerData.port=Integer.parseInt(editTextPort.getText().toString());
+        	mServerData.user=editTextUser.getText().toString();
+        	mServerData.password=editTextPassword.getText().toString();
         	
-        	//d.user="user";
-        	text=(EditText) findViewById(R.id.editTextUser);
-        	d.user=text.getText().toString();
+        	Log.v(TAG,"connecting to Server: "+mServerData);
         	
-        	//d.password="ubuntu123";
-        	text=(EditText) findViewById(R.id.editTextPassword);
-        	d.password=text.getText().toString();
-        	
-        	Log.v(TAG,"connecting to Server: "+d);
-        	
-        	mRsService.mRsCtrlService.setServerData(d);
+        	mRsService.mRsCtrlService.setServerData(mServerData);
         	mRsService.mRsCtrlService.connect();
+        	
+        	buttonConnect.setVisibility(View.GONE);
+        	
+        	textViewConnectionState.setTextColor(Color.BLACK);
+        	textViewConnectionState.setText("connecting...");
+        	textViewConnectionState.setVisibility(View.VISIBLE);
             //EditText text2=(EditText) findViewById(R.id.editText1);
             //text2.setText(output.toString());
         }
@@ -183,4 +232,10 @@ public class MainActivity extends RsActivityBase {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
+
+	@Override
+	public void onConnectionStateChanged() {
+		Log.v(TAG,"MainActivity.onConnectionStateChanged()");
+		updateViews();
+	}
 }
