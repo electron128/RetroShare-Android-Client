@@ -24,5 +24,7 @@
     <string name="err_auth_failed">ssh authentification failed: wrong  user or password</string>
     <string name="err_send">error while sending</string>
     <string name="err_receive">error while receiving</string>
+    <string name="block_friend">(TODO) block friend</string>
+    <string name="system_status">(TODO) system status</string>
 
 </resources>

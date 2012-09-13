@@ -41,6 +41,7 @@
                 <data android:scheme="retroshare"/>
             </intent-filter>
 	    </activity>
+	    <activity android:name=".PeerDetailsActivity"></activity>
     </application>
 
 </manifest>

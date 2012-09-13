@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -46,6 +47,7 @@ public class PeersActivity extends RsActivityBase {
         ListView lv=new ListView(this);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(adapter);
+        lv.setOnItemLongClickListener(adapter);
         setContentView(lv);
     }
     
@@ -63,7 +65,7 @@ public class PeersActivity extends RsActivityBase {
     	//showPeers();}
     }
     
-    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, PeersServiceListener{
+    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,PeersServiceListener{
     	
     	private List<Person> personList=new ArrayList<Person>();
     	private List<Location> locationList=new ArrayList<Location>();
@@ -102,6 +104,17 @@ public class PeersActivity extends RsActivityBase {
     		startActivity(i);
     		
     	}
+    	
+		@Override
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+			Location loc=locationList.get(position);
+			Person p=mapLocationToPerson.get(loc);
+    		Intent i=new Intent(PeersActivity.this,PeerDetailsActivity.class);
+    		i.putExtra("GpgId", p.getGpgId());
+    		i.putExtra("SslId", loc.getSslId());
+    		startActivity(i);
+			return true;
+		}
 
 		@Override
 		public int getCount() {
