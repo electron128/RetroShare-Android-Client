@@ -19,7 +19,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/imageView1"
         android:ems="10"
-        android:hint="Hostname"
+        android:hint="@string/hostname"
         android:inputType="textMultiLine" />
 
     <EditText
@@ -30,7 +30,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editTextHostname"
         android:ems="10"
-        android:hint="Port"
+        android:hint="@string/port"
         android:inputType="number" >
 
         <requestFocus />
@@ -44,7 +44,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editTextPort"
         android:ems="10"
-        android:hint="User"
+        android:hint="@string/user"
         android:inputType="text" />
 
     <EditText
@@ -55,7 +55,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editTextUser"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="textPassword" />
 
     <TextView
@@ -65,7 +65,6 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/editTextPassword"
         android:layout_toLeftOf="@+id/button4"
-        android:hint="server key"
         android:text="verylongserverkeyandstillnotstoppingendlesslong"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

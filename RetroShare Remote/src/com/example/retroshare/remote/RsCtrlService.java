@@ -3,8 +3,11 @@ package com.example.retroshare.remote;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.lag.jaramiko.AuthenticationFailedException;
+import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
 /**
@@ -66,15 +71,57 @@ public class RsCtrlService implements Runnable{
 		CONNECT,DISCONNECT,NONE
 	}
 	
-	public enum ConnectError{
-		NONE
+	public enum ConnectionError{
+		NONE,
+		
+		// Exception descritption copied from javadoc
+		
+		/*
+		 * Thrown to indicate that the IP address of a host could not be determined.
+		 */
+		UnknownHostException,
+
+		/*
+		 * Signals that an error occurred while attempting to connect a socket
+		 *  to a remote address and port. Typically, the remote host cannot be 
+		 *  reached because of an intervening firewall, or if an intermediate 
+		 *  router is down.
+		 */
+		NoRouteToHostException,
+		
+		/*
+		 * Signals that an error occurred while attempting to connect a socket 
+		 * to a remote address and port. Typically, the connection was refused 
+		 * remotely (e.g., no process is listening on the remote address/port).
+		 */
+		ConnectException,
+		
+		// wrong hostkey
+		BadSignatureException,
+		
+		//wrong username or password
+		AuthenticationFailedException,
+		
+		SEND_ERROR,
+		RECEIVE_ERROR,
+		
+		UNKNOWN,
+	}
+	public ConnectionError getLastConnectionError(){
+		return mLastConnectionError;
+	}
+	public String getLasConnectionErrorString(){
+		return mLastConnectionErrorString;
 	}
 	
 	/*************************************/
+	// dont know if i have to worry with enums and threads
+	private volatile ConnectState mConnectState=ConnectState.OFFLINE;
+	private volatile ConnectAction mConnectAction=ConnectAction.NONE;
+	private volatile ConnectionError mLastConnectionError=ConnectionError.NONE;
+	private volatile String mLastConnectionErrorString="";
+	
 	// accessed from worker and ui thread, so we have to use synchronized()
-	private ConnectState mConnectState=ConnectState.OFFLINE;
-	private ConnectAction mConnectAction=ConnectAction.NONE;
-	private ConnectError mLastConnectError=ConnectError.NONE;
 	
 	private UiThreadHandlerInterface mUiThreadHandler;
 	private Thread mThread;
@@ -308,16 +355,51 @@ public class RsCtrlService implements Runnable{
 				
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
 			}
+		} 
+		
+		// catch zeugs tut ned
+		//noch zu händeln:
+		// WLAN aus: Java.net.SocketException: Network unreachable
+		// wlan an aber falsche ip: Java.net.SocketTimeoutException: Transport endpoint is not connected
+		
+		catch (UnknownHostException e){
+			mLastConnectionError=ConnectionError.UnknownHostException;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
+		} catch (NoRouteToHostException e){
+			mLastConnectionError=ConnectionError.NoRouteToHostException;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
+		} catch (ConnectException e){
+			mLastConnectionError=ConnectionError.ConnectException;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
+		} catch (BadSignatureException e){
+			mLastConnectionError=ConnectionError.BadSignatureException;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
+		
+		// tut
+		} catch (AuthenticationFailedException e){
+			mLastConnectionError=ConnectionError.AuthenticationFailedException;	
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
 			
+			mLastConnectionError=ConnectionError.UNKNOWN;
+			mLastConnectionErrorString=e.toString();
+			
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			
-			//noch zu händeln:
-			// WLAN aus: Java.net.SocketException: Network unreachable
-			// Java.net.SocketTimeoutException: Transport endpoint is not connected 
+			postNotifyListenersToUiThread();
 		}
 	}
 	
@@ -346,6 +428,10 @@ public class RsCtrlService implements Runnable{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
+			mLastConnectionError=ConnectionError.SEND_ERROR;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
 		}
 	}
 	
@@ -458,6 +544,10 @@ public class RsCtrlService implements Runnable{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
+			mLastConnectionError=ConnectionError.RECEIVE_ERROR;
+			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+			postNotifyListenersToUiThread();
 		}
 		return -1;
 	}

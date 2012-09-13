@@ -33,6 +33,14 @@
 	    <service android:name=".RsService"></service>
 	    <activity android:name=".ChatlobbyActivity" android:label="@string/chat"></activity>
 	    <activity android:name=".ChatActivity"></activity>
+	    <activity android:name=".AddFriendActivity">
+	         <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="retroshare"/>
+            </intent-filter>
+	    </activity>
     </application>
 
 </manifest>

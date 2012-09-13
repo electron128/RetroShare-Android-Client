@@ -79,12 +79,16 @@ public final class Core {
     PEERS(0, 1),
     SYSTEM(1, 2),
     CHAT(2, 3),
-    GXS(3, 1000),
+    SEARCH(3, 4),
+    FILES(4, 5),
+    GXS(5, 1000),
     ;
     
     public static final int PEERS_VALUE = 1;
     public static final int SYSTEM_VALUE = 2;
     public static final int CHAT_VALUE = 3;
+    public static final int SEARCH_VALUE = 4;
+    public static final int FILES_VALUE = 5;
     public static final int GXS_VALUE = 1000;
     
     
@@ -95,6 +99,8 @@ public final class Core {
         case 1: return PEERS;
         case 2: return SYSTEM;
         case 3: return CHAT;
+        case 4: return SEARCH;
+        case 5: return FILES;
         case 1000: return GXS;
         default: return null;
       }
@@ -126,7 +132,7 @@ public final class Core {
     }
     
     private static final PackageId[] VALUES = {
-      PEERS, SYSTEM, CHAT, GXS, 
+      PEERS, SYSTEM, CHAT, SEARCH, FILES, GXS, 
     };
     
     public static PackageId valueOf(
@@ -193,15 +199,17 @@ public final class Core {
       FAILED(0, 0),
       NO_IMPL_YET(1, 1),
       INVALID_QUERY(2, 2),
-      SUCCESS(3, 3),
-      READMSG(4, 4),
+      PARTIAL_SUCCESS(3, 3),
+      SUCCESS(4, 4),
+      READMSG(5, 5),
       ;
       
       public static final int FAILED_VALUE = 0;
       public static final int NO_IMPL_YET_VALUE = 1;
       public static final int INVALID_QUERY_VALUE = 2;
-      public static final int SUCCESS_VALUE = 3;
-      public static final int READMSG_VALUE = 4;
+      public static final int PARTIAL_SUCCESS_VALUE = 3;
+      public static final int SUCCESS_VALUE = 4;
+      public static final int READMSG_VALUE = 5;
       
       
       public final int getNumber() { return value; }
@@ -211,8 +219,9 @@ public final class Core {
           case 0: return FAILED;
           case 1: return NO_IMPL_YET;
           case 2: return INVALID_QUERY;
-          case 3: return SUCCESS;
-          case 4: return READMSG;
+          case 3: return PARTIAL_SUCCESS;
+          case 4: return SUCCESS;
+          case 5: return READMSG;
           default: return null;
         }
       }
@@ -243,7 +252,7 @@ public final class Core {
       }
       
       private static final StatusCode[] VALUES = {
-        FAILED, NO_IMPL_YET, INVALID_QUERY, SUCCESS, READMSG, 
+        FAILED, NO_IMPL_YET, INVALID_QUERY, PARTIAL_SUCCESS, SUCCESS, READMSG, 
       };
       
       public static StatusCode valueOf(
@@ -2994,17 +3003,9 @@ public final class Core {
     boolean hasHash();
     String getHash();
     
-    // required int64 size = 3;
+    // required uint64 size = 3;
     boolean hasSize();
     long getSize();
-    
-    // optional string path = 4;
-    boolean hasPath();
-    String getPath();
-    
-    // optional string avail = 5;
-    boolean hasAvail();
-    String getAvail();
   }
   public static final class File extends
       com.google.protobuf.GeneratedMessage
@@ -3099,7 +3100,7 @@ public final class Core {
       }
     }
     
-    // required int64 size = 3;
+    // required uint64 size = 3;
     public static final int SIZE_FIELD_NUMBER = 3;
     private long size_;
     public boolean hasSize() {
@@ -3109,76 +3110,10 @@ public final class Core {
       return size_;
     }
     
-    // optional string path = 4;
-    public static final int PATH_FIELD_NUMBER = 4;
-    private java.lang.Object path_;
-    public boolean hasPath() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public String getPath() {
-      java.lang.Object ref = path_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          path_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getPathBytes() {
-      java.lang.Object ref = path_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        path_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
-    // optional string avail = 5;
-    public static final int AVAIL_FIELD_NUMBER = 5;
-    private java.lang.Object avail_;
-    public boolean hasAvail() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    public String getAvail() {
-      java.lang.Object ref = avail_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          avail_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getAvailBytes() {
-      java.lang.Object ref = avail_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        avail_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
     private void initFields() {
       name_ = "";
       hash_ = "";
       size_ = 0L;
-      path_ = "";
-      avail_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3211,13 +3146,7 @@ public final class Core {
         output.writeBytes(2, getHashBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt64(3, size_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getPathBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(5, getAvailBytes());
+        output.writeUInt64(3, size_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3238,15 +3167,7 @@ public final class Core {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, size_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getPathBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getAvailBytes());
+          .computeUInt64Size(3, size_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3378,10 +3299,6 @@ public final class Core {
         bitField0_ = (bitField0_ & ~0x00000002);
         size_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
-        path_ = "";
-        bitField0_ = (bitField0_ & ~0x00000008);
-        avail_ = "";
-        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       
@@ -3432,14 +3349,6 @@ public final class Core {
           to_bitField0_ |= 0x00000004;
         }
         result.size_ = size_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.path_ = path_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.avail_ = avail_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3464,12 +3373,6 @@ public final class Core {
         }
         if (other.hasSize()) {
           setSize(other.getSize());
-        }
-        if (other.hasPath()) {
-          setPath(other.getPath());
-        }
-        if (other.hasAvail()) {
-          setAvail(other.getAvail());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3526,17 +3429,7 @@ public final class Core {
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              size_ = input.readInt64();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000008;
-              path_ = input.readBytes();
-              break;
-            }
-            case 42: {
-              bitField0_ |= 0x00000010;
-              avail_ = input.readBytes();
+              size_ = input.readUInt64();
               break;
             }
           }
@@ -3617,7 +3510,7 @@ public final class Core {
         onChanged();
       }
       
-      // required int64 size = 3;
+      // required uint64 size = 3;
       private long size_ ;
       public boolean hasSize() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -3636,78 +3529,6 @@ public final class Core {
         size_ = 0L;
         onChanged();
         return this;
-      }
-      
-      // optional string path = 4;
-      private java.lang.Object path_ = "";
-      public boolean hasPath() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
-      }
-      public String getPath() {
-        java.lang.Object ref = path_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          path_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
-      }
-      public Builder setPath(String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000008;
-        path_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearPath() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        path_ = getDefaultInstance().getPath();
-        onChanged();
-        return this;
-      }
-      void setPath(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
-        path_ = value;
-        onChanged();
-      }
-      
-      // optional string avail = 5;
-      private java.lang.Object avail_ = "";
-      public boolean hasAvail() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      public String getAvail() {
-        java.lang.Object ref = avail_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          avail_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
-      }
-      public Builder setAvail(String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000010;
-        avail_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearAvail() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        avail_ = getDefaultInstance().getAvail();
-        onChanged();
-        return this;
-      }
-      void setAvail(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000010;
-        avail_ = value;
-        onChanged();
       }
       
       // @@protoc_insertion_point(builder_scope:rsctrl.core.File)
@@ -6437,39 +6258,39 @@ public final class Core {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\ncore.proto\022\013rsctrl.core\"\233\001\n\006Status\022,\n\004" +
+      "\n\ncore.proto\022\013rsctrl.core\"\260\001\n\006Status\022,\n\004" +
       "code\030\001 \002(\0162\036.rsctrl.core.Status.StatusCo" +
-      "de\022\013\n\003msg\030\002 \001(\t\"V\n\nStatusCode\022\n\n\006FAILED\020" +
-      "\000\022\017\n\013NO_IMPL_YET\020\001\022\021\n\rINVALID_QUERY\020\002\022\013\n" +
-      "\007SUCCESS\020\003\022\013\n\007READMSG\020\004\")\n\006IpAddr\022\016\n\004add" +
-      "r\030\001 \002(\t:\000\022\017\n\004port\030\002 \002(\r:\0010\"\303\001\n\010Location\022" +
-      "\016\n\006ssl_id\030\001 \002(\t\022\020\n\010location\030\002 \002(\t\022&\n\tloc" +
-      "aladdr\030\003 \002(\0132\023.rsctrl.core.IpAddr\022$\n\007ext" +
-      "addr\030\004 \002(\0132\023.rsctrl.core.IpAddr\022\r\n\005state" +
-      "\030\005 \002(\r\"8\n\nStateFlags\022\n\n\006ONLINE\020\001\022\r\n\tCONN",
-      "ECTED\020\002\022\017\n\013UNREACHABLE\020\004\"\340\001\n\006Person\022\016\n\006g" +
-      "pg_id\030\001 \002(\t\022\014\n\004name\030\002 \002(\t\0222\n\010relation\030\003 " +
-      "\002(\0162 .rsctrl.core.Person.Relationship\022(\n" +
-      "\tlocations\030\004 \003(\0132\025.rsctrl.core.Location\"" +
-      "Z\n\014Relationship\022\n\n\006FRIEND\020\001\022\032\n\026FRIEND_OF" +
-      "_MANY_FRIENDS\020\002\022\025\n\021FRIEND_OF_FRIENDS\020\003\022\013" +
-      "\n\007UNKNOWN\020\004\"M\n\004File\022\014\n\004name\030\001 \002(\t\022\014\n\004has" +
-      "h\030\002 \002(\t\022\014\n\004size\030\003 \002(\003\022\014\n\004path\030\004 \001(\t\022\r\n\005a" +
-      "vail\030\005 \001(\t\"f\n\003Dir\022\014\n\004name\030\001 \002(\t\022\014\n\004path\030" +
-      "\002 \002(\t\022!\n\007subdirs\030\003 \003(\0132\020.rsctrl.core.Dir",
-      "\022 \n\005files\030\004 \003(\0132\021.rsctrl.core.File\"\372\001\n\014S" +
-      "ystemStatus\0225\n\nnet_status\030\001 \002(\0162!.rsctrl" +
-      ".core.SystemStatus.NetCode\022\013\n\003msg\030\002 \001(\t\"" +
-      "\245\001\n\007NetCode\022\017\n\013BAD_UNKNOWN\020\000\022\017\n\013BAD_OFFL" +
-      "INE\020\001\022\016\n\nBAD_NATSYM\020\002\022\021\n\rBAD_NODHT_NAT\020\003" +
-      "\022\023\n\017WARNING_RESTART\020\004\022\022\n\016WARNING_NATTED\020" +
-      "\005\022\021\n\rWARNING_NODHT\020\006\022\010\n\004GOOD\020\007\022\017\n\013ADV_FO" +
-      "RWARD\020\010\"3\n\tBandwidth\022\n\n\002up\030\001 \002(\002\022\014\n\004down" +
-      "\030\002 \002(\002\022\014\n\004name\030\003 \001(\t\":\n\014BandwidthSet\022*\n\n" +
-      "bandwidths\030\001 \003(\0132\026.rsctrl.core.Bandwidth",
-      "*\027\n\013ExtensionId\022\010\n\004CORE\020\000*6\n\tPackageId\022\t" +
-      "\n\005PEERS\020\001\022\n\n\006SYSTEM\020\002\022\010\n\004CHAT\020\003\022\010\n\003GXS\020\350" +
-      "\007"
+      "de\022\013\n\003msg\030\002 \001(\t\"k\n\nStatusCode\022\n\n\006FAILED\020" +
+      "\000\022\017\n\013NO_IMPL_YET\020\001\022\021\n\rINVALID_QUERY\020\002\022\023\n" +
+      "\017PARTIAL_SUCCESS\020\003\022\013\n\007SUCCESS\020\004\022\013\n\007READM" +
+      "SG\020\005\")\n\006IpAddr\022\016\n\004addr\030\001 \002(\t:\000\022\017\n\004port\030\002" +
+      " \002(\r:\0010\"\303\001\n\010Location\022\016\n\006ssl_id\030\001 \002(\t\022\020\n\010" +
+      "location\030\002 \002(\t\022&\n\tlocaladdr\030\003 \002(\0132\023.rsct" +
+      "rl.core.IpAddr\022$\n\007extaddr\030\004 \002(\0132\023.rsctrl" +
+      ".core.IpAddr\022\r\n\005state\030\005 \002(\r\"8\n\nStateFlag",
+      "s\022\n\n\006ONLINE\020\001\022\r\n\tCONNECTED\020\002\022\017\n\013UNREACHA" +
+      "BLE\020\004\"\340\001\n\006Person\022\016\n\006gpg_id\030\001 \002(\t\022\014\n\004name" +
+      "\030\002 \002(\t\0222\n\010relation\030\003 \002(\0162 .rsctrl.core.P" +
+      "erson.Relationship\022(\n\tlocations\030\004 \003(\0132\025." +
+      "rsctrl.core.Location\"Z\n\014Relationship\022\n\n\006" +
+      "FRIEND\020\001\022\032\n\026FRIEND_OF_MANY_FRIENDS\020\002\022\025\n\021" +
+      "FRIEND_OF_FRIENDS\020\003\022\013\n\007UNKNOWN\020\004\"0\n\004File" +
+      "\022\014\n\004name\030\001 \002(\t\022\014\n\004hash\030\002 \002(\t\022\014\n\004size\030\003 \002" +
+      "(\004\"f\n\003Dir\022\014\n\004name\030\001 \002(\t\022\014\n\004path\030\002 \002(\t\022!\n" +
+      "\007subdirs\030\003 \003(\0132\020.rsctrl.core.Dir\022 \n\005file",
+      "s\030\004 \003(\0132\021.rsctrl.core.File\"\372\001\n\014SystemSta" +
+      "tus\0225\n\nnet_status\030\001 \002(\0162!.rsctrl.core.Sy" +
+      "stemStatus.NetCode\022\013\n\003msg\030\002 \001(\t\"\245\001\n\007NetC" +
+      "ode\022\017\n\013BAD_UNKNOWN\020\000\022\017\n\013BAD_OFFLINE\020\001\022\016\n" +
+      "\nBAD_NATSYM\020\002\022\021\n\rBAD_NODHT_NAT\020\003\022\023\n\017WARN" +
+      "ING_RESTART\020\004\022\022\n\016WARNING_NATTED\020\005\022\021\n\rWAR" +
+      "NING_NODHT\020\006\022\010\n\004GOOD\020\007\022\017\n\013ADV_FORWARD\020\010\"" +
+      "3\n\tBandwidth\022\n\n\002up\030\001 \002(\002\022\014\n\004down\030\002 \002(\002\022\014" +
+      "\n\004name\030\003 \001(\t\":\n\014BandwidthSet\022*\n\nbandwidt" +
+      "hs\030\001 \003(\0132\026.rsctrl.core.Bandwidth*\027\n\013Exte",
+      "nsionId\022\010\n\004CORE\020\000*M\n\tPackageId\022\t\n\005PEERS\020" +
+      "\001\022\n\n\006SYSTEM\020\002\022\010\n\004CHAT\020\003\022\n\n\006SEARCH\020\004\022\t\n\005F" +
+      "ILES\020\005\022\010\n\003GXS\020\350\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6513,7 +6334,7 @@ public final class Core {
           internal_static_rsctrl_core_File_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_core_File_descriptor,
-              new java.lang.String[] { "Name", "Hash", "Size", "Path", "Avail", },
+              new java.lang.String[] { "Name", "Hash", "Size", },
               rsctrl.core.Core.File.class,
               rsctrl.core.Core.File.Builder.class);
           internal_static_rsctrl_core_Dir_descriptor =

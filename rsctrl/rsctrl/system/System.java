@@ -11,9 +11,11 @@ public final class System {
   public enum RequestMsgIds
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_RequestSystemStatus(0, 1),
+    MsgId_RequestSystemQuit(1, 2),
     ;
     
     public static final int MsgId_RequestSystemStatus_VALUE = 1;
+    public static final int MsgId_RequestSystemQuit_VALUE = 2;
     
     
     public final int getNumber() { return value; }
@@ -21,6 +23,7 @@ public final class System {
     public static RequestMsgIds valueOf(int value) {
       switch (value) {
         case 1: return MsgId_RequestSystemStatus;
+        case 2: return MsgId_RequestSystemQuit;
         default: return null;
       }
     }
@@ -51,7 +54,7 @@ public final class System {
     }
     
     private static final RequestMsgIds[] VALUES = {
-      MsgId_RequestSystemStatus, 
+      MsgId_RequestSystemStatus, MsgId_RequestSystemQuit, 
     };
     
     public static RequestMsgIds valueOf(
@@ -77,9 +80,11 @@ public final class System {
   public enum ResponseMsgIds
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_ResponseSystemStatus(0, 1),
+    MsgId_ResponseSystemQuit(1, 2),
     ;
     
     public static final int MsgId_ResponseSystemStatus_VALUE = 1;
+    public static final int MsgId_ResponseSystemQuit_VALUE = 2;
     
     
     public final int getNumber() { return value; }
@@ -87,6 +92,7 @@ public final class System {
     public static ResponseMsgIds valueOf(int value) {
       switch (value) {
         case 1: return MsgId_ResponseSystemStatus;
+        case 2: return MsgId_ResponseSystemQuit;
         default: return null;
       }
     }
@@ -117,7 +123,7 @@ public final class System {
     }
     
     private static final ResponseMsgIds[] VALUES = {
-      MsgId_ResponseSystemStatus, 
+      MsgId_ResponseSystemStatus, MsgId_ResponseSystemQuit, 
     };
     
     public static ResponseMsgIds valueOf(
@@ -1309,6 +1315,870 @@ public final class System {
     // @@protoc_insertion_point(class_scope:rsctrl.system.ResponseSystemStatus)
   }
   
+  public interface RequestSystemQuitOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.system.RequestSystemQuit.QuitCode quit_code = 1;
+    boolean hasQuitCode();
+    rsctrl.system.System.RequestSystemQuit.QuitCode getQuitCode();
+  }
+  public static final class RequestSystemQuit extends
+      com.google.protobuf.GeneratedMessage
+      implements RequestSystemQuitOrBuilder {
+    // Use RequestSystemQuit.newBuilder() to construct.
+    private RequestSystemQuit(Builder builder) {
+      super(builder);
+    }
+    private RequestSystemQuit(boolean noInit) {}
+    
+    private static final RequestSystemQuit defaultInstance;
+    public static RequestSystemQuit getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RequestSystemQuit getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemQuit_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemQuit_fieldAccessorTable;
+    }
+    
+    public enum QuitCode
+        implements com.google.protobuf.ProtocolMessageEnum {
+      CLOSE_CHANNEL(0, 1),
+      SHUTDOWN_RS(1, 2),
+      ;
+      
+      public static final int CLOSE_CHANNEL_VALUE = 1;
+      public static final int SHUTDOWN_RS_VALUE = 2;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static QuitCode valueOf(int value) {
+        switch (value) {
+          case 1: return CLOSE_CHANNEL;
+          case 2: return SHUTDOWN_RS;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<QuitCode>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<QuitCode>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<QuitCode>() {
+              public QuitCode findValueByNumber(int number) {
+                return QuitCode.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return rsctrl.system.System.RequestSystemQuit.getDescriptor().getEnumTypes().get(0);
+      }
+      
+      private static final QuitCode[] VALUES = {
+        CLOSE_CHANNEL, SHUTDOWN_RS, 
+      };
+      
+      public static QuitCode valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private QuitCode(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:rsctrl.system.RequestSystemQuit.QuitCode)
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.system.RequestSystemQuit.QuitCode quit_code = 1;
+    public static final int QUIT_CODE_FIELD_NUMBER = 1;
+    private rsctrl.system.System.RequestSystemQuit.QuitCode quitCode_;
+    public boolean hasQuitCode() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.system.System.RequestSystemQuit.QuitCode getQuitCode() {
+      return quitCode_;
+    }
+    
+    private void initFields() {
+      quitCode_ = rsctrl.system.System.RequestSystemQuit.QuitCode.CLOSE_CHANNEL;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasQuitCode()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeEnum(1, quitCode_.getNumber());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, quitCode_.getNumber());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemQuit parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.system.System.RequestSystemQuit prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.system.System.RequestSystemQuitOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemQuit_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemQuit_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.system.System.RequestSystemQuit.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        quitCode_ = rsctrl.system.System.RequestSystemQuit.QuitCode.CLOSE_CHANNEL;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.system.System.RequestSystemQuit.getDescriptor();
+      }
+      
+      public rsctrl.system.System.RequestSystemQuit getDefaultInstanceForType() {
+        return rsctrl.system.System.RequestSystemQuit.getDefaultInstance();
+      }
+      
+      public rsctrl.system.System.RequestSystemQuit build() {
+        rsctrl.system.System.RequestSystemQuit result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.system.System.RequestSystemQuit buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.system.System.RequestSystemQuit result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.system.System.RequestSystemQuit buildPartial() {
+        rsctrl.system.System.RequestSystemQuit result = new rsctrl.system.System.RequestSystemQuit(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.quitCode_ = quitCode_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.system.System.RequestSystemQuit) {
+          return mergeFrom((rsctrl.system.System.RequestSystemQuit)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.system.System.RequestSystemQuit other) {
+        if (other == rsctrl.system.System.RequestSystemQuit.getDefaultInstance()) return this;
+        if (other.hasQuitCode()) {
+          setQuitCode(other.getQuitCode());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasQuitCode()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              int rawValue = input.readEnum();
+              rsctrl.system.System.RequestSystemQuit.QuitCode value = rsctrl.system.System.RequestSystemQuit.QuitCode.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000001;
+                quitCode_ = value;
+              }
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.system.RequestSystemQuit.QuitCode quit_code = 1;
+      private rsctrl.system.System.RequestSystemQuit.QuitCode quitCode_ = rsctrl.system.System.RequestSystemQuit.QuitCode.CLOSE_CHANNEL;
+      public boolean hasQuitCode() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.system.System.RequestSystemQuit.QuitCode getQuitCode() {
+        return quitCode_;
+      }
+      public Builder setQuitCode(rsctrl.system.System.RequestSystemQuit.QuitCode value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        quitCode_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearQuitCode() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        quitCode_ = rsctrl.system.System.RequestSystemQuit.QuitCode.CLOSE_CHANNEL;
+        onChanged();
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.system.RequestSystemQuit)
+    }
+    
+    static {
+      defaultInstance = new RequestSystemQuit(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.system.RequestSystemQuit)
+  }
+  
+  public interface ResponseSystemQuitOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.core.Status status = 1;
+    boolean hasStatus();
+    rsctrl.core.Core.Status getStatus();
+    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
+  }
+  public static final class ResponseSystemQuit extends
+      com.google.protobuf.GeneratedMessage
+      implements ResponseSystemQuitOrBuilder {
+    // Use ResponseSystemQuit.newBuilder() to construct.
+    private ResponseSystemQuit(Builder builder) {
+      super(builder);
+    }
+    private ResponseSystemQuit(boolean noInit) {}
+    
+    private static final ResponseSystemQuit defaultInstance;
+    public static ResponseSystemQuit getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public ResponseSystemQuit getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemQuit_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemQuit_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.core.Status status = 1;
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private rsctrl.core.Core.Status status_;
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.core.Core.Status getStatus() {
+      return status_;
+    }
+    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+      return status_;
+    }
+    
+    private void initFields() {
+      status_ = rsctrl.core.Core.Status.getDefaultInstance();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasStatus()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getStatus().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, status_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, status_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemQuit parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.system.System.ResponseSystemQuit prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.system.System.ResponseSystemQuitOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemQuit_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemQuit_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.system.System.ResponseSystemQuit.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getStatusFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.system.System.ResponseSystemQuit.getDescriptor();
+      }
+      
+      public rsctrl.system.System.ResponseSystemQuit getDefaultInstanceForType() {
+        return rsctrl.system.System.ResponseSystemQuit.getDefaultInstance();
+      }
+      
+      public rsctrl.system.System.ResponseSystemQuit build() {
+        rsctrl.system.System.ResponseSystemQuit result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.system.System.ResponseSystemQuit buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.system.System.ResponseSystemQuit result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.system.System.ResponseSystemQuit buildPartial() {
+        rsctrl.system.System.ResponseSystemQuit result = new rsctrl.system.System.ResponseSystemQuit(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (statusBuilder_ == null) {
+          result.status_ = status_;
+        } else {
+          result.status_ = statusBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.system.System.ResponseSystemQuit) {
+          return mergeFrom((rsctrl.system.System.ResponseSystemQuit)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.system.System.ResponseSystemQuit other) {
+        if (other == rsctrl.system.System.ResponseSystemQuit.getDefaultInstance()) return this;
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasStatus()) {
+          
+          return false;
+        }
+        if (!getStatus().isInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
+              if (hasStatus()) {
+                subBuilder.mergeFrom(getStatus());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setStatus(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.core.Status status = 1;
+      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.core.Core.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      public Builder setStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder setStatus(
+          rsctrl.core.Core.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder mergeStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
+            status_ =
+              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
+          } else {
+            status_ = value;
+          }
+          onChanged();
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder clearStatus() {
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+          onChanged();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getStatusFieldBuilder().getBuilder();
+      }
+      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
+          getStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
+                  status_,
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.system.ResponseSystemQuit)
+    }
+    
+    static {
+      defaultInstance = new ResponseSystemQuit(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.system.ResponseSystemQuit)
+  }
+  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_system_RequestSystemStatus_descriptor;
   private static
@@ -1319,6 +2189,16 @@ public final class System {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_system_ResponseSystemStatus_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_system_RequestSystemQuit_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_system_RequestSystemQuit_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_system_ResponseSystemQuit_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_system_ResponseSystemQuit_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1339,9 +2219,15 @@ public final class System {
       "\016\n\nBAD_NATSYM\020\002\022\021\n\rBAD_NODHT_NAT\020\003\022\023\n\017WA" +
       "RNING_RESTART\020\004\022\022\n\016WARNING_NATTED\020\005\022\021\n\rW",
       "ARNING_NODHT\020\006\022\010\n\004GOOD\020\007\022\017\n\013ADV_FORWARD\020" +
-      "\010*.\n\rRequestMsgIds\022\035\n\031MsgId_RequestSyste" +
-      "mStatus\020\001*0\n\016ResponseMsgIds\022\036\n\032MsgId_Res" +
-      "ponseSystemStatus\020\001"
+      "\010\"\201\001\n\021RequestSystemQuit\022<\n\tquit_code\030\001 \002" +
+      "(\0162).rsctrl.system.RequestSystemQuit.Qui" +
+      "tCode\".\n\010QuitCode\022\021\n\rCLOSE_CHANNEL\020\001\022\017\n\013" +
+      "SHUTDOWN_RS\020\002\"9\n\022ResponseSystemQuit\022#\n\006s" +
+      "tatus\030\001 \002(\0132\023.rsctrl.core.Status*K\n\rRequ" +
+      "estMsgIds\022\035\n\031MsgId_RequestSystemStatus\020\001" +
+      "\022\033\n\027MsgId_RequestSystemQuit\020\002*N\n\016Respons" +
+      "eMsgIds\022\036\n\032MsgId_ResponseSystemStatus\020\001\022" +
+      "\034\n\030MsgId_ResponseSystemQuit\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1364,6 +2250,22 @@ public final class System {
               new java.lang.String[] { "Status", "NoPeers", "NoConnected", "NetStatus", "BwTotal", },
               rsctrl.system.System.ResponseSystemStatus.class,
               rsctrl.system.System.ResponseSystemStatus.Builder.class);
+          internal_static_rsctrl_system_RequestSystemQuit_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_rsctrl_system_RequestSystemQuit_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_system_RequestSystemQuit_descriptor,
+              new java.lang.String[] { "QuitCode", },
+              rsctrl.system.System.RequestSystemQuit.class,
+              rsctrl.system.System.RequestSystemQuit.Builder.class);
+          internal_static_rsctrl_system_ResponseSystemQuit_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_rsctrl_system_ResponseSystemQuit_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_system_ResponseSystemQuit_descriptor,
+              new java.lang.String[] { "Status", },
+              rsctrl.system.System.ResponseSystemQuit.class,
+              rsctrl.system.System.ResponseSystemQuit.Builder.class);
           return null;
         }
       };

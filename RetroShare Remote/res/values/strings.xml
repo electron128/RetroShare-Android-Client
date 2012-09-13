@@ -11,5 +11,18 @@
     <string name="peers">peers</string>
     <string name="chat">chat</string>
     <string name="chat_lobbies">chat lobbies</string>
+    <string name="add_friend">add friend</string>
+    <string name="hostname">hostname</string>
+    <string name="port">port</string>
+    <string name="user">user</string>
+    <string name="password">password</string>
+    <string name="error">error</string>
+    <string name="err_unknown_host">could not get ip for  this hostname</string>
+    <string name="err_no_route_to_host">could not contact server. maybe you are not connected to a network.</string>
+    <string name="err_connection_refused">host refused connection: ip or port wrong or server not running</string>
+    <string name="err_bad_signature">the servers public is not the same as last time</string>
+    <string name="err_auth_failed">ssh authentification failed: wrong  user or password</string>
+    <string name="err_send">error while sending</string>
+    <string name="err_receive">error while receiving</string>
 
 </resources>

@@ -10,6 +10,7 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
+import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -154,7 +155,11 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	//Log.v(TAG,"Saved ServerData: "+mServerData);
     	//if(mServerData!=null){
 	    	editTextHostname.setText(mServerData.hostname);
-	    	editTextPort.setText(Integer.toString(mServerData.port));
+	    	if(mServerData.port!=0){
+	    		editTextPort.setText(Integer.toString(mServerData.port));
+	    	}else{
+	    		editTextPort.setText("");
+	    	}
 	    	editTextUser.setText(mServerData.user);
 	    	editTextPassword.setText(mServerData.password);
 	    	
@@ -175,7 +180,47 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
             	textViewConnectionState.setVisibility(View.VISIBLE);
     		}else{
     			buttonConnect.setVisibility(View.VISIBLE);
-    			textViewConnectionState.setVisibility(View.GONE);
+    			
+    			ConnectionError conErr=mRsService.mRsCtrlService.getLastConnectionError();
+    			Log.v(TAG,"updateViews(): conErr: "+conErr);
+    			if(conErr==ConnectionError.NONE){
+	    			textViewConnectionState.setVisibility(View.GONE);
+    			}
+    			else{
+    				switch(conErr){
+					case AuthenticationFailedException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_auth_failed));
+						break;
+					case BadSignatureException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_bad_signature));
+						break;
+					case ConnectException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_connection_refused));
+						break;
+					case NoRouteToHostException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_no_route_to_host));
+						break;
+					case RECEIVE_ERROR:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_receive));
+						break;
+					case SEND_ERROR:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_send));
+						break;
+					case UnknownHostException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_unknown_host));
+						break;
+					case UNKNOWN:
+						textViewConnectionState.setText(mRsService.mRsCtrlService.getLasConnectionErrorString());
+						break;
+					default:
+						textViewConnectionState.setText("default reached, this should not happen");
+						break;
+    				
+    				}
+	    			textViewConnectionState.setTextColor(Color.RED);            	
+	    			textViewConnectionState.setVisibility(View.VISIBLE);
+    			}
+
     		}
     	}else{
     		Log.e(TAG,"Error: MainActivity.updateViews(): not bound");
@@ -235,7 +280,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 
 	@Override
 	public void onConnectionStateChanged() {
-		Log.v(TAG,"MainActivity.onConnectionStateChanged()");
+		//Log.v(TAG,"MainActivity.onConnectionStateChanged()");
 		updateViews();
 	}
 }
