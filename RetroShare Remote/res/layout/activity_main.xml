@@ -16,14 +16,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_launcher" />
-
+
         <EditText
             android:id="@+id/editTextHostname"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/hostname"
-            android:inputType="textMultiLine" />
+            android:inputType="text" >
+        </EditText>
 
         <EditText
             android:id="@+id/editTextPort"
@@ -32,8 +33,6 @@
             android:ems="10"
             android:hint="@string/port"
             android:inputType="number" >
-
-            <requestFocus />
         </EditText>
 
         <EditText

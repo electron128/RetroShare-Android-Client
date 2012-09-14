@@ -16,6 +16,7 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
+import com.example.retroshare.remote.ChatService.ChatServiceListener;
 import com.example.retroshare.remote.PeersService.PeersServiceListener;
 
 import android.content.Context;
@@ -57,10 +58,20 @@ public class PeersActivity extends RsActivityBase {
     @Override
     protected void onServiceConnected(){
         mRsService.mRsCtrlService.peersService.registerListener(adapter);
+        mRsService.mRsCtrlService.chatService.registerListener(adapter);
         mRsService.mRsCtrlService.peersService.updatePeersList();
     	
     	
     	//showPeers();
+    }
+    
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	if(mBound){
+    		mRsService.mRsCtrlService.peersService.updatePeersList();
+    		adapter.update();
+    	}
     }
     
     //Button Handler
@@ -68,7 +79,7 @@ public class PeersActivity extends RsActivityBase {
     	//showPeers();}
     }
     
-    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,PeersServiceListener{
+    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,PeersServiceListener,ChatServiceListener{
     	
     	private List<Person> personList=new ArrayList<Person>();
     	private List<Location> locationList=new ArrayList<Location>();
@@ -83,6 +94,7 @@ public class PeersActivity extends RsActivityBase {
     	
     	public void setData(List<Person> pl){
     		personList=pl;
+    		locationList.clear();
     		mapLocationToPerson.clear();
     		for(Person p:personList){
     			for(Location l:p.getLocationsList()){
