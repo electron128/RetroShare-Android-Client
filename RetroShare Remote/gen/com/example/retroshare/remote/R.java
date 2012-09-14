@@ -11,25 +11,38 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_action_search=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
-        public static final int no_avatar_background=0x7f020002;
+        public static final int chat=0x7f020000;
+        public static final int ic_action_search=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
+        public static final int im_user=0x7f020003;
+        public static final int im_user_away=0x7f020004;
+        public static final int im_user_busy=0x7f020005;
+        public static final int im_user_inactive=0x7f020006;
+        public static final int im_user_offline=0x7f020007;
+        public static final int no_avatar_background=0x7f020008;
+        public static final int rstray0=0x7f020009;
+        public static final int rstray0_err=0x7f02000a;
+        public static final int rstray0_err2=0x7f02000b;
+        public static final int rstray1=0x7f02000c;
+        public static final int rstray2=0x7f02000d;
+        public static final int rstray3=0x7f02000e;
     }
     public static final class id {
         public static final int LinearLayout=0x7f070018;
         public static final int LinearLayout1=0x7f070009;
         public static final int ScrollView=0x7f070008;
+        public static final int TableLayout=0x7f07001a;
         public static final int button1=0x7f070007;
-        public static final int button10=0x7f07001f;
-        public static final int button11=0x7f070020;
+        public static final int button10=0x7f070022;
+        public static final int button11=0x7f070023;
         public static final int button2=0x7f070004;
         public static final int button3=0x7f070013;
         public static final int button4=0x7f070010;
-        public static final int button5=0x7f07001a;
-        public static final int button6=0x7f07001b;
-        public static final int button7=0x7f07001c;
-        public static final int button8=0x7f07001d;
-        public static final int button9=0x7f07001e;
+        public static final int button5=0x7f07001d;
+        public static final int button6=0x7f07001e;
+        public static final int button7=0x7f07001f;
+        public static final int button8=0x7f070020;
+        public static final int button9=0x7f070021;
         public static final int buttonAddFriend=0x7f070003;
         public static final int buttonBlockFriend=0x7f070017;
         public static final int buttonConnect=0x7f070012;
@@ -40,8 +53,10 @@ public final class R {
         public static final int editTextUser=0x7f07000d;
         public static final int imageView1=0x7f07000a;
         public static final int imageViewAvatar=0x7f070014;
+        public static final int imageViewMessage=0x7f07001b;
+        public static final int imageViewUserState=0x7f07001c;
         public static final int listView1=0x7f070019;
-        public static final int menu_settings=0x7f070021;
+        public static final int menu_settings=0x7f070024;
         public static final int scrollView1=0x7f070001;
         public static final int textView1=0x7f070000;
         public static final int textView2=0x7f070002;
@@ -72,6 +87,8 @@ public final class R {
         public static final int chat=0x7f040009;
         public static final int chat_lobbies=0x7f04000a;
         public static final int connect=0x7f040004;
+        public static final int connected=0x7f04001b;
+        public static final int connection_error=0x7f04001a;
         public static final int err_auth_failed=0x7f040015;
         public static final int err_bad_signature=0x7f040014;
         public static final int err_connection_refused=0x7f040013;
@@ -85,6 +102,8 @@ public final class R {
         public static final int insert_message_here=0x7f040007;
         public static final int leave_lobby=0x7f040005;
         public static final int menu_settings=0x7f040002;
+        public static final int new_message=0x7f04001d;
+        public static final int not_connected=0x7f04001c;
         public static final int password=0x7f04000f;
         public static final int peers=0x7f040008;
         public static final int port=0x7f04000d;

@@ -48,6 +48,20 @@ public class ChatService implements ServiceInterface{
 	
 	private List<Chat.ChatLobbyInfo> ChatLobbies=new ArrayList<Chat.ChatLobbyInfo>();
 	private Map<ChatId,List<ChatMessage>> ChatHistory=new HashMap<ChatId,List<ChatMessage>>();
+	private Map<ChatId,Boolean> ChatChanged=new HashMap<ChatId,Boolean>();
+	private ChatId NotifyBlockedChat;
+	
+	public void setNotifyBlockedChat(ChatId id){
+		NotifyBlockedChat=id;
+		clearChatChanged(id);
+	}
+	public void clearChatChanged(ChatId ci){
+		ChatChanged.put(ci, false);
+		_notifyListeners();
+	}
+	public Map<ChatId,Boolean> getChatChanged(){
+		return ChatChanged;
+	}
 	
 	public void updateChatLobbies(){
     	RequestChatLobbies.Builder reqb=RequestChatLobbies.newBuilder();
@@ -153,6 +167,9 @@ public class ChatService implements ServiceInterface{
 			ChatHistory.put(m.getId(), new ArrayList<ChatMessage>());
 		}
 		ChatHistory.get(m.getId()).add(m);
+		if(m.getId()!=NotifyBlockedChat){
+			ChatChanged.put(m.getId(), true);
+		}
 		_notifyListeners();
 	}
 	

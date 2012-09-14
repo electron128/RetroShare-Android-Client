@@ -21,13 +21,16 @@ import com.example.retroshare.remote.PeersService.PeersServiceListener;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -139,11 +142,31 @@ public class PeersActivity extends RsActivityBase {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
-	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
-	        //TextView textView2 = (TextView) view.findViewById(R.id.textView2);
-	        Location l=locationList.get(position);
+			Location l=locationList.get(position);
 	        Person p=mapLocationToPerson.get(l);
+	        
+	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
+	        
+	        ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
+	        ImageView imageViewUserState=(ImageView) view.findViewById(R.id.imageViewUserState);
+	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
+	        
+	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
+	        Boolean haveNewMesage = mRsService.mRsCtrlService.chatService.getChatChanged().get(chatId);
+	        imageViewMessage.setVisibility(View.GONE);
+	        if(haveNewMesage!=null){
+	        	if(haveNewMesage.equals(Boolean.TRUE)){
+	        		imageViewMessage.setVisibility(View.VISIBLE);
+	        	}
+	        }
+	        
+	        if((l.getState()&Location.StateFlags.CONNECTED_VALUE)==Location.StateFlags.CONNECTED_VALUE){
+	        	imageViewUserState.setImageResource(R.drawable.im_user);
+	        	textView1.setTextColor(Color.BLUE);
+	        }else{
+	        	textView1.setTextColor(Color.GRAY);
+	        }
+	        
 	        textView1.setText(p.getName()+" ("+l.getLocation()+") "+Integer.toBinaryString(l.getState()));
 	        //textView2.setText("Thema:"+LobbyList.get(position).getLobbyTopic()+"\rLobbyId:"+LobbyList.get(position).getLobbyId());
 	        return view;

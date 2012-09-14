@@ -26,5 +26,9 @@
     <string name="err_receive">error while receiving</string>
     <string name="block_friend">(TODO) block friend</string>
     <string name="system_status">(TODO) system status</string>
+    <string name="connection_error">connection error</string>
+    <string name="connected">connected</string>
+    <string name="not_connected">not connected</string>
+    <string name="new_message">new message</string>
 
 </resources>

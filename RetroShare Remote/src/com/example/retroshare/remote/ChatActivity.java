@@ -54,7 +54,8 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 	
 	protected void onServiceConnected(){
 		
-		mRsService.mRsCtrlService.chatService.registerForEventsAtServer();
+		// done in RsService now
+		//mRsService.mRsCtrlService.chatService.registerForEventsAtServer();
 		
 		try {
 			mChatId=ChatId.parseFrom(getIntent().getByteArrayExtra("ChatId"));
@@ -83,6 +84,8 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 		}
 		
 		updateViews();
+		
+		mRsService.mRsCtrlService.chatService.setNotifyBlockedChat(mChatId);
 		
 		mRsService.mRsCtrlService.chatService.registerListener(this);
 		
@@ -167,6 +170,22 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 	//	}
 		
 		//_sendChatMsg("<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==' alt='Red dot'>");
+	}
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		if(mBound){
+			mRsService.mRsCtrlService.chatService.setNotifyBlockedChat(null);
+		}
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		if(mBound){
+			mRsService.mRsCtrlService.chatService.setNotifyBlockedChat(mChatId);
+		}
 	}
 	
 		

@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 
@@ -44,6 +45,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		RsServerData serverData=new RsServerData();
 	}
 	private Datapack mDatapack;
+	private NotifyService mNotifyService;
 	
 	//private Handler mHandler;
 	@Override
@@ -71,6 +73,10 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		mRsCtrlService=new RsCtrlService(new UiThreadHandler());
 		mRsCtrlService.setServerData(mDatapack.serverData);
 		mRsCtrlService.registerListener(this);
+		
+		mNotifyService=new NotifyService(mRsCtrlService.chatService,this);
+		
+		updateNotification();
 		
 		int RESPONSE=(0x01<<24);
 		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
@@ -123,7 +129,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		mNotificationManager.notify(HELLO_ID, notification);
 		*/
 		
-		
+		/*
 		// tut auch, macht die benachrichtigung aber wegen startForeground() unlöschbar
 		Notification notification = new Notification(R.drawable.ic_launcher, "blubber",System.currentTimeMillis());
 		
@@ -135,7 +141,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		
 		//first param has to be greater 0, dont know why
 		startForeground(1, notification);
-		
+		*/
 		
 		return mBinder;
 	}
@@ -160,6 +166,49 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	@Override
 	public void onConnectionStateChanged() {
 		saveData();
+		updateNotification();
+		if(mRsCtrlService.isOnline()){
+			mRsCtrlService.chatService.registerForEventsAtServer();
+		}
+	}
+	
+	private void updateNotification(){
+		int icon;
+		String tickerText;
+		String contentTitle=(String) getResources().getText(R.string.app_name);
+		String contentMessage;
+		
+		//=(String) getResources().getText(R.string.error)
+		
+		if(mRsCtrlService.isOnline()){
+			icon=R.drawable.rstray3;
+			tickerText=(String) getResources().getText(R.string.connected);
+			//contentTitle=(String) getResources().getText(R.string.app_name);
+			contentMessage=(String) getResources().getText(R.string.connected);
+		}else{
+			if(mRsCtrlService.getLastConnectionError()==ConnectionError.NONE){
+				icon=R.drawable.rstray0;				
+				tickerText=(String) getResources().getText(R.string.not_connected);
+				//contentTitle="RetroShare Remote";
+				contentMessage=(String) getResources().getText(R.string.not_connected);
+			}else{
+				icon=R.drawable.rstray0_err2;
+				tickerText=(String) getResources().getText(R.string.connection_error);
+				//contentTitle="RetroShare Remote";
+				contentMessage=(String) getResources().getText(R.string.connection_error);
+			}
+		}
+
+		
+		Notification notification = new Notification(icon, tickerText,System.currentTimeMillis());
+		
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		
+		notification.setLatestEventInfo(this, contentTitle,contentMessage, pendingIntent);
+		
+		startForeground(NotificationIds.RS_SERVICE, notification);
 	}
 	
 	
