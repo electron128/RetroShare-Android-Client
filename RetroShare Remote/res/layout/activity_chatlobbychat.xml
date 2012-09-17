@@ -10,11 +10,12 @@
         android:layout_height="wrap_content"
         android:hint="@string/insert_message_here"
         android:text="TextView" />
-
+
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/buttonLeaveLobby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="leaveLobby"
         android:text="@string/leave_lobby" />
 
     <ScrollView

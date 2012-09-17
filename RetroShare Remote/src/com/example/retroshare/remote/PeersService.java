@@ -54,6 +54,36 @@ public class PeersService implements ServiceInterface{
 		return null;
 	}
 	
+	private Person ownPerson;
+	public Person getOwnPerson(){
+		if(ownPerson==null){
+			RequestPeers.Builder reqb= RequestPeers.newBuilder();
+			reqb.setSet(RequestPeers.SetOption.OWNID);
+			reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
+			RequestPeers req=reqb.build();
+			byte[] b;
+			b=req.toByteArray();
+			//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
+	    	RsMessage msg= new RsMessage();
+	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
+	    	msg.body=b;
+	    	mRsCtrlService.sendMsg(msg,new OwnIdReceivedHandler());
+		}
+		return ownPerson;
+	}
+	
+	private class OwnIdReceivedHandler extends RsMessageHandler{
+		@Override
+		protected void rsHandleMsg(RsMessage msg){
+			try {
+				ownPerson=ResponsePeerList.parseFrom(msg.body).getPeersList().get(0);
+			} catch (InvalidProtocolBufferException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void updatePeersList(){
 		RequestPeers.Builder reqb= RequestPeers.newBuilder();
 		reqb.setSet(RequestPeers.SetOption.FRIENDS);

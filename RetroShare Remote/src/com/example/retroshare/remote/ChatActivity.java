@@ -19,7 +19,9 @@ import rsctrl.core.Core.Person;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,8 +41,24 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_chatlobbychat);
 	    
-	    Button b=(Button) findViewById(R.id.button2);
-	    b.setVisibility(View.GONE);
+	    ((Button) findViewById(R.id.button1)).setVisibility(View.GONE);
+	    
+	    ((EditText) findViewById(R.id.editText1)).setOnKeyListener(new KeyListener());
+	}
+	
+	private class KeyListener implements OnKeyListener{
+		@Override
+		public boolean onKey(View v, int keyCode, KeyEvent event) {
+			
+			if((event.getAction()==KeyEvent.ACTION_DOWN)&(event.getKeyCode() == KeyEvent.KEYCODE_ENTER)){
+				Log.v(TAG,"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
+				sendChatMsg(null);
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
 	}
 	
 	//private ChatHandler mChatHandler=null;
@@ -72,6 +90,9 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 			mRsService.mRsCtrlService.chatService.joinChatLobby(mChatLobbyInfo);
 			TextView tv=(TextView) findViewById(R.id.textView1);
 			tv.setText(mChatLobbyInfo.getLobbyName());
+			
+		    Button b=(Button) findViewById(R.id.buttonLeaveLobby);
+		    b.setVisibility(View.VISIBLE);
 		} else{
 			//private chat
 			TextView tv=(TextView) findViewById(R.id.textView1);
@@ -81,6 +102,9 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 				name=p.getName();
 			}
 			tv.setText(name);
+			
+		    Button b=(Button) findViewById(R.id.buttonLeaveLobby);
+		    b.setVisibility(View.GONE);
 		}
 		
 		updateViews();
@@ -88,6 +112,8 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 		mRsService.mRsCtrlService.chatService.setNotifyBlockedChat(mChatId);
 		
 		mRsService.mRsCtrlService.chatService.registerListener(this);
+		
+		Log.v(TAG,"onServiceConnected(): mChatId="+mChatId);
 		
 		/*
 		// Join Lobby
@@ -281,8 +307,17 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 		//_sendChatMsg(et.getText().toString());
 		
 		ChatMessage msg=ChatMessage.newBuilder().setId(mChatId).setMsg((et.getText().toString())).build();
+		et.setText("");
 		
 		mRsService.mRsCtrlService.chatService.sendChatMessage(msg);
+	}
+	
+	public void leaveLobby(View v){
+		if(mChatLobbyInfo!=null){
+			mRsService.mRsCtrlService.chatService.leaveChatLobby(mChatLobbyInfo);
+			// quit this activity
+			finish();
+		}
 	}
 	/*
 	private void _sendChatMsg(String s){

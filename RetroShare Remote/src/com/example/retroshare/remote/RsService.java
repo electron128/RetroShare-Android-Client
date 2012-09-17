@@ -76,6 +76,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		
 		mNotifyService=new NotifyService(mRsCtrlService.chatService,this);
 		
+		// update own State Notification
 		updateNotification();
 		
 		int RESPONSE=(0x01<<24);

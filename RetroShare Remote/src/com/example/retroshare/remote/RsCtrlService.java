@@ -152,6 +152,13 @@ public class RsCtrlService implements Runnable{
 		Services.add(chatService);
 		peersService=new PeersService(this);
 		Services.add(peersService);
+		
+		// preload own Name, needed for Chat
+		peersService.getOwnPerson();
+		// preload peers list, needed for chat notification
+		peersService.updatePeersList();
+		// preload chatobby list, because first requset returns just an empty list
+		chatService.updateChatLobbies();
 	}
 	
 	// **************************

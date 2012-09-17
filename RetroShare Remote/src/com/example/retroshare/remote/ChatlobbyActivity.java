@@ -6,13 +6,16 @@ import java.util.List;
 import rsctrl.chat.Chat;
 import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatLobbyInfo;
+import rsctrl.chat.Chat.ChatLobbyInfo.LobbyState;
 import rsctrl.chat.Chat.ChatType;
 import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.chat.Chat.ResponseChatLobbies;
 import rsctrl.core.Core;
+import rsctrl.core.Core.Location;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -179,10 +183,30 @@ public class ChatlobbyActivity extends RsActivityBase {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 	        View view = mInflater.inflate(R.layout.activity_chalobby_lobby_item, parent, false);
+	        
 	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
 	        TextView textView2 = (TextView) view.findViewById(R.id.textView2);
+	        ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
+	        
+	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(LobbyList.get(position).getLobbyId()).build();
+	        Boolean haveNewMesage = mRsService.mRsCtrlService.chatService.getChatChanged().get(chatId);
+	        imageViewMessage.setVisibility(View.GONE);
+	        if(haveNewMesage!=null){
+	        	if(haveNewMesage.equals(Boolean.TRUE)){
+	        		imageViewMessage.setVisibility(View.VISIBLE);
+	        	}
+	        }
+	        
+	        if(LobbyList.get(position).getLobbyState().equals(LobbyState.LOBBYSTATE_JOINED)){
+	        	textView1.setTextColor(Color.BLUE);
+	        	textView2.setTextColor(Color.BLUE);
+	        }else{
+	        	textView1.setTextColor(Color.GRAY);
+	        	textView2.setTextColor(Color.GRAY);
+	        }
+
 	        textView1.setText(LobbyList.get(position).getLobbyName()+" ("+Integer.toString(LobbyList.get(position).getNoPeers())+")");
-	        textView2.setText("Thema:"+LobbyList.get(position).getLobbyTopic()+"\rLobbyId:"+LobbyList.get(position).getLobbyId());
+	        textView2.setText(getResources().getText(R.string.topic)+": "+LobbyList.get(position).getLobbyTopic());
 	        return view;
 		}
 
