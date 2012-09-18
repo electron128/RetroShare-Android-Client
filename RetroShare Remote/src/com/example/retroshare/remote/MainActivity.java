@@ -4,17 +4,24 @@ package com.example.retroshare.remote;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 
+import rsctrl.chat.Chat;
 import rsctrl.core.Core;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
+import rsctrl.system.System.RequestSystemStatus;
+import rsctrl.system.System.ResponseSystemStatus;
 
 import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
+import com.example.retroshare.remote.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,6 +35,8 @@ import android.widget.TextView;
 public class MainActivity extends RsActivityBase implements RsCtrlServiceListener {
 	private static final String TAG="MainActivity";
 	
+	private static final int UPDATE_INTERVALL=1000;
+	
 	ByteArrayOutputStream output=new ByteArrayOutputStream();
 	
    	EditText editTextHostname;
@@ -36,6 +45,14 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
    	EditText editTextPassword;
 	TextView textViewConnectionState;
 	Button buttonConnect;
+	
+	TextView textViewNetStatus;
+	TextView textViewNoPeers;
+	TextView textViewBandwidth;
+	
+	Handler mHandler;
+	
+	boolean isInForeground=false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +66,19 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
         textViewConnectionState=(TextView) findViewById(R.id.textViewConnectionState);
         buttonConnect=(Button) findViewById(R.id.buttonConnect);
         
+    	textViewNetStatus=(TextView) findViewById(R.id.textViewNetStatus);
+    	textViewNoPeers=(TextView) findViewById(R.id.textViewNoPeers);
+    	textViewBandwidth=(TextView) findViewById(R.id.textViewBandwidth);
+        
         textViewConnectionState.setVisibility(View.GONE);
+        
+    	textViewNetStatus.setVisibility(View.GONE);
+    	textViewNoPeers.setVisibility(View.GONE);
+    	textViewBandwidth.setVisibility(View.GONE);
+    	
+    	mHandler=new Handler();
+    	mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+        
         /*
     	RsServerData[] d=new RsServerData[2];
     	d[0]=new RsServerData();
@@ -149,6 +178,12 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
         	mServerData=mRsService.mRsCtrlService.getServerData();
         	updateViews();
     	}
+    	isInForeground=true;
+    }
+    @Override
+    public void onPause(){
+    	super.onPause();
+    	isInForeground=false;
     }
     
     private void updateViews(){
@@ -173,12 +208,29 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	
     	if(mBound){
     		if(mRsService.mRsCtrlService.isOnline()){
+    			
+    			editTextHostname.setVisibility(View.GONE);
+    			editTextPort.setVisibility(View.GONE);
+    			editTextUser.setVisibility(View.GONE);
+    			editTextPassword.setVisibility(View.GONE);
+    			
             	buttonConnect.setVisibility(View.GONE);
             	
             	textViewConnectionState.setTextColor(Color.GREEN);            	
             	textViewConnectionState.setText("  connected");
             	textViewConnectionState.setVisibility(View.VISIBLE);
     		}else{
+    			requestSystemStatus();
+    			
+    			editTextHostname.setVisibility(View.VISIBLE);
+    			editTextPort.setVisibility(View.VISIBLE);
+    			editTextUser.setVisibility(View.VISIBLE);
+    			editTextPassword.setVisibility(View.VISIBLE);
+    			
+    	    	textViewNetStatus.setVisibility(View.GONE);
+    	    	textViewNoPeers.setVisibility(View.GONE);
+    	    	textViewBandwidth.setVisibility(View.GONE);
+    			
     			buttonConnect.setVisibility(View.VISIBLE);
     			
     			ConnectionError conErr=mRsService.mRsCtrlService.getLastConnectionError();
@@ -282,5 +334,46 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	public void onConnectionStateChanged() {
 		//Log.v(TAG,"MainActivity.onConnectionStateChanged()");
 		updateViews();
+	}
+	
+	private void requestSystemStatus(){
+    	if(mBound && mRsService.mRsCtrlService.isOnline()){
+			RsMessage msg=new RsMessage();
+			msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SYSTEM_VALUE<<8)|rsctrl.system.System.RequestMsgIds.MsgId_RequestSystemStatus_VALUE;
+			msg.body=RequestSystemStatus.newBuilder().build().toByteArray();
+			mRsService.mRsCtrlService.sendMsg(msg, new SystemStatusHandler());
+    	}
+	}
+	
+	private class requestSystemStatusRunnable implements Runnable{
+		@Override
+		public void run() {
+			if(isInForeground){
+				requestSystemStatus();
+			}
+			mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+		}
+	}
+	
+	private class SystemStatusHandler extends RsMessageHandler{
+		@Override
+		protected void rsHandleMsg(RsMessage msg){
+			ResponseSystemStatus resp;
+			try {
+				resp = ResponseSystemStatus.parseFrom(msg.body);
+		    	textViewNetStatus.setText(getResources().getText(R.string.network_status)+":\n"+resp.getNetStatus().toString());
+		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers()+resp.getNoConnected()));
+		    	DecimalFormat df = new DecimalFormat("#.##");
+		    	textViewBandwidth.setText(getResources().getText(R.string.bandwidth_up_down)+":\n"+df.format(resp.getBwTotal().getUp())+"/"+df.format(resp.getBwTotal().getDown())+" (kB/s)");
+		    	
+		    	textViewNetStatus.setVisibility(View.VISIBLE);
+		    	textViewNoPeers.setVisibility(View.VISIBLE);
+		    	textViewBandwidth.setVisibility(View.VISIBLE);
+			} catch (InvalidProtocolBufferException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 	}
 }

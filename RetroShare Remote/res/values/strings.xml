@@ -33,5 +33,7 @@
     <string name="new_private_chat_message">new private chat message</string>
     <string name="new_lobby_chat_message">new lobby chat message</string>
     <string name="topic">topic</string>
+    <string name="bandwidth_up_down">bandwidth up/down</string>
+    <string name="network_status">network status</string>
 
 </resources>
