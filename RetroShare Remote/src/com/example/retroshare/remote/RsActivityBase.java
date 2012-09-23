@@ -1,8 +1,5 @@
 package com.example.retroshare.remote;
-
 import com.example.retroshare.remote.RsService.RsBinder;
-//import com.example.retroshare.remote.RsService.RsMessage;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +8,36 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
+
+
+
+/*
+	private static final String TAG="ShowQrCodeActivity";
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+    
+    @Override
+    protected void onServiceConnected(){
+    	
+    }
+    
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	
+    }
+    @Override
+    public void onPause(){
+    	super.onPause();
+    	
+    }
+
+*/
 
 public class RsActivityBase extends Activity {
 	protected RsService mRsService;

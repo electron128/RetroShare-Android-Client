@@ -119,6 +119,13 @@
             android:layout_height="wrap_content"
             android:onClick="showPeers"
             android:text="@string/peers" />
+
+        <Button
+            android:id="@+id/buttonShowQrCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onShowQrCode"
+            android:text="Button" />
 
     </LinearLayout>
 

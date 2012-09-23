@@ -42,6 +42,7 @@
             </intent-filter>
 	    </activity>
 	    <activity android:name=".PeerDetailsActivity"></activity>
+	    <activity android:name=".ShowQrCodeActivity"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="zxing"/>
 	<classpathentry kind="src" path="jaramiko"/>
 	<classpathentry kind="src" path="protobuf"/>
 	<classpathentry kind="src" path="rsctrl"/>

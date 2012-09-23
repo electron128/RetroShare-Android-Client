@@ -323,6 +323,11 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	Intent intent = new Intent(this, ChatlobbyActivity.class);
     	startActivity(intent);
     }
+    
+    public void onShowQrCode(View v){
+    	Intent intent = new Intent(this, ShowQrCodeActivity.class);
+    	startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

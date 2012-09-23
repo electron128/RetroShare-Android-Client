@@ -46,5 +46,10 @@
 			<type>2</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/rsctrl</locationURI>
 		</link>
+		<link>
+			<name>zxing</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-2-PROJECT_LOC%7D/zxing-2.0/core/src</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

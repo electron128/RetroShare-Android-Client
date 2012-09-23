@@ -166,7 +166,7 @@ public class ChatService implements ServiceInterface{
 				_addChatMessageToHistory(m);
 				//_addChatMessageToHistory() will notify Listeners
 				
-				//System.err.println(resp.getMsg());
+				System.err.println(resp.getMsg());
 				
 			} catch (InvalidProtocolBufferException e) {
 				// TODO Auto-generated catch block
