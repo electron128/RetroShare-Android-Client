@@ -326,6 +326,13 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     
     public void onShowQrCode(View v){
     	Intent intent = new Intent(this, ShowQrCodeActivity.class);
+    	intent.putExtra("Description", "just a test");
+    	intent.putExtra("Data", "just a test");
+    	startActivity(intent);
+    }
+    
+    public void showFilesActivity(View v){
+    	Intent intent = new Intent(this, FilesActivity.class);
     	startActivity(intent);
     }
 
@@ -367,7 +374,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 			try {
 				resp = ResponseSystemStatus.parseFrom(msg.body);
 		    	textViewNetStatus.setText(getResources().getText(R.string.network_status)+":\n"+resp.getNetStatus().toString());
-		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers()+resp.getNoConnected()));
+		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers()));
 		    	DecimalFormat df = new DecimalFormat("#.##");
 		    	textViewBandwidth.setText(getResources().getText(R.string.bandwidth_up_down)+":\n"+df.format(resp.getBwTotal().getUp())+"/"+df.format(resp.getBwTotal().getDown())+" (kB/s)");
 		    	

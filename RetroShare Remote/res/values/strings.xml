@@ -35,5 +35,20 @@
     <string name="topic">topic</string>
     <string name="bandwidth_up_down">bandwidth up/down</string>
     <string name="network_status">network status</string>
+    <string name="files">files</string>
+    <string-array name="file_actions">
+        <item >continue</item>
+        <item >wait</item>
+        <item >pause</item>
+        <item >restart</item>
+        <item >check</item>
+        <item >cancel</item>
+        <item >show link as qrcode</item>
+    </string-array>
+        <string name="filename">filename:</string>
+        <string name="size">size:</string>
+        <string name="hash">hash:</string>
+        <string name="download">download</string>
+        <string name="rate">rate:</string>
 
 </resources>

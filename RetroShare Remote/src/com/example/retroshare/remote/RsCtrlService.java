@@ -141,6 +141,7 @@ public class RsCtrlService implements Runnable{
 	private Set<ServiceInterface> Services=new HashSet<ServiceInterface>();
 	public ChatService chatService;
 	public PeersService peersService;
+	public FilesService filesService;
 	
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
@@ -150,8 +151,12 @@ public class RsCtrlService implements Runnable{
 		
 		chatService=new ChatService(this);
 		Services.add(chatService);
+		
 		peersService=new PeersService(this);
 		Services.add(peersService);
+		
+		filesService=new FilesService(this);
+		Services.add(filesService);
 		
 		// preload own Name, needed for Chat
 		peersService.getOwnPerson();
@@ -368,6 +373,7 @@ public class RsCtrlService implements Runnable{
 		//noch zu händeln:
 		// WLAN aus: Java.net.SocketException: Network unreachable
 		// wlan an aber falsche ip: Java.net.SocketTimeoutException: Transport endpoint is not connected
+		// rs-nogui hat kein cleanup gemacht: net.lag.jaramiko.SSHException: Timeout
 		
 		catch (UnknownHostException e){
 			mLastConnectionError=ConnectionError.UnknownHostException;

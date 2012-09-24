@@ -1,7 +1,5 @@
 package com.example.retroshare.remote;
 
-import rsctrl.chat.Chat;
-import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.core.Core;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestAddPeer;

@@ -38,11 +38,20 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="retroshare"/>
+                <data android:scheme="retroshare" android:host="certificate"/>
             </intent-filter>
 	    </activity>
 	    <activity android:name=".PeerDetailsActivity"></activity>
 	    <activity android:name=".ShowQrCodeActivity"></activity>
+	    <activity android:name=".FilesActivity" android:label="@string/files"></activity>
+	    <activity android:name=".AddDownloadActivity">
+	        <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="retroshare" android:host="file"/>
+            </intent-filter>
+	    </activity>
     </application>
 
 </manifest>

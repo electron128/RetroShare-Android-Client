@@ -39,7 +39,7 @@ import android.util.Log;
 
 */
 
-public class RsActivityBase extends Activity {
+public abstract class RsActivityBase extends Activity {
 	protected RsService mRsService;
 	protected boolean mBound=false;
 	
@@ -62,7 +62,7 @@ public class RsActivityBase extends Activity {
     };
     
     //should be overridden by child classes
-    protected void onServiceConnected(){}
+    protected abstract void onServiceConnected();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -4,10 +4,11 @@ import android.os.Handler;
 
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 
-public class RsMessageHandler extends Handler implements Runnable{
+public abstract class RsMessageHandler extends Handler implements Runnable{
+	
 	// must be implemented in child class
 	// will be called by run()
-	protected void rsHandleMsg(RsMessage msg){}
+	abstract protected void rsHandleMsg(RsMessage msg);
 	
 	private RsMessage mMsg;
 	
