@@ -50,5 +50,6 @@
         <string name="hash">hash:</string>
         <string name="download">download</string>
         <string name="rate">rate:</string>
+        <string name="search">search</string>
 
 </resources>

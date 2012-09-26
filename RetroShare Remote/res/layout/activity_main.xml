@@ -126,6 +126,13 @@
             android:layout_height="wrap_content"
             android:onClick="showFilesActivity"
             android:text="@string/files" />
+
+        <Button
+            android:id="@+id/buttonSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="showSearchActivity"
+            android:text="@string/search" />
 
         <Button
             android:id="@+id/buttonShowQrCode"

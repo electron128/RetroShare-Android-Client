@@ -142,6 +142,7 @@ public class RsCtrlService implements Runnable{
 	public ChatService chatService;
 	public PeersService peersService;
 	public FilesService filesService;
+	public SearchService searchcService;
 	
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
@@ -157,6 +158,9 @@ public class RsCtrlService implements Runnable{
 		
 		filesService=new FilesService(this);
 		Services.add(filesService);
+		
+		searchcService=new SearchService(this);
+		Services.add(searchcService);
 		
 		// preload own Name, needed for Chat
 		peersService.getOwnPerson();
@@ -416,11 +420,6 @@ public class RsCtrlService implements Runnable{
 		}
 	}
 	
-	// blockiert nicht
-	// aber: nicblockierend in einem eigenen thread ist schwachsinn,
-	// deswegen auf blockierend umstellen, oder den thread weglassen und nichtblockierend pollen
-	// problem: rausfinden wie das timeout für die blockierung in jaramiko ist
-	// nachteil: blockierend blockiert auch alle anderen aktionen im thread
 	private void _sendMsg(RsMessage msg) {
 		//allocate memory
 		// 16 byte header + body
@@ -460,10 +459,17 @@ public class RsCtrlService implements Runnable{
 	private int curBodySize;
 	private byte[] curBody;
 	
-	/**
-	 * 
-	 * @return 
-	 */
+	// blockiert nicht
+	// aber: nicblockierend in einem eigenen thread ist schwachsinn,
+	// deswegen auf blockierend umstellen, oder den thread weglassen und nichtblockierend pollen
+	// problem: rausfinden wie das timeout für die blockierung in jaramiko ist
+	// nachteil: blockierend blockiert auch alle anderen aktionen im thread
+	//
+	// neue erkenntnis:
+	// http://lag.net/jaramiko/docs/net/lag/jaramiko/Channel.html#setTimeout(int)
+	//
+	// update: blockiert jetzt, jetzt weil ich auf bulk read umgestellt habe
+	//
 	private int _recvMsg(){
 		try {
 			switch(inputState){
@@ -534,10 +540,21 @@ public class RsCtrlService implements Runnable{
 					}
 					break;
 				case HAVE_BODY_SIZE:
+					// maybe faster
+					byte[] bytes=new byte[curBodySize];
+					int nobytesread=0;
+					while(nobytesread<curBodySize){
+						nobytesread=+mInputStream.read(bytes,nobytesread,curBodySize-nobytesread);
+					}
+					inbuf.put(bytes);
+					/*
+					 * to slow for megabytes
+					 * 
 					while(mInputStream.available()>0 && inbuf.position()<curBodySize)
 					{
 						inbuf.put((byte) mInputStream.read());
 					}
+					*/
 					if(inbuf.position()==curBodySize)
 					{
 						inbuf.rewind();

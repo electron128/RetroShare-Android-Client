@@ -335,6 +335,11 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	Intent intent = new Intent(this, FilesActivity.class);
     	startActivity(intent);
     }
+    
+    public void showSearchActivity(View v){
+    	Intent intent = new Intent(this, ListSearchesActivity.class);
+    	startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

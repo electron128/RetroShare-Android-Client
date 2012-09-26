@@ -52,6 +52,8 @@
                 <data android:scheme="retroshare" android:host="file"/>
             </intent-filter>
 	    </activity>
+	    <activity android:name=".ShowSearchResultsActivity"></activity>
+	    <activity android:name=".ListSearchesActivity"></activity>
     </application>
 
 </manifest>

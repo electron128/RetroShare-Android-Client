@@ -48,13 +48,21 @@ public class AddDownloadActivity extends RsActivityBase {
 			e.printStackTrace();
 		}
 		*/
-    	
-    	Uri uri = getIntent().getData();
-    	mFile=File.newBuilder()
-    			.setName(uri.getQueryParameter("name"))
-    			.setHash(uri.getQueryParameter("hash"))
-    			.setSize(Long.parseLong(uri.getQueryParameter("size")))
-    			.build();
+    	if(getIntent().hasExtra("File")){
+    		try {
+				mFile=File.parseFrom(getIntent().getByteArrayExtra("File"));
+			} catch (InvalidProtocolBufferException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}else{
+	    	Uri uri = getIntent().getData();
+	    	mFile=File.newBuilder()
+	    			.setName(uri.getQueryParameter("name"))
+	    			.setHash(uri.getQueryParameter("hash"))
+	    			.setSize(Long.parseLong(uri.getQueryParameter("size")))
+	    			.build();
+    	}
     }
     
     @Override
