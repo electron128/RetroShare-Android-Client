@@ -56,7 +56,7 @@ public class ShowSearchResultsActivity extends RsActivityBase {
         setContentView(listView);
         
     	mHandler=new Handler();
-    	mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+    	//mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
     }
     
     @Override
@@ -64,7 +64,7 @@ public class ShowSearchResultsActivity extends RsActivityBase {
         mRsService.mRsCtrlService.searchcService.registerListener(adapter);
         
         // remove this
-        //mRsService.mRsCtrlService.searchcService.updateSearchResults(mId);
+        mRsService.mRsCtrlService.searchcService.updateSearchResults(mId);
     }
     
     boolean isInForeground=false;

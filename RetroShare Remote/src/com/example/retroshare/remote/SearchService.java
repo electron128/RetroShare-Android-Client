@@ -148,21 +148,24 @@ public class SearchService implements ServiceInterface {
 		@Override
 		protected void rsHandleMsg(RsMessage msg) {
 			try {
+				System.out.println("RequestSearchResultsHandler: parsing...");
 				ResponseSearchResults resp=ResponseSearchResults.parseFrom(msg.body);
-				//System.out.println("RequestSearchResultsHandler:\n"+resp);
+				System.out.println("RequestSearchResultsHandler: parsed msg, updating searchhitsmap...");
 				//searchHitsMap.put(resp.getSearchesList().get(0).getSearchId(), resp.getSearchesList().get(0).getHitsList());
 				
 				for(SearchSet ss:resp.getSearchesList()){
 					Map<String,SearchHit> searchHitsByHash=new HashMap<String,SearchHit>();
 					for(SearchHit sh:ss.getHitsList()){
 						searchHitsByHash.put(sh.getFile().getHash(), sh);
-						/*
+						
 						if(searchHitsByHash.size()>100){
 							break;
-						}*/
+						}
 					}
 					searchHitsMap.put(ss.getSearchId(), new ArrayList<SearchHit>(searchHitsByHash.values()));
 				}
+				
+				System.out.println("RequestSearchResultsHandler: completed");
 				
 				/*
 				 * uses to much cpu

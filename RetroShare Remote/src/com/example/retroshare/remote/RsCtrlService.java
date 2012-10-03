@@ -540,30 +540,43 @@ public class RsCtrlService implements Runnable{
 					}
 					break;
 				case HAVE_BODY_SIZE:
-					// maybe faster
+					// not blocking and fast
+					int nobytestoread=mInputStream.available();
+					if(nobytestoread>(curBodySize-inbuf.position())){
+						nobytestoread=curBodySize-inbuf.position();
+					}
+					byte[] newbytes=new byte[nobytestoread];
+					int nobytesread=mInputStream.read(newbytes,0,nobytestoread);
+					inbuf.put(newbytes, 0, nobytesread);
+					
+					// maybe faster, but blocking
+					/*
 					byte[] bytes=new byte[curBodySize];
 					int nobytesread=0;
 					while(nobytesread<curBodySize){
 						nobytesread=+mInputStream.read(bytes,nobytesread,curBodySize-nobytesread);
 					}
 					inbuf.put(bytes);
+					*/
 					/*
 					 * to slow for megabytes
-					 * 
+					 *
 					while(mInputStream.available()>0 && inbuf.position()<curBodySize)
 					{
 						inbuf.put((byte) mInputStream.read());
-					}
-					*/
+					}*/
+					
 					if(inbuf.position()==curBodySize)
 					{
 						inbuf.rewind();
 						curBody=inbuf.array();
 						inbuf=ByteBuffer.allocate(4);
 						inputState=InputState.BEGIN;
-						System.out.println("received complete Body:");
-						System.out.print(util.byteArrayToHexString(curBody));
-						System.out.println();
+						if(curBodySize<1000){
+							System.out.println("received complete Body:\n"+util.byteArrayToHexString(curBody));
+						}else{
+							System.out.println("received complete Body: bigger than 1000Bytes");
+						}
 						return curMsgId;
 					}
 					break;
