@@ -173,13 +173,14 @@ public class PeersActivity extends RsActivityBase {
 	        }
 	        
 	        if((l.getState()&Location.StateFlags.CONNECTED_VALUE)==Location.StateFlags.CONNECTED_VALUE){
-	        	imageViewUserState.setImageResource(R.drawable.im_user);
+	        	imageViewUserState.setImageResource(R.drawable.identity);
 	        	textView1.setTextColor(Color.BLUE);
 	        }else{
+	        	imageViewUserState.setImageResource(R.drawable.identity_grey);
 	        	textView1.setTextColor(Color.GRAY);
 	        }
 	        
-	        textView1.setText(p.getName()+" ("+l.getLocation()+") "+Integer.toBinaryString(l.getState()));
+	        textView1.setText(p.getName()+" ("+l.getLocation()+") "/*+Integer.toBinaryString(l.getState())*/);
 	        //textView2.setText("Thema:"+LobbyList.get(position).getLobbyTopic()+"\rLobbyId:"+LobbyList.get(position).getLobbyId());
 	        return view;
 		}

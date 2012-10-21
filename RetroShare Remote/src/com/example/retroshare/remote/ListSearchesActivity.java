@@ -57,7 +57,7 @@ public class ListSearchesActivity extends RsActivityBase {
 			
 			if((event.getAction()==KeyEvent.ACTION_DOWN)&(event.getKeyCode() == KeyEvent.KEYCODE_ENTER)){
 				Log.v(TAG,"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
-				mRsService.mRsCtrlService.searchcService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
+				mRsService.mRsCtrlService.searchService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
 				return true;
 			}else{
 				return false;
@@ -79,14 +79,14 @@ public class ListSearchesActivity extends RsActivityBase {
     
     @Override
     protected void onServiceConnected(){
-    	adapter.setData(mRsService.mRsCtrlService.searchcService.getSearches());
+    	adapter.setData(mRsService.mRsCtrlService.searchService.getSearches());
     }
     
     @Override
     public void onResume(){
     	super.onResume();
     	if(mBound){
-    		adapter.setData(mRsService.mRsCtrlService.searchcService.getSearches());
+    		adapter.setData(mRsService.mRsCtrlService.searchService.getSearches());
     	}
     }
     @Override

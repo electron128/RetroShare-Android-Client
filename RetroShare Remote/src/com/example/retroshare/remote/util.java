@@ -29,25 +29,39 @@ public class util {
 	static Bitmap encodeQrCode(String contents) throws WriterException {
 		QRCode qrCode=new QRCode();
 		Encoder.encode(contents, ErrorCorrectionLevel.L, qrCode);
+		
+		System.out.println("encoded qrCode: "+qrCode);
 
 		ByteMatrix result =qrCode.getMatrix();
-		int width = result.getWidth();
-		int height = result.getHeight();
-		int[] pixels = new int[width * height];
-		for (int y = 0; y < height; y++) {
-			int offset = y * width;
-			for (int x = 0; x < width; x++) {
+		int codewidth=result.getWidth();
+		int codeheight=result.getHeight();
+		// +2 for quiet zone
+		int imagewidth = result.getWidth()+2;
+		int imageheight = result.getHeight()+2;
+		int[] pixels = new int[imagewidth * imageheight];
+		
+		// init pixels with white:
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = Color.WHITE;
+		}
+		
+		// set black pixels
+		// use 1pixel quiet zone, this is enough for most readers, see
+		// http://qrworld.wordpress.com/2011/08/09/the-quiet-zone/
+		for (int y = 0; y < codeheight; y++) {
+			//             +1 line horizontal for quiet zone
+			int offset = (y+1) * imagewidth;
+			for (int x = 0; x < codewidth; x++) {
 				if(result.get(x, y)==1){
-					pixels[offset + x] =  Color.BLACK;
-				}else{
-					pixels[offset + x] = Color.WHITE;
+					//                +1 pixel vertical for quiet zone
+					pixels[offset + x +1] =  Color.BLACK;
 				}
 			}
 		}
 
-		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-		bitmap=Bitmap.createScaledBitmap(bitmap, width*6, height*6, false);
+		Bitmap bitmap = Bitmap.createBitmap(imagewidth, imageheight, Bitmap.Config.ARGB_8888);
+		bitmap.setPixels(pixels, 0, imagewidth, 0, 0, imagewidth, imageheight);
+		bitmap=Bitmap.createScaledBitmap(bitmap, imagewidth*6, imageheight*6, false);
 		return bitmap;
 		}
 }

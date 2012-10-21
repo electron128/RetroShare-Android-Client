@@ -61,7 +61,7 @@ public class NotifyService implements ChatServiceListener{
 		}
 		
 		if(privateUnread){
-			int icon=R.drawable.chat;
+			int icon=R.drawable.chat_bubble;
 			CharSequence tickerText;
 			CharSequence contentTitle = mService.getResources().getText(R.string.app_name);
 			CharSequence contentText = mService.getResources().getText(R.string.new_private_chat_message);
@@ -87,7 +87,7 @@ public class NotifyService implements ChatServiceListener{
 		}
 		
 		if(lobbyUnread){
-			int icon=R.drawable.chat;
+			int icon=R.drawable.irc_protocol;
 			CharSequence tickerText;
 			CharSequence contentTitle = mService.getResources().getText(R.string.app_name);
 			CharSequence contentText = mService.getResources().getText(R.string.new_lobby_chat_message);

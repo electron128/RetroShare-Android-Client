@@ -107,6 +107,7 @@ public class PeersService implements ServiceInterface{
 			System.err.println("received Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE");
 			try {
 				Persons=ResponsePeerList.parseFrom(msg.body).getPeersList();
+				System.err.println(Persons);
 				_notifyListeners();
 				
 				//System.err.println(Persons);

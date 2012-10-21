@@ -142,7 +142,7 @@ public class RsCtrlService implements Runnable{
 	public ChatService chatService;
 	public PeersService peersService;
 	public FilesService filesService;
-	public SearchService searchcService;
+	public SearchService searchService;
 	
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
@@ -159,8 +159,8 @@ public class RsCtrlService implements Runnable{
 		filesService=new FilesService(this);
 		Services.add(filesService);
 		
-		searchcService=new SearchService(this);
-		Services.add(searchcService);
+		searchService=new SearchService(this);
+		Services.add(searchService);
 		
 		// preload own Name, needed for Chat
 		peersService.getOwnPerson();

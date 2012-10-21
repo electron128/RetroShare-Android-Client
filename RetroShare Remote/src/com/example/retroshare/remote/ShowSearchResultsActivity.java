@@ -61,10 +61,10 @@ public class ShowSearchResultsActivity extends RsActivityBase {
     
     @Override
     protected void onServiceConnected(){
-        mRsService.mRsCtrlService.searchcService.registerListener(adapter);
+        mRsService.mRsCtrlService.searchService.registerListener(adapter);
         
         // remove this
-        mRsService.mRsCtrlService.searchcService.updateSearchResults(mId);
+        mRsService.mRsCtrlService.searchService.updateSearchResults(mId);
     }
     
     boolean isInForeground=false;
@@ -84,7 +84,7 @@ public class ShowSearchResultsActivity extends RsActivityBase {
 		@Override
 		public void run() {
 			if(isInForeground && mBound && mRsService.mRsCtrlService.isOnline()){
-				mRsService.mRsCtrlService.searchcService.updateSearchResults(mId);
+				mRsService.mRsCtrlService.searchService.updateSearchResults(mId);
 			}
 			mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
 		}
@@ -188,8 +188,8 @@ public class ShowSearchResultsActivity extends RsActivityBase {
 
 		@Override
 		public void update() {
-			Log.v(TAG, "update: "+Integer.toString(mRsService.mRsCtrlService.searchcService.getSearchResults(mId).size())+" items");
-			setData(mRsService.mRsCtrlService.searchcService.getSearchResults(mId));
+			Log.v(TAG, "update: "+Integer.toString(mRsService.mRsCtrlService.searchService.getSearchResults(mId).size())+" items");
+			setData(mRsService.mRsCtrlService.searchService.getSearchResults(mId));
 		}
     	
     }

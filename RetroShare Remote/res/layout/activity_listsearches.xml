@@ -13,12 +13,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
-
+
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="note: when the search has to many results, rs-nogui will stop sending. then you have to kill this app. search may cause lots of traffic from rs-nogui to android. the number of hits is wrong!"
+                android:text="note: search may cause lots of traffic from rs-nogui to android. the number of hits is wrong!"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <EditText

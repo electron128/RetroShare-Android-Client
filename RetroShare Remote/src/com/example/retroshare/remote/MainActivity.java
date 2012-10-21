@@ -57,7 +57,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_2);
         
         editTextHostname=(EditText) findViewById(R.id.editTextHostname);
         editTextPort=(EditText) findViewById(R.id.editTextPort);

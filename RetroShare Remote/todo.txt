@@ -1,0 +1,12 @@
+update readme
+
+call ChatService.registerForEventsAtServer() once, at the end of the connection process
+- remove check in ChatService
+- create nice callback: onConnected()
+
+change display of ssh public key
+- users don't know what net.lag.jaramiko means
+- put key in extra activity?
+- display ipd:port instead?
+
+add disconnect
