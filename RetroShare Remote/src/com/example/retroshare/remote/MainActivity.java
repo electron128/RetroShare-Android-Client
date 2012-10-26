@@ -200,9 +200,10 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	    	
 	    	TextView textViewServerKey=(TextView) findViewById(R.id.textViewServerKey);
 	    	try{
-	    		textViewServerKey.setText("Server Key:"+mServerData.hostkey);
+	    		textViewServerKey.setText("Server Key:"+mServerData.getHostkeyFingerprint());//+mServerData.hostkey);
 	    	}catch(NullPointerException e){
 	    		textViewServerKey.setText("Server Key: Error in sd.hostkey.toString");
+	    		e.printStackTrace();
 	    	}
     	//}
     	
@@ -352,6 +353,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 		//Log.v(TAG,"MainActivity.onConnectionStateChanged()");
 		updateViews();
 	}
+	@Override public void onConnected(){}
 	
 	private void requestSystemStatus(){
     	if(mBound && mRsService.mRsCtrlService.isOnline()){

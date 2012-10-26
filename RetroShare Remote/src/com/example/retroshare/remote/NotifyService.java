@@ -42,6 +42,11 @@ public class NotifyService implements ChatServiceListener{
 	}
 	Notification notification;
 	
+	public void cancelAll(){
+		mNotificationManager.cancel(NotificationIds.CHAT_PRIVATE);
+		mNotificationManager.cancel(NotificationIds.CHAT_LOBBY);
+	}
+	
 	@Override
 	public void update() {
 		Log.v(TAG,"update");

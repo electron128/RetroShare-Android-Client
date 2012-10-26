@@ -66,6 +66,7 @@ public class ListSearchesActivity extends RsActivityBase {
 		
 	}
 	
+	// needed, because we know dont know the serach id before we received the result
 	private class ResponseHandler implements SearchResponseHandler{
 		@Override
 		public void onSearchResponseReceived(int id) {

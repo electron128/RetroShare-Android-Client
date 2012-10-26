@@ -25,10 +25,11 @@ import rsctrl.core.Core.Person;
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class ChatService implements ServiceInterface{
+public class ChatService implements ServiceInterface, RsCtrlService.RsCtrlServiceListener{
 	RsCtrlService mRsCtrlService;
 	ChatService(RsCtrlService s){
 		mRsCtrlService=s;
+		mRsCtrlService.registerListener(this);
 	}
 	
 	public static interface ChatServiceListener{
@@ -177,22 +178,15 @@ public class ChatService implements ServiceInterface{
 		
 	}
 	
-	// set to true once, to prevent multiple registration
-	// rs-nogui will send events twice if we register twice
-	private boolean haveRegisteredEventsOnServer=false;
+	// called once in onConnected()
 	public void registerForEventsAtServer(){
-		//at Server
-		if(haveRegisteredEventsOnServer==false){
-			haveRegisteredEventsOnServer=true;
-			
-			RequestRegisterEvents.Builder reqb= RequestRegisterEvents.newBuilder();
-			reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
-			
-	    	RsMessage msg=new RsMessage();
-	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
-	    	msg.body=reqb.build().toByteArray();
-	    	mRsCtrlService.sendMsg(msg);
-		}
+		RequestRegisterEvents.Builder reqb= RequestRegisterEvents.newBuilder();
+		reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
+		
+    	RsMessage msg=new RsMessage();
+    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
+    	msg.body=reqb.build().toByteArray();
+    	mRsCtrlService.sendMsg(msg);
 	}
 	
 	
@@ -270,6 +264,16 @@ public class ChatService implements ServiceInterface{
 			ChatChanged.put(m.getId(), true);
 		}
 		_notifyListeners();
+	}
+	
+	@Override
+	public void onConnectionStateChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onConnected() {
+		registerForEventsAtServer();
 	}
 	
 	

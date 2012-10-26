@@ -86,6 +86,25 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		
 	}
 	
+	@Override
+	public void onDestroy(){
+		Log.v(TAG, "onDestroy()");
+		mNotifyService.cancelAll();
+		mRsCtrlService.disconnect();
+		mRsCtrlService.destroy();
+		mRsCtrlService=null;
+	}
+	
+	/*
+	@Override
+	public boolean onUnbind(Intent intent){
+		Log.v(TAG, "onUnbind()");
+		
+		// don't use rebind
+		return false;
+	}
+	*/
+	
 	public void saveData(){
 		try {
 			mDatapack.serverData=mRsCtrlService.getServerData();
@@ -168,10 +187,9 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	public void onConnectionStateChanged() {
 		saveData();
 		updateNotification();
-		if(mRsCtrlService.isOnline()){
-			mRsCtrlService.chatService.registerForEventsAtServer();
-		}
 	}
+	@Override
+	public void onConnected(){}
 	
 	private void updateNotification(){
 		int icon;

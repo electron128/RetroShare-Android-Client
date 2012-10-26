@@ -22,7 +22,7 @@ import net.lag.jaramiko.ClientTransport;
 /**
  * Platform independent RsCtrlService
  * @author till
- *
+ * 
  */
 
 public class RsCtrlService implements Runnable{
@@ -40,6 +40,11 @@ public class RsCtrlService implements Runnable{
 	// TODO: callbacks
 	public interface RsCtrlServiceListener{
 		public void onConnectionStateChanged();
+		// we have 2 callbacks now, maybe it is better to have only one with a parameter?
+		// onConnectionStateChanged(connected)
+		// onConnectionStateChanged(disconnected)
+		public void onConnected();
+		//public void onDisconnected();
 	}
 	
 	private Set<RsCtrlServiceListener> mListeners=new HashSet<RsCtrlServiceListener>();
@@ -49,16 +54,29 @@ public class RsCtrlService implements Runnable{
 	public void unregisterListener(RsCtrlServiceListener l){
 		mListeners.remove(l);
 	}
-	private void notifyListeners(){
+	private void notifyListenersOnConnectionStateChanged(){
 		for(RsCtrlServiceListener l:mListeners){
 			l.onConnectionStateChanged();
 		}
 	}
-	private void postNotifyListenersToUiThread(){
+	private void notifyListenersOnConnected(){
+		for(RsCtrlServiceListener l:mListeners){
+			l.onConnected();
+		}
+	}
+	private void postNotifyListenersToUiThreadOnConnectionStateChanged(){
 		mUiThreadHandler.postToUiThread(new Runnable(){
 			@Override
 			public void run(){
-				notifyListeners();
+				notifyListenersOnConnectionStateChanged();
+			}
+		});
+	}
+	private void postNotifyListenersToUiThreadOnConnected(){
+		mUiThreadHandler.postToUiThread(new Runnable(){
+			@Override
+			public void run(){
+				notifyListenersOnConnected();
 			}
 		});
 	}
@@ -144,6 +162,10 @@ public class RsCtrlService implements Runnable{
 	public FilesService filesService;
 	public SearchService searchService;
 	
+	/**
+	 * 
+	 * @param h
+	 */
 	RsCtrlService(UiThreadHandlerInterface h){
 		mUiThreadHandler=h;
 		mThread=new Thread(this);
@@ -170,6 +192,10 @@ public class RsCtrlService implements Runnable{
 		chatService.updateChatLobbies();
 	}
 	
+	public void destroy(){
+		runThread=false;
+	}
+	
 	// **************************
 	// todo: clone the server data, so outside thread 
 	// can't change our serverdata which is used in our workerthread
@@ -177,7 +203,7 @@ public class RsCtrlService implements Runnable{
 		synchronized(mServerData){
 			mServerData=d.clone();
 		}
-		notifyListeners();
+		notifyListenersOnConnectionStateChanged();
 	}
 	public RsServerData getServerData(){
 		synchronized(mServerData){
@@ -191,6 +217,13 @@ public class RsCtrlService implements Runnable{
 		
 		synchronized(mConnectAction){
 			mConnectAction=ConnectAction.CONNECT;
+		}
+	}
+	public void disconnect(){
+		if(DEBUG){System.err.println("RsCtrlService: disconnect()");}
+		
+		synchronized(mConnectAction){
+			mConnectAction=ConnectAction.DISCONNECT;
 		}
 	}
 	
@@ -253,11 +286,15 @@ public class RsCtrlService implements Runnable{
 			}
 			
 			boolean connect=false;
+			boolean disconnect=false;
 			boolean isonline=false;
 			
 			// check if we have to connect
 			synchronized(mConnectAction){
 				connect=(mConnectAction==ConnectAction.CONNECT);
+			}
+			synchronized(mConnectAction){
+				disconnect=(mConnectAction==ConnectAction.DISCONNECT);
 			}
 			
 			synchronized(mConnectState){
@@ -324,6 +361,9 @@ public class RsCtrlService implements Runnable{
 				}
 				
 			}
+			if(disconnect){
+				_disconnect();
+			}
 		}
 		
 	}
@@ -360,7 +400,8 @@ public class RsCtrlService implements Runnable{
 				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
 				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 				
-				postNotifyListenersToUiThread();
+				postNotifyListenersToUiThreadOnConnected();
+				postNotifyListenersToUiThreadOnConnectionStateChanged();
 				
 				/*mUiThreadHandler.postToUiThread(new Runnable(){
 					@Override
@@ -378,34 +419,35 @@ public class RsCtrlService implements Runnable{
 		// WLAN aus: Java.net.SocketException: Network unreachable
 		// wlan an aber falsche ip: Java.net.SocketTimeoutException: Transport endpoint is not connected
 		// rs-nogui hat kein cleanup gemacht: net.lag.jaramiko.SSHException: Timeout
+		// falscher hostkey: net.lag.jaramiko.SShException: Bad host key from server
 		
 		catch (UnknownHostException e){
 			mLastConnectionError=ConnectionError.UnknownHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		} catch (NoRouteToHostException e){
 			mLastConnectionError=ConnectionError.NoRouteToHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		} catch (ConnectException e){
 			mLastConnectionError=ConnectionError.ConnectException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		} catch (BadSignatureException e){
 			mLastConnectionError=ConnectionError.BadSignatureException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		
 		// tut
 		} catch (AuthenticationFailedException e){
 			mLastConnectionError=ConnectionError.AuthenticationFailedException;	
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -416,8 +458,43 @@ public class RsCtrlService implements Runnable{
 			
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		}
+	}
+	
+	private void _disconnect(){
+		if(DEBUG){System.err.println("RsCtrlService: _disconnect() ...");}
+		
+		synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
+		synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
+		
+		mLastConnectionError=ConnectionError.NONE;
+		
+		mInputStream=null;
+		mOutputStream=null;
+		
+		mChannel.close();
+		mChannel=null;
+		
+		mTransport.close();
+		mTransport=null;
+		
+		try {
+			mSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mSocket=null;
+		
+		/*
+		mSocket;
+		mTransport;
+		mChannel;
+		mInputStream;
+		mOutputStream;
+		*/
+		
 	}
 	
 	private void _sendMsg(RsMessage msg) {
@@ -443,7 +520,7 @@ public class RsCtrlService implements Runnable{
 			mLastConnectionError=ConnectionError.SEND_ERROR;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		}
 	}
 	
@@ -590,7 +667,7 @@ public class RsCtrlService implements Runnable{
 			mLastConnectionError=ConnectionError.RECEIVE_ERROR;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThread();
+			postNotifyListenersToUiThreadOnConnectionStateChanged();
 		}
 		return -1;
 	}

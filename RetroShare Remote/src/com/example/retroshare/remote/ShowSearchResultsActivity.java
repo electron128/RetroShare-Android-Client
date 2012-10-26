@@ -56,6 +56,7 @@ public class ShowSearchResultsActivity extends RsActivityBase {
         setContentView(listView);
         
     	mHandler=new Handler();
+    	
     	//mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
     }
     
@@ -78,6 +79,11 @@ public class ShowSearchResultsActivity extends RsActivityBase {
     public void onPause(){
     	super.onPause();
     	isInForeground=false;
+    }
+    @Override
+    public void onDestroy(){
+    	super.onDestroy();
+    	mRsService.mRsCtrlService.searchService.unregisterListener(adapter);
     }
     
 	private class updateRunnable implements Runnable{
