@@ -2,7 +2,7 @@
 
 A Client for retroshare-nogui(ssh).
 
-[Download RetroShare Remote.apk](https://github.com/electron128/RetroShare-Android-Client/raw/master/Releases/RetroShare%20Remote2.apk)
+[Download RetroShare Remote.apk](https://github.com/electron128/RetroShare-Android-Client/raw/master/Releases/RetroShare%20Remote3.apk)
 
 
 Note: at the moment (12.09.2012) you can find retroshare-nogui at the [v0.5-gxs-b1](http://retroshare.svn.sourceforge.net/viewvc/retroshare/branches/v0.5-gxs-b1/) branch.
