@@ -16,3 +16,34 @@ add errorhandling:
 mServerData.port=Integer.parseInt(editTextPort.getText().toString());
 
 use unregisterListener, to allow gc of old objects
+
+add auto-update to chatlobby activity
+
+
+
+
+
+notes
+
+github markdown
+https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#wiki-images
+
+eclipse c++:
+http://mhandroid.wordpress.com/2011/01/23/using-eclipse-for-android-cc-development/
+
+std::cerr from c++ to logcat:
+create a local.prop on your workstation, then adb push local.prop /data
+local.prop:
+log.redirect-stdio = true
+
+
+
+
+
+
+ndk-stack:
+D:\Java_Dev\android-ndk-r8b>ndk-stack -sym D:\Java_Dev\RetroShareRemote\RetroSha
+reRemote\obj\local\armeabi -dump <path to log from logcat>
+
+
+

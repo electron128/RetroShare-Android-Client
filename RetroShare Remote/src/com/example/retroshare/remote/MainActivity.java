@@ -3,6 +3,10 @@ package com.example.retroshare.remote;
 //import JRS;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 
@@ -54,8 +58,64 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	
 	boolean isInForeground=false;
 	
+	Thread testThread;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	
+    	
+    	// todo: test with while(true){Thread.sleep(50);} at end of thread
+    	// run test
+    	// run in own thread to not get killed by activitymanager
+    	testThread=new Thread(new Runnable(){
+			@Override
+			public void run() {
+			    try {
+			    	// copy bdboot.txt
+			    	InputStream in = getResources().openRawResource(R.raw.bdboot);
+					FileOutputStream out=openFileOutput("bdboot.txt", 0);
+					int read=0;
+					//int length=0;
+					byte[] buffer=new byte[1000];
+					while(read!=-1){
+						read=in.read(buffer);
+						if(read!=-1){
+							out.write(buffer, 0, read);
+							//length+=read;
+						}
+					}
+					in.close();
+					out.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			    Log.v(TAG, "java: calling native code");
+			    String path=getFilesDir().getAbsolutePath()+"/bdboot.txt";
+				Log.v(TAG, "native code:"+bitdht.getIp(path));
+				Log.v(TAG, "java: native code returned");
+				/*
+				while(true){try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}}*/
+			}
+		});
+    	testThread.start();
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_2);
         
