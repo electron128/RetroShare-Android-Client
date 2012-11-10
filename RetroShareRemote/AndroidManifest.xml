@@ -17,11 +17,6 @@
         <activity
             android:name=".MainActivity"
             android:label="RetroShare Remote" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 	    <activity
 	        android:name=".PeersActivity"
@@ -54,6 +49,12 @@
 	    </activity>
 	    <activity android:name=".ShowSearchResultsActivity"></activity>
 	    <activity android:name=".ListSearchesActivity"></activity>
+	    <activity android:name=".LoginActivity"><intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter></activity>
+	    <activity android:name=".AddServerActivity"></activity>
     </application>
 
 </manifest>

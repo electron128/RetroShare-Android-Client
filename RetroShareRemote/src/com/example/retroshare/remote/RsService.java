@@ -14,6 +14,8 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
@@ -42,7 +44,9 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	
 	
 	private static class Datapack implements Serializable{
-		RsServerData serverData=new RsServerData();
+		static final long serialVersionUID = 1L;
+		// index: server name
+		Map<String,RsServerData> serverDataMap=new HashMap<String,RsServerData>();
 	}
 	private Datapack mDatapack;
 	private NotifyService mNotifyService;
@@ -51,10 +55,10 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	@Override
 	public void onCreate(){
 		try {
-			ObjectInputStream i=new ObjectInputStream(openFileInput("RsService"));
+			ObjectInputStream i=new ObjectInputStream(openFileInput("RsService"+Long.toString(Datapack.serialVersionUID)));
 			mDatapack=(Datapack) i.readObject();
 			
-			Log.v(TAG, "read Datapack, Datapack.serverData="+mDatapack.serverData);
+			Log.v(TAG, "read Datapack, Datapack.serverDataMap="+mDatapack.serverDataMap);
 		} catch (StreamCorruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,7 +75,6 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		if(mDatapack==null){mDatapack=new Datapack();}
 		
 		mRsCtrlService=new RsCtrlService(new UiThreadHandler());
-		mRsCtrlService.setServerData(mDatapack.serverData);
 		mRsCtrlService.registerListener(this);
 		
 		mNotifyService=new NotifyService(mRsCtrlService.chatService,this);
@@ -107,9 +110,10 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	
 	public void saveData(){
 		try {
-			mDatapack.serverData=mRsCtrlService.getServerData();
-			Log.v(TAG, "trying to save Datapack, Datapack.serverData="+mDatapack.serverData);
-			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService", 0));
+			RsServerData sd=mRsCtrlService.getServerData();
+			mDatapack.serverDataMap.put(sd.name, sd);
+			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
+			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -118,6 +122,10 @@ public class RsService extends Service implements RsCtrlServiceListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public Map<String,RsServerData> getServers(){
+		return mDatapack.serverDataMap;
 	}
 	
 	//---------------------------------------------
@@ -184,12 +192,10 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	public RsCtrlService mRsCtrlService;
 
 	@Override
-	public void onConnectionStateChanged() {
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) {
 		saveData();
 		updateNotification();
 	}
-	@Override
-	public void onConnected(){}
 	
 	private void updateNotification(){
 		int icon;

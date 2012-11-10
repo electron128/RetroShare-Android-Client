@@ -15,9 +15,14 @@ public class RsServerData implements Serializable, Cloneable{
 	private static final boolean DEBUG=false;
 	private static final long serialVersionUID = 0;
 	
+	// name to identify this server
+	public String name;
+	
 	public String user;
 	public String password;
+	public boolean savePassword=false;
 	public String hostname;
+	public String dhtKey;
 	public int port;
 	public transient PKey hostkey;
 	
@@ -25,10 +30,10 @@ public class RsServerData implements Serializable, Cloneable{
 	public String toString(){
 		//if(hostkey!=null){
 			try{
-				return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
+				return "Servername:"+name+" \""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
 			} catch(NullPointerException e){
 				//System.err.println("NullPointerException in RsServerData.toString()");
-				return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key=Error in RsServerData.toString() \"";
+				return "Servername:"+name+" \""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key=Error in RsServerData.toString() \"";
 			}/*
 		}else{
 			return "\""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key=RsServerData::toString: hostkey=null\"";
@@ -93,9 +98,12 @@ public class RsServerData implements Serializable, Cloneable{
 	
 	protected RsServerData clone(){
 		RsServerData d=new RsServerData();
+		d.name=name;
 		d.user=user;
 		d.password=password;
+		d.savePassword=savePassword;
 		d.hostname=hostname;
+		d.dhtKey=dhtKey;
 		d.port=port;
 		if(hostkey!=null){
 			try {

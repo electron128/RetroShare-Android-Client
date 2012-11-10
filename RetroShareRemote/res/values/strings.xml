@@ -51,5 +51,15 @@
         <string name="download">download</string>
         <string name="rate">rate:</string>
         <string name="search">search</string>
+        <string name="select_server">select server/account</string>
+        <string name="show_password">" show password"</string>
+        <string name="save_password">save password</string>
+        <string name="new_server">new server ...</string>
+        <string name="add">add</string>
+        <string name="enter_ssh_password">enter ssh password</string>
+        <string name="arbitrary_name">arbitrary name</string>
+        <string name="ssh_username">ssh username</string>
+        <string name="ssh_port">ssh port</string>
+        <string name="new_retroshare_nogui_server">new retroshare-nogui server</string>
 
 </resources>

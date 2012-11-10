@@ -20,6 +20,14 @@ use unregisterListener, to allow gc of old objects
 add auto-update to chatlobby activity
 
 
+add check if port is a number
+
+
+important:
+with different accounts we have to renew the chatservice when the account is changed
+- maybe just restart RsCtrlService?
+
+
 
 
 

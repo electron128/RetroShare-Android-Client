@@ -267,13 +267,10 @@ public class ChatService implements ServiceInterface, RsCtrlService.RsCtrlServic
 	}
 	
 	@Override
-	public void onConnectionStateChanged() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onConnected() {
-		registerForEventsAtServer();
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) {
+		if(ce==RsCtrlService.ConnectionEvent.CONNECTED){
+			registerForEventsAtServer();
+		}
 	}
 	
 	

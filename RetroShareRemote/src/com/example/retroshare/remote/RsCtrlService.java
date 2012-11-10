@@ -37,14 +37,11 @@ public class RsCtrlService implements Runnable{
 		public byte[] body;
 	}
 	
-	// TODO: callbacks
+	public enum ConnectionEvent{
+		SERVER_DATA_CHANGED,ERROR_WHILE_CONNECTING,CONNECTED,ERROR_DISCONNECTED
+	}
 	public interface RsCtrlServiceListener{
-		public void onConnectionStateChanged();
-		// we have 2 callbacks now, maybe it is better to have only one with a parameter?
-		// onConnectionStateChanged(connected)
-		// onConnectionStateChanged(disconnected)
-		public void onConnected();
-		//public void onDisconnected();
+		public void onConnectionStateChanged(ConnectionEvent ce);
 	}
 	
 	private Set<RsCtrlServiceListener> mListeners=new HashSet<RsCtrlServiceListener>();
@@ -54,29 +51,17 @@ public class RsCtrlService implements Runnable{
 	public void unregisterListener(RsCtrlServiceListener l){
 		mListeners.remove(l);
 	}
-	private void notifyListenersOnConnectionStateChanged(){
+	private void notifyListenersOnConnectionStateChanged(ConnectionEvent ce){
 		for(RsCtrlServiceListener l:mListeners){
-			l.onConnectionStateChanged();
+			l.onConnectionStateChanged(ce);
 		}
 	}
-	private void notifyListenersOnConnected(){
-		for(RsCtrlServiceListener l:mListeners){
-			l.onConnected();
-		}
-	}
-	private void postNotifyListenersToUiThreadOnConnectionStateChanged(){
+
+	private void postNotifyListenersToUiThreadOnConnectionStateChanged(final ConnectionEvent ce){
 		mUiThreadHandler.postToUiThread(new Runnable(){
 			@Override
 			public void run(){
-				notifyListenersOnConnectionStateChanged();
-			}
-		});
-	}
-	private void postNotifyListenersToUiThreadOnConnected(){
-		mUiThreadHandler.postToUiThread(new Runnable(){
-			@Override
-			public void run(){
-				notifyListenersOnConnected();
+				notifyListenersOnConnectionStateChanged(ce);
 			}
 		});
 	}
@@ -203,7 +188,7 @@ public class RsCtrlService implements Runnable{
 		synchronized(mServerData){
 			mServerData=d.clone();
 		}
-		notifyListenersOnConnectionStateChanged();
+		notifyListenersOnConnectionStateChanged(ConnectionEvent.SERVER_DATA_CHANGED);
 	}
 	public RsServerData getServerData(){
 		synchronized(mServerData){
@@ -400,8 +385,7 @@ public class RsCtrlService implements Runnable{
 				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
 				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 				
-				postNotifyListenersToUiThreadOnConnected();
-				postNotifyListenersToUiThreadOnConnectionStateChanged();
+				postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.CONNECTED);
 				
 				/*mUiThreadHandler.postToUiThread(new Runnable(){
 					@Override
@@ -425,29 +409,30 @@ public class RsCtrlService implements Runnable{
 			mLastConnectionError=ConnectionError.UnknownHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		} catch (NoRouteToHostException e){
 			mLastConnectionError=ConnectionError.NoRouteToHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		} catch (ConnectException e){
 			mLastConnectionError=ConnectionError.ConnectException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		} catch (BadSignatureException e){
 			mLastConnectionError=ConnectionError.BadSignatureException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		
 		// tut
 		} catch (AuthenticationFailedException e){
+			mLastConnectionErrorString="wrong password or username";
 			mLastConnectionError=ConnectionError.AuthenticationFailedException;	
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -458,7 +443,7 @@ public class RsCtrlService implements Runnable{
 			
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		}
 	}
 	
@@ -473,10 +458,14 @@ public class RsCtrlService implements Runnable{
 		mInputStream=null;
 		mOutputStream=null;
 		
-		mChannel.close();
+		if(mChannel !=null){
+			mChannel.close();
+		}
 		mChannel=null;
 		
-		mTransport.close();
+		if(mTransport !=null){
+			mTransport.close();
+		}
 		mTransport=null;
 		
 		try {
@@ -520,7 +509,7 @@ public class RsCtrlService implements Runnable{
 			mLastConnectionError=ConnectionError.SEND_ERROR;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_DISCONNECTED);
 		}
 	}
 	
@@ -667,7 +656,7 @@ public class RsCtrlService implements Runnable{
 			mLastConnectionError=ConnectionError.RECEIVE_ERROR;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged();
+			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_DISCONNECTED);
 		}
 		return -1;
 	}
