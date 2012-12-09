@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.example.retroshare.remote.RsCtrlService.ConnectAction;
 import com.example.retroshare.remote.RsCtrlService.ConnectState;
+import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
 
 import android.app.AlertDialog;
@@ -24,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -31,6 +33,54 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import 	android.text.method.PasswordTransformationMethod;
+
+
+
+
+
+
+
+
+/*
+ * old code from main activity
+ * 
+      			ConnectionError conErr=mRsService.mRsCtrlService.getLastConnectionError();
+    			Log.v(TAG,"updateViews(): conErr: "+conErr);
+    			if(conErr==ConnectionError.NONE){
+	    			textViewConnectionState.setVisibility(View.GONE);
+    			}
+    			else{
+    				switch(conErr){
+					case AuthenticationFailedException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_auth_failed));
+						break;
+					case BadSignatureException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_bad_signature));
+						break;
+					case ConnectException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_connection_refused));
+						break;
+					case NoRouteToHostException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_no_route_to_host));
+						break;
+					case RECEIVE_ERROR:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_receive));
+						break;
+					case SEND_ERROR:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_send));
+						break;
+					case UnknownHostException:
+						textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_unknown_host));
+						break;
+					case UNKNOWN:
+						textViewConnectionState.setText(mRsService.mRsCtrlService.getLasConnectionErrorString());
+						break;
+					default:
+						textViewConnectionState.setText("default reached, this should not happen");
+						break;
+    				
+    				}
+ */
 
 public class LoginActivity extends RsActivityBase implements RsCtrlServiceListener{
 
@@ -100,6 +150,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
         lal=new ListAdapterListener(this);
         listView.setAdapter(lal);
         listView.setOnItemClickListener(lal);
+        listView.setOnItemLongClickListener(lal);
     }
     
     @Override
@@ -136,6 +187,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     private static final int DIALOG_PASSWORD=0;
     private static final int DIALOG_CONNECT=1;
     private static final int DIALOG_CONNECT_ERROR=2;
+    private static final int DIALOG_REMOVE_SERVER=3;
     
     
     //private ProgressDialog pd;
@@ -179,13 +231,12 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 	    	return builder.create();
     	case DIALOG_CONNECT:
     		ProgressDialog pd=new ProgressDialog(LoginActivity.this);
-    		pd.setMessage("connecting to "+selectedServer.hostname+":"+selectedServer.port);
     		return pd;
     	case DIALOG_CONNECT_ERROR:
     		AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 	    	builder2.setTitle(R.string.connection_error)
-	    		// TODO solve the connection error thing
-	    		.setMessage(mRsService.mRsCtrlService.getLasConnectionErrorString())
+	    		// set to something!=null, else it is not possible to change it later
+	    		.setMessage("123")
 	    		.setPositiveButton("ok", new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -194,8 +245,58 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 					}
 	    		});
 	    	return builder2.create();
+    	case DIALOG_REMOVE_SERVER:
+    		AlertDialog.Builder builder3 = new AlertDialog.Builder(this);
+	    	builder3.setTitle(R.string.remove_server)
+	    		// set to something!=null, else it is not possible to change it later
+	    		.setMessage("123")
+	    		.setPositiveButton("yes", new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						
+						mRsService.removeServer(selectedServer);
+						lal.update();
+					}
+	    		})
+	    		.setNegativeButton("no", new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						//nothing here
+					}
+	    		});
+	    	return builder3.create();
     	}
     	return null;
+    }
+    
+    @Override
+    protected void onPrepareDialog(int id,Dialog dlg){
+    	switch(id){
+    	case DIALOG_PASSWORD:
+	    	EditText et=(EditText) dlg.findViewById(R.id.editTextPassword);
+	    	CheckBox cbvp=(CheckBox) dlg.findViewById(R.id.checkBoxShowPassword);
+	    	CheckBox cbsp=(CheckBox) dlg.findViewById(R.id.checkBoxSavePassword);
+	    	
+	    	et.setText("");
+	    	cbvp.setChecked(false);
+	    	cbsp.setChecked(selectedServer.savePassword);
+	    	
+	    	break;
+	    	
+    	case DIALOG_CONNECT:
+    		((ProgressDialog)dlg).setMessage("connecting to "+selectedServer.hostname+":"+selectedServer.port);
+    		break;
+
+    	case DIALOG_CONNECT_ERROR:
+    		// TODO solve the connection error thing
+    		((AlertDialog)dlg).setMessage("ConnectionError: "+mRsService.mRsCtrlService.getLastConnectionError()+"\nConnectionErrorString: "+mRsService.mRsCtrlService.getLasConnectionErrorString());
+    		break;
+    		
+    	case DIALOG_REMOVE_SERVER:
+    		((AlertDialog)dlg).setMessage(selectedServer.user+"@"+selectedServer.name);
+    		break;
+    		
+    	}
     }
     
     private void connect(){
@@ -211,6 +312,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 			dismissDialog(DIALOG_CONNECT);
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
+			finish();
 		}
 		if(ce==RsCtrlService.ConnectionEvent.ERROR_WHILE_CONNECTING){
 			dismissDialog(DIALOG_CONNECT);
@@ -218,7 +320,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 		}
 	}
     
-    private class ListAdapterListener implements ListAdapter, OnItemClickListener{
+    private class ListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener{
     	
     	private List<RsServerData> servers=new ArrayList<RsServerData>();
     	
@@ -242,12 +344,19 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     	@Override
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
     		selectedServer=servers.get(position);
-    		if(selectedServer.password==null){
+    		if(selectedServer.savePassword==false){
     			showDialog(DIALOG_PASSWORD);
     		}else{
     			connect();
     		}
     	}
+    	
+		@Override
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+			selectedServer=servers.get(position);
+			showDialog(DIALOG_REMOVE_SERVER);
+			return true;
+		}
 
 		@Override
 		public int getCount() {

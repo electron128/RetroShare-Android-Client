@@ -1,36 +1,21 @@
 package com.example.retroshare.remote;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.example.retroshare.remote.RsCtrlService.ConnectionError;
 import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
-
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
 
-import net.lag.jaramiko.Channel;
-import net.lag.jaramiko.ClientTransport;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -108,10 +93,26 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	}
 	*/
 	
-	public void saveData(){
+	/*
+	 * no addServer here, see RsCtrlService.setServerData()
+	 */
+	public void removeServer(RsServerData sd){
+		mDatapack.serverDataMap.remove(sd.name);
+		
+		// prevent server from being saved if it is in rsctrlservice
+		if(sd.name.equals(mRsCtrlService.getServerData().name)){
+			saveData(false);
+		}else{
+			saveData(true);
+		}
+	}
+	
+	private void saveData(boolean saveServerFromRsCtrlService){
 		try {
-			RsServerData sd=mRsCtrlService.getServerData();
-			mDatapack.serverDataMap.put(sd.name, sd);
+			if(saveServerFromRsCtrlService){
+				RsServerData sd=mRsCtrlService.getServerData();
+				mDatapack.serverDataMap.put(sd.name, sd);
+			}
 			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
 			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
@@ -193,7 +194,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) {
-		saveData();
+		saveData(true);
 		updateNotification();
 	}
 	

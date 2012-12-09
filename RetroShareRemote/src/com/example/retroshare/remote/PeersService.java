@@ -63,7 +63,6 @@ public class PeersService implements ServiceInterface{
 			RequestPeers req=reqb.build();
 			byte[] b;
 			b=req.toByteArray();
-			//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
 	    	RsMessage msg= new RsMessage();
 	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
 	    	msg.body=b;
@@ -91,8 +90,7 @@ public class PeersService implements ServiceInterface{
 		RequestPeers req=reqb.build();
 		byte[] b;
 		b=req.toByteArray();
-		//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
-    	RsMessage msg= new RsMessage();
+		RsMessage msg= new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
     	msg.body=b;
     	mRsCtrlService.sendMsg(msg);

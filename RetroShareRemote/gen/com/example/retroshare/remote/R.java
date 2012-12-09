@@ -77,7 +77,7 @@ public final class R {
         public static final int TextView04=0x7f090039;
         public static final int View01=0x7f090031;
         public static final int View02=0x7f090037;
-        public static final int View03=0x7f09001f;
+        public static final int View03=0x7f09001e;
         public static final int button1=0x7f090018;
         public static final int button10=0x7f09004a;
         public static final int button11=0x7f09004b;
@@ -112,11 +112,11 @@ public final class R {
         public static final int imageViewMessage=0x7f090013;
         public static final int imageViewQrCode=0x7f090044;
         public static final int imageViewUserState=0x7f090042;
+        public static final int linearLayout=0x7f09001d;
         public static final int listView=0x7f09001c;
-        public static final int listView1=0x7f09001e;
+        public static final int listView1=0x7f09001f;
         public static final int menu_settings=0x7f09004c;
         public static final int progressBar1=0x7f09001a;
-        public static final int scrollView=0x7f09001d;
         public static final int scrollView1=0x7f09000e;
         public static final int textView1=0x7f090000;
         public static final int textView2=0x7f09000f;
@@ -206,6 +206,7 @@ public final class R {
         public static final int peers=0x7f050008;
         public static final int port=0x7f05000d;
         public static final int rate=0x7f050028;
+        public static final int remove_server=0x7f050034;
         public static final int save_password=0x7f05002c;
         public static final int search=0x7f050029;
         public static final int select_server=0x7f05002a;

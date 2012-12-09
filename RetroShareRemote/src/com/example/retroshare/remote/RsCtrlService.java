@@ -289,7 +289,8 @@ public class RsCtrlService implements Runnable{
 			if(connect){
 				_connect();
 			}
-			if(isonline){
+			// if connect==true, we could be offline because _connect() failed
+			if(!connect & isonline){
 				// handle outgoing
 				{
 					RsMessage msg=null;
@@ -355,9 +356,13 @@ public class RsCtrlService implements Runnable{
 
 	
 	private void _connect(){
+		boolean error=true;
 		try {
 			synchronized(mServerData){
 				if(DEBUG){System.err.println("RsCtrlService: _connect() ...");}
+				// cleanup old connection
+				// dont know if needed
+				//_disconnect();
 				
 				boolean newHostKey=false;
 				if(mServerData.hostkey==null){
@@ -395,6 +400,7 @@ public class RsCtrlService implements Runnable{
 				});*/
 				
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
+				error=false;
 			}
 		} 
 		
@@ -407,43 +413,34 @@ public class RsCtrlService implements Runnable{
 		
 		catch (UnknownHostException e){
 			mLastConnectionError=ConnectionError.UnknownHostException;
-			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
+			
 		} catch (NoRouteToHostException e){
 			mLastConnectionError=ConnectionError.NoRouteToHostException;
-			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
+			
 		} catch (ConnectException e){
 			mLastConnectionError=ConnectionError.ConnectException;
-			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
+			
 		} catch (BadSignatureException e){
 			mLastConnectionError=ConnectionError.BadSignatureException;
-			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
-		
+			
 		// tut
 		} catch (AuthenticationFailedException e){
 			mLastConnectionErrorString="wrong password or username";
 			mLastConnectionError=ConnectionError.AuthenticationFailedException;	
-			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
 			
 			mLastConnectionError=ConnectionError.UNKNOWN;
 			mLastConnectionErrorString=e.toString();
-			
+		}
+		
+		if(error){
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
+			// cleanup
+			_disconnect();
 		}
 	}
 	
@@ -452,8 +449,6 @@ public class RsCtrlService implements Runnable{
 		
 		synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 		synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-		
-		mLastConnectionError=ConnectionError.NONE;
 		
 		mInputStream=null;
 		mOutputStream=null;
@@ -469,7 +464,9 @@ public class RsCtrlService implements Runnable{
 		mTransport=null;
 		
 		try {
-			mSocket.close();
+			if(mSocket !=null){
+				mSocket.close();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

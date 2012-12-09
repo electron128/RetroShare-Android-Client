@@ -19,7 +19,8 @@ public class RsServerData implements Serializable, Cloneable{
 	public String name;
 	
 	public String user;
-	public String password;
+	// will only be wrritten on disk, if savePassword==true
+	public transient String password;
 	public boolean savePassword=false;
 	public String hostname;
 	public String dhtKey;
@@ -66,11 +67,18 @@ public class RsServerData implements Serializable, Cloneable{
 		if(DEBUG){System.err.println("RsServerData::writeObject: "+this);}
 		try {
 			out.defaultWriteObject();
+			
+			if(savePassword){
+				out.writeBoolean(true);
+				out.writeObject(password);
+			}else{
+				out.writeBoolean(false);
+			}
+			
 			if(hostkey!=null){
 				out.writeBoolean(true);
 				out.writeObject(hostkey.toByteArray());
-			}
-			else{
+			}else{
 				out.writeBoolean(false);
 			}
 		} catch (IOException e) {
@@ -84,6 +92,16 @@ public class RsServerData implements Serializable, Cloneable{
 	private void readObject(ObjectInputStream in) throws NotActiveException, IOException, ClassNotFoundException{
 		if(DEBUG){System.err.println("RsServerData::readObject begin: ");}
 		in.defaultReadObject();
+		
+		if(in.readBoolean()){
+			if(DEBUG){System.err.println("RsServerData::readObject: savePassword==true");}
+			password=(String) in.readObject();
+		}
+		else{
+			if(DEBUG){System.err.println("RsServerData::readObject: savePassword==false");}
+			password=null;
+		}
+		
 		if(in.readBoolean()){
 			if(DEBUG){System.err.println("RsServerData::readObject: PKey!=null");}
 			byte[] b=(byte[]) in.readObject();

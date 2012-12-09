@@ -16,40 +16,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_launcher" />
-
-        <EditText
-            android:id="@+id/editTextHostname"
-            android:layout_width="fill_parent"
+
+        <TextView
+            android:id="@+id/textViewConnectionState"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/hostname"
-            android:inputType="text" >
-        </EditText>
-
-        <EditText
-            android:id="@+id/editTextPort"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/port"
-            android:inputType="number" >
-        </EditText>
-
-        <EditText
-            android:id="@+id/editTextUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/user"
-            android:inputType="text" />
-
-        <EditText
-            android:id="@+id/editTextPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:layout_marginLeft="8dp"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,21 +47,6 @@
                 android:src="@drawable/cancel" />
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textViewConnectionState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <Button
-            android:id="@+id/buttonConnect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="connect"
-            android:text="@string/connect" />
 
         <TextView
             android:id="@+id/textViewNetStatus"

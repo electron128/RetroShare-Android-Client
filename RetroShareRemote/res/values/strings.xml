@@ -61,5 +61,6 @@
         <string name="ssh_username">ssh username</string>
         <string name="ssh_port">ssh port</string>
         <string name="new_retroshare_nogui_server">new retroshare-nogui server</string>
+        <string name="remove_server">remove server?</string>
 
 </resources>
