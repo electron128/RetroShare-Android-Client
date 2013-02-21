@@ -50,8 +50,7 @@ log.redirect-stdio = true
 
 
 ndk-stack:
-D:\Java_Dev\android-ndk-r8b>ndk-stack -sym D:\Java_Dev\RetroShareRemote\RetroSha
-reRemote\obj\local\armeabi -dump <path to log from logcat>
+D:\Java_Dev\android-ndk-r8b>ndk-stack -sym D:\Java_Dev\RetroShareRemote\RetroShareRemote\obj\local\armeabi -dump <path to log from logcat>
 
 
 

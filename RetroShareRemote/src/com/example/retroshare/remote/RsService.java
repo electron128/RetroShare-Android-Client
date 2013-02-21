@@ -125,6 +125,12 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return all known servers
+	 * 
+	 * no AddServer here, please use RSService.mRSCTRService
+	 */
 	public Map<String,RsServerData> getServers(){
 		return mDatapack.serverDataMap;
 	}

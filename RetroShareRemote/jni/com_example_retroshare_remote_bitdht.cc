@@ -2,7 +2,7 @@
 
 #include "com_example_retroshare_remote_bitdht.h"
 
-#include "example/bssdht.h"
+#include "example/bootstrap_fn.h"
 #include <iostream>
 
 jstring Java_com_example_retroshare_remote_bitdht_getIp
@@ -15,7 +15,9 @@ jstring Java_com_example_retroshare_remote_bitdht_getIp
     const char* str = env->GetStringUTFChars(s, &b);
     std::string stdstr(str);
     env->ReleaseStringUTFChars(s, str);
-	dowork(stdstr);
+
+    std::cerr << "calling bdSingleShotFindPeer()" << std::endl;
+    bdSingleShotFindPeer(stdstr);
 
 	std::cerr << "Java_com_example_retroshare_remote_bitdht_getIp() returning ..." << std::endl;
 

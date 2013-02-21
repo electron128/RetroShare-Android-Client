@@ -9,6 +9,7 @@ LOCAL_SRC_FILES := \
 	com_example_retroshare_remote_bitdht.cc	\
 	example/bdhandler.cc	\
 	example/bssdht.cc	\
+	example/bootstrap_fn.cc	\
 	bitdht/bencode.c	\
 	bitdht/bdobj.cc    	\
 	bitdht/bdmsgs.cc	\
