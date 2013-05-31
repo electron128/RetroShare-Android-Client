@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.retroshare.remote"
+    package="org.retroshare.android"
     android:versionCode="1"
     android:versionName="1" >
     
@@ -23,7 +23,7 @@
 	        android:label="@string/peers" >
 	        <meta-data
 	            android:name="android.support.PARENT_ACTIVITY"
-	            android:value="com.example.retroshare.remote.MainActivity" />
+	            android:value="org.retroshare.android.MainActivity" />
 	    </activity>ChatlobbyActivityChatlobbyActivity
 	    <service android:name=".RsService"></service>
 	    <activity android:name=".ChatlobbyActivity" android:label="@string/chat_lobbies"></activity>

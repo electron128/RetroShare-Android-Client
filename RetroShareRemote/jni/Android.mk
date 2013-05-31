@@ -6,7 +6,7 @@ LOCAL_CPP_EXTENSION := .cc
 
 LOCAL_MODULE    := bitdht
 LOCAL_SRC_FILES := \
-	com_example_retroshare_remote_bitdht.cc	\
+	org_retroshare_android_bitdht.cc	\
 	example/bdhandler.cc	\
 	example/bssdht.cc	\
 	bitdht/bencode.c	\
