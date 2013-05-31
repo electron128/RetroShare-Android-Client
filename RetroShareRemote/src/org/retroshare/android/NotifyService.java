@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.Map;
 
@@ -13,7 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.example.retroshare.remote.ChatService.ChatServiceListener;
+import org.retroshare.android.ChatService.ChatServiceListener;
 
 /**
  * The only service class which relies on Android

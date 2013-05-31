@@ -1,8 +1,8 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import android.os.Handler;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 public abstract class RsMessageHandler extends Handler implements Runnable{
 	

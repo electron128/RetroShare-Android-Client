@@ -1,5 +1,5 @@
-package com.example.retroshare.remote;
-import com.example.retroshare.remote.RsService.RsBinder;
+package org.retroshare.android;
+import org.retroshare.android.RsService.RsBinder;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;

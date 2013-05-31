@@ -1,11 +1,11 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.example.retroshare.remote.SearchService.SearchServiceListener;
+import org.retroshare.android.SearchService.SearchServiceListener;
 
 import rsctrl.search.Search.SearchHit;
 

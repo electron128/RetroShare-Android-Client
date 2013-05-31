@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import com.example.retroshare.remote.ChatService.ChatServiceListener;
-import com.example.retroshare.remote.PeersService.PeersServiceListener;
+import org.retroshare.android.ChatService.ChatServiceListener;
+import org.retroshare.android.PeersService.PeersServiceListener;
 
 import android.content.Context;
 import android.content.Intent;

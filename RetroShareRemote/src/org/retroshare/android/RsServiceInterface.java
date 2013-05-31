@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 public interface RsServiceInterface {
 	

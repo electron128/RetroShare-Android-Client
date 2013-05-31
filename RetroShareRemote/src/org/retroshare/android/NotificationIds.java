@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 public class NotificationIds {
 	/*

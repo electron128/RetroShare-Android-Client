@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.io.IOException;
 import java.io.InputStream;

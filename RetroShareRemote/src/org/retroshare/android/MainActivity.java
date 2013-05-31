@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 //import JRS;
 
@@ -18,9 +18,9 @@ import rsctrl.peers.Peers.ResponsePeerList;
 import rsctrl.system.System.RequestSystemStatus;
 import rsctrl.system.System.ResponseSystemStatus;
 
-import com.example.retroshare.remote.RsCtrlService.ConnectionError;
-import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.ConnectionError;
+import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.os.Bundle;

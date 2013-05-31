@@ -1,9 +1,9 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import com.example.retroshare.remote.FilesService.FilesServiceListener;
+import org.retroshare.android.FilesService.FilesServiceListener;
 
 import rsctrl.core.Core;
 import rsctrl.files.Files;

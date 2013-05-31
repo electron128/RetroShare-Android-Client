@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.retroshare.remote.ChatService.ChatServiceListener;
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
-//import com.example.retroshare.remote.RsService.RsMessage;
+import org.retroshare.android.ChatService.ChatServiceListener;
+import org.retroshare.android.RsCtrlService.RsMessage;
+//import org.retroshare.android.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatlobbyActivity extends RsActivityBase {

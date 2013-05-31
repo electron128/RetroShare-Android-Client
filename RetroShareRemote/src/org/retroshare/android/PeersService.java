@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +12,7 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class PeersService implements ServiceInterface{

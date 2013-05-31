@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,9 +7,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.retroshare.remote.RsCtrlService.ConnectAction;
-import com.example.retroshare.remote.RsCtrlService.ConnectState;
-import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.android.RsCtrlService.ConnectAction;
+import org.retroshare.android.RsCtrlService.ConnectState;
+import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

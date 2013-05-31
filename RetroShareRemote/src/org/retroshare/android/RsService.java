@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.example.retroshare.remote.RsCtrlService.ConnectionError;
-import com.example.retroshare.remote.RsCtrlService.RsCtrlServiceListener;
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.ConnectionError;
+import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;

@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import rsctrl.files.Files.RequestTransferList;
 import rsctrl.files.Files.ResponseTransferList;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class FilesService implements ServiceInterface{

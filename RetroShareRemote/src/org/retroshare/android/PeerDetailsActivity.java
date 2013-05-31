@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import android.content.Intent;
 import android.os.Bundle;

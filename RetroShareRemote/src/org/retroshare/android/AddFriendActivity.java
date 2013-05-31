@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import rsctrl.core.Core;
 import rsctrl.peers.Peers;
@@ -6,7 +6,7 @@ import rsctrl.peers.Peers.RequestAddPeer;
 import rsctrl.peers.Peers.RequestAddPeer.AddCmd;
 import rsctrl.peers.Peers.ResponseAddPeer;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.net.Uri;

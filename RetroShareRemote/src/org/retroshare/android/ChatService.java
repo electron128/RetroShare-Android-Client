@@ -1,4 +1,4 @@
-package com.example.retroshare.remote;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
 import rsctrl.core.Core.Person;
 
-import com.example.retroshare.remote.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatService implements ServiceInterface, RsCtrlService.RsCtrlServiceListener{
