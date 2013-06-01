@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.lag.jaramiko.AuthenticationFailedException;
@@ -25,97 +24,105 @@ import net.lag.jaramiko.ClientTransport;
  * 
  */
 
-public class RsCtrlService implements Runnable{
+public class RsCtrlService implements Runnable
+{
 	private static final boolean DEBUG=true;
 	
 	public static final int MAGIC_CODE = 0x137f0001;
 	public static final int RESPONSE=(0x01<<24);
 	
-	public static class RsMessage{
+	public static class RsMessage
+	{
 		public int msgId;
 		public int reqId;
 		public byte[] body;
 	}
 	
-	public enum ConnectionEvent{
-		SERVER_DATA_CHANGED,ERROR_WHILE_CONNECTING,CONNECTED,ERROR_DISCONNECTED
-	}
-	public interface RsCtrlServiceListener{
+	public enum ConnectionEvent { SERVER_DATA_CHANGED, ERROR_WHILE_CONNECTING, CONNECTED,ERROR_DISCONNECTED }
+
+	public interface RsCtrlServiceListener
+	{
 		public void onConnectionStateChanged(ConnectionEvent ce);
 	}
 	
-	private Set<RsCtrlServiceListener> mListeners=new HashSet<RsCtrlServiceListener>();
-	public void registerListener(RsCtrlServiceListener l){
-		mListeners.add(l);
-	}
-	public void unregisterListener(RsCtrlServiceListener l){
-		mListeners.remove(l);
-	}
-	private void notifyListenersOnConnectionStateChanged(ConnectionEvent ce){
-		for(RsCtrlServiceListener l:mListeners){
+	private Set<RsCtrlServiceListener> mListeners = new HashSet<RsCtrlServiceListener>();
+	public void registerListener(RsCtrlServiceListener l) { mListeners.add(l); }
+	public void unregisterListener(RsCtrlServiceListener l){ mListeners.remove(l); }
+	private void notifyListenersOnConnectionStateChanged(ConnectionEvent ce)
+	{
+		for(RsCtrlServiceListener l:mListeners)
+		{
 			l.onConnectionStateChanged(ce);
 		}
 	}
 
-	private void postNotifyListenersToUiThreadOnConnectionStateChanged(final ConnectionEvent ce){
-		mUiThreadHandler.postToUiThread(new Runnable(){
-			@Override
-			public void run(){
-				notifyListenersOnConnectionStateChanged(ce);
-			}
-		});
+	private void postNotifyListenersToUiThreadOnConnectionStateChanged(final ConnectionEvent ce)
+	{
+		mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ notifyListenersOnConnectionStateChanged(ce); }});
 	}
 	
-	public enum ConnectState{
-		ONLINE,OFFLINE
-	}
+	public enum ConnectState{ ONLINE, OFFLINE }
 	
-	public enum ConnectAction{
-		CONNECT,DISCONNECT,NONE
-	}
+	public enum ConnectAction{ CONNECT, DISCONNECT, NONE }
 	
-	public enum ConnectionError{
+	/**
+	 * Connection errors enum
+	 */
+	public enum ConnectionError
+	{
+		/**
+		 * No error
+		 */
 		NONE,
 		
-		// Exception descritption copied from javadoc
-		
-		/*
-		 * Thrown to indicate that the IP address of a host could not be determined.
+		/**
+		 * The IP address of the host could not be determined.
 		 */
 		UnknownHostException,
 
-		/*
+		/**
 		 * Signals that an error occurred while attempting to connect a socket
-		 *  to a remote address and port. Typically, the remote host cannot be 
-		 *  reached because of an intervening firewall, or if an intermediate 
-		 *  router is down.
+		 * to a remote address and port. Typically, the remote host cannot be 
+		 * reached because of an intervening firewall, or if an intermediate 
+		 * router is down.
 		 */
 		NoRouteToHostException,
 		
-		/*
+		/**
 		 * Signals that an error occurred while attempting to connect a socket 
 		 * to a remote address and port. Typically, the connection was refused 
 		 * remotely (e.g., no process is listening on the remote address/port).
 		 */
 		ConnectException,
 		
-		// wrong hostkey
+		/**
+		 * Hostkey mismatch, hostkey changed since first connection this can mean that someone is trying to do a Man In The Middle attack
+		 */
 		BadSignatureException,
 		
-		//wrong username or password
+		/**
+		 * Wrong user name or password
+		 */
 		AuthenticationFailedException,
 		
+		/**
+		 * IO Level exception caught sending data
+		 */
 		SEND_ERROR,
+		
+		/**
+		 * IO Level exception caught receiving data
+		 */
 		RECEIVE_ERROR,
 		
+		/**
+		 * Something is not working but we don't know what/why
+		 */
 		UNKNOWN,
 	}
-	public ConnectionError getLastConnectionError(){
-		return mLastConnectionError;
-	}
-	public String getLasConnectionErrorString(){
-		return mLastConnectionErrorString;
-	}
+	
+	public ConnectionError getLastConnectionError(){ return mLastConnectionError; } /** @return Last connection error */
+	public String getLasConnectionErrorString(){ return mLastConnectionErrorString;	} /** @return Last connection error string */
 	
 	/*************************************/
 	// dont know if i have to worry with enums and threads
@@ -128,9 +135,9 @@ public class RsCtrlService implements Runnable{
 	
 	private UiThreadHandlerInterface mUiThreadHandler;
 	private Thread mThread;
-	volatile static boolean runThread=false;
+	volatile static boolean runThread = false;
 	
-	private RsServerData mServerData=new RsServerData();
+	private RsServerData mServerData = new RsServerData();
 	
 	/*************************************/
 	// accessed from worker thread only
@@ -141,7 +148,7 @@ public class RsCtrlService implements Runnable{
 	private OutputStream mOutputStream;
 	/*************************************/
 	
-	private Set<ServiceInterface> Services=new HashSet<ServiceInterface>();
+	private Set<ServiceInterface> Services  =new HashSet<ServiceInterface>();
 	public ChatService chatService;
 	public PeersService peersService;
 	public FilesService filesService;
@@ -151,7 +158,8 @@ public class RsCtrlService implements Runnable{
 	 * 
 	 * @param h
 	 */
-	RsCtrlService(UiThreadHandlerInterface h){
+	RsCtrlService(UiThreadHandlerInterface h)
+	{
 		mUiThreadHandler=h;
 		mThread=new Thread(this);
 		runThread=true;
@@ -173,49 +181,41 @@ public class RsCtrlService implements Runnable{
 		peersService.getOwnPerson();
 		// preload peers list, needed for chat notification
 		peersService.updatePeersList();
-		// preload chatobby list, because first requset returns just an empty list
+		// preload chatobby list, because first request returns just an empty list
 		chatService.updateChatLobbies();
 	}
 	
-	public void destroy(){
-		runThread=false;
-	}
+	public void destroy(){ runThread=false;	}
 	
 	// **************************
 	// todo: clone the server data, so outside thread 
 	// can't change our serverdata which is used in our workerthread
-	public void setServerData(RsServerData d){
-		synchronized(mServerData){
-			mServerData=d.clone();
-		}
+	public void setServerData(RsServerData d)
+	{
+		synchronized(mServerData){ mServerData=d.clone(); }
 		notifyListenersOnConnectionStateChanged(ConnectionEvent.SERVER_DATA_CHANGED);
 	}
-	public RsServerData getServerData(){
-		synchronized(mServerData){
-			return mServerData.clone();
-		}
+	public RsServerData getServerData()
+	{
+		synchronized(mServerData){ return mServerData.clone(); }
 	}
 	// **************************
 	
-	public void connect(){
+	public void connect()
+	{
 		if(DEBUG){System.err.println("RsCtrlService: connect()");}
 		
-		synchronized(mConnectAction){
-			mConnectAction=ConnectAction.CONNECT;
-		}
+		synchronized(mConnectAction){ mConnectAction = ConnectAction.CONNECT; }
 	}
 	public void disconnect(){
 		if(DEBUG){System.err.println("RsCtrlService: disconnect()");}
 		
-		synchronized(mConnectAction){
-			mConnectAction=ConnectAction.DISCONNECT;
-		}
+		synchronized(mConnectAction){ mConnectAction=ConnectAction.DISCONNECT; }
 	}
 	
-	public boolean isOnline(){
-		synchronized(mConnectState){
-			return (mConnectState==ConnectState.ONLINE);
-		}
+	public boolean isOnline()
+	{
+		synchronized(mConnectState){ return (mConnectState==ConnectState.ONLINE); }
 	}
 	
 	// use with synchronized()
@@ -227,45 +227,49 @@ public class RsCtrlService implements Runnable{
 	//holds pairs of <msgId,handler>
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
 	
-	public int sendMsg(RsMessage msg){
-		return sendMsg(msg,null);
-	}
-	
-	public int sendMsg(RsMessage msg, RsMessageHandler h){
+	public int sendMsg(RsMessage msg){ return sendMsg(msg,null); }
+
+	public int sendMsg(RsMessage msg, RsMessageHandler h)
+	{
 		int reqId=0;
-		synchronized(outMsgList){
+		synchronized(outMsgList)
+		{
 			msgCounter++;
 			msg.reqId=msgCounter;
 			outMsgList.add(msg);
 			reqId=msg.reqId;
 		}
-		synchronized(msgHandlers){
+		synchronized(msgHandlers)
+		{
 			msgHandlers.put(reqId, h);
 		}
 		return reqId;
 	}
 	
-	public void registerMsgHandler(int msgId,RsMessageHandler h){
-		synchronized(msgHandlersById){
-			msgHandlersById.put(msgId, h);
-		}
+	public void registerMsgHandler(int msgId,RsMessageHandler h)
+	{
+		synchronized(msgHandlersById){ msgHandlersById.put(msgId, h); }
 	}
 	
-	public RsMessageHandler getHandler(int msgId){
-		return msgHandlersById.get(msgId);
-	}
+	public RsMessageHandler getHandler(int msgId) { return msgHandlersById.get(msgId); }
 	
 	/**
 	 * 
 	 */
 	@Override
-	public void run() {
-		while(runThread){
+	public void run()
+	{
+		while(runThread)
+		{
 			
-			try {
+			try
+			{
+				// TODO It is ok to hardcode this ?
 				Thread.sleep(50);
 				//Thread.sleep(100);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				// TODO Auto-generated catch block
 				System.err.print(e);
 			}
@@ -274,167 +278,151 @@ public class RsCtrlService implements Runnable{
 			boolean disconnect=false;
 			boolean isonline=false;
 			
+			// TODO isn't it better to use just 2 syncronized statement here ?
 			// check if we have to connect
-			synchronized(mConnectAction){
-				connect=(mConnectAction==ConnectAction.CONNECT);
-			}
-			synchronized(mConnectAction){
-				disconnect=(mConnectAction==ConnectAction.DISCONNECT);
-			}
+			synchronized(mConnectAction){ connect    = (mConnectAction == ConnectAction.CONNECT); }
+			synchronized(mConnectAction){ disconnect = (mConnectAction == ConnectAction.DISCONNECT); }
+			synchronized(mConnectState) { isonline   = (mConnectState  == ConnectState.ONLINE); }
 			
-			synchronized(mConnectState){
-				isonline=(mConnectState==ConnectState.ONLINE);
-			}
+			if(connect){ _connect(); }
 			
-			if(connect){
-				_connect();
-			}
-			if(isonline){
+			if(isonline)
+			{
 				// handle outgoing
 				{
-					RsMessage msg=null;
-					synchronized(outMsgList){
-						if(!outMsgList.isEmpty()){
-							msg=outMsgList.remove(0);
-						}
+					RsMessage msg = null;
+					synchronized(outMsgList)
+					{
+						if(!outMsgList.isEmpty()) { msg=outMsgList.remove(0); }
 					}
-					if(msg != null){
-						_sendMsg(msg);
-					}
+					if(msg != null){ _sendMsg(msg); }
 				}
 				// handle incoming
 				{
 					int msgType=_recvMsg();
-					if(msgType != -1){
-						final RsMessage msg=new RsMessage();
-						msg.msgId=curMsgId;
-						msg.reqId=curReqId;
-						msg.body=curBody;
-						RsMessageHandler h=null;
-						synchronized(msgHandlers){
-							h=msgHandlers.remove(msg.reqId);
-						}
-						if(h!=null){
+					if(msgType != -1)
+					{
+						final RsMessage msg = new RsMessage();
+						msg.msgId = curMsgId;
+						msg.reqId = curReqId;
+						msg.body  = curBody;
+						RsMessageHandler h = null;
+						synchronized(msgHandlers) { h=msgHandlers.remove(msg.reqId); }
+						if(h != null)
+						{
 							if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with reqId Handler, will now post Msg to UI Thread");}
 							h.setMsg(msg);
 							// post to ui thread
 							h.post(h);
 						}
-						else{
-							synchronized(msgHandlersById){
-								h=msgHandlersById.get(msg.msgId);
-							}
-							if(h!=null){
+						else
+						{
+							synchronized(msgHandlersById) { h=msgHandlersById.get(msg.msgId); }
+							if( h != null )
+							{
 								if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with msgId Handler, will now post Msg to UI Thread");}
 								h.setMsg(msg);
 								// post to ui thread
 								h.post(h);
 							}
-							else{
-								if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}
-							}
+							else { if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}}
 						}
+						
+						// TODO it seams to me that we write code similar to this more than 1 time, check if it is generalizable and find a solution to avoid rewriting same code
 						// tell every service about the message
-						mUiThreadHandler.postToUiThread(new Runnable(){
-							@Override public void run(){
-								for(ServiceInterface service:Services){
-									service.handleMessage(msg);
-								}
-							}
-						});
+						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(ServiceInterface service:Services) { service.handleMessage(msg); }}});
 					}
 				}
 				
 			}
-			if(disconnect){
-				_disconnect();
-			}
+			if(disconnect) { _disconnect(); }
 		}
-		
 	}
 
-	
-	private void _connect(){
+	private void _connect()
+	{
 		try {
-			synchronized(mServerData){
+			synchronized(mServerData)
+			{
 				if(DEBUG){System.err.println("RsCtrlService: _connect() ...");}
 				
 				boolean newHostKey=false;
-				if(mServerData.hostkey==null){
-					newHostKey=true;
-				}
+				if( mServerData.hostkey == null ){ newHostKey = true; }
 				
-				mSocket=new Socket();
-				mSocket.connect(new InetSocketAddress(mServerData.hostname,mServerData.port), 2000);
-				// try to find when crai in jaramiko is constructed
+				mSocket = new Socket();
+				//TODO Avoid hardcoding timeout, moreover same value is used multiple times in the code
+				mSocket.connect(new InetSocketAddress(mServerData.hostname, mServerData.port), 2000);
+				// TODO try to find when crai in jaramiko is constructed
 				// error here
 				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
-				mTransport=new ClientTransport(mSocket);
+				mTransport = new ClientTransport(mSocket);
 				// no more error here
 				System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport.start(mServerData.hostkey, 2000);
-				if(newHostKey){
-					mServerData.hostkey=mTransport.getRemoteServerKey();
-				}
+				if(newHostKey){ mServerData.hostkey = mTransport.getRemoteServerKey(); }
 				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
-				mChannel=mTransport.openSession(2000);
+				mChannel = mTransport.openSession(2000);
 				mChannel.invokeShell(2000);
-				mInputStream=mChannel.getInputStream();
-				mOutputStream=mChannel.getOutputStream();
+				mInputStream = mChannel.getInputStream();
+				mOutputStream = mChannel.getOutputStream();
 				
-				synchronized(mConnectState){mConnectState=ConnectState.ONLINE;}
-				synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
-				
+				synchronized(mConnectState){  mConnectState = ConnectState.ONLINE; }
+				synchronized(mConnectAction){ mConnectAction = ConnectAction.NONE; }
+
 				postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.CONNECTED);
-				
-				/*mUiThreadHandler.postToUiThread(new Runnable(){
-					@Override
-					public void run(){
-						notifyListeners();
-					}
-				});*/
-				
+
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
 			}
 		} 
 		
 		// catch zeugs tut ned
-		//noch zu händeln:
+		//noch zu hï¿½ndeln:
 		// WLAN aus: Java.net.SocketException: Network unreachable
 		// wlan an aber falsche ip: Java.net.SocketTimeoutException: Transport endpoint is not connected
 		// rs-nogui hat kein cleanup gemacht: net.lag.jaramiko.SSHException: Timeout
 		// falscher hostkey: net.lag.jaramiko.SShException: Bad host key from server
 		
-		catch (UnknownHostException e){
+		catch (UnknownHostException e)
+		{
 			mLastConnectionError=ConnectionError.UnknownHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
-		} catch (NoRouteToHostException e){
+		}
+		catch (NoRouteToHostException e)
+		{
 			mLastConnectionError=ConnectionError.NoRouteToHostException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
-		} catch (ConnectException e){
+		}
+		catch (ConnectException e)
+		{
 			mLastConnectionError=ConnectionError.ConnectException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
-		} catch (BadSignatureException e){
+		}
+		catch (BadSignatureException e)
+		{
 			mLastConnectionError=ConnectionError.BadSignatureException;
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 		
 		// tut
-		} catch (AuthenticationFailedException e){
+		}
+		catch (AuthenticationFailedException e)
+		{
 			mLastConnectionErrorString="wrong password or username";
 			mLastConnectionError=ConnectionError.AuthenticationFailedException;	
 			synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction=ConnectAction.NONE;}
 			postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.ERROR_WHILE_CONNECTING);
 			
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
 			
@@ -447,7 +435,8 @@ public class RsCtrlService implements Runnable{
 		}
 	}
 	
-	private void _disconnect(){
+	private void _disconnect()
+	{
 		if(DEBUG){System.err.println("RsCtrlService: _disconnect() ...");}
 		
 		synchronized(mConnectState){mConnectState=ConnectState.OFFLINE;}
@@ -458,22 +447,13 @@ public class RsCtrlService implements Runnable{
 		mInputStream=null;
 		mOutputStream=null;
 		
-		if(mChannel !=null){
-			mChannel.close();
-		}
-		mChannel=null;
+		if(mChannel != null){ mChannel.close(); }
+		mChannel = null;
 		
-		if(mTransport !=null){
-			mTransport.close();
-		}
+		if(mTransport != null){ mTransport.close(); }
 		mTransport=null;
 		
-		try {
-			mSocket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		try { mSocket.close(); } catch (IOException e) { e.printStackTrace(); }
 		mSocket=null;
 		
 		/*
@@ -486,7 +466,8 @@ public class RsCtrlService implements Runnable{
 		
 	}
 	
-	private void _sendMsg(RsMessage msg) {
+	private void _sendMsg(RsMessage msg)
+	{
 		//allocate memory
 		// 16 byte header + body
 		ByteBuffer bb=ByteBuffer.allocate(16+msg.body.length);
@@ -528,7 +509,7 @@ public class RsCtrlService implements Runnable{
 	// blockiert nicht
 	// aber: nicblockierend in einem eigenen thread ist schwachsinn,
 	// deswegen auf blockierend umstellen, oder den thread weglassen und nichtblockierend pollen
-	// problem: rausfinden wie das timeout für die blockierung in jaramiko ist
+	// problem: rausfinden wie das timeout fï¿½r die blockierung in jaramiko ist
 	// nachteil: blockierend blockiert auch alle anderen aktionen im thread
 	//
 	// neue erkenntnis:
