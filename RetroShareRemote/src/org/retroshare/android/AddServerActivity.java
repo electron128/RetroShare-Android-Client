@@ -4,7 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-public class AddServerActivity extends RsActivityBase {
+public class AddServerActivity extends RsActivityBase
+{
 	private static final String TAG="AddServerActivity";
 	
 	EditText editTextName;
@@ -13,7 +14,8 @@ public class AddServerActivity extends RsActivityBase {
    	EditText editTextUser;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.activity_add_server);
@@ -24,8 +26,10 @@ public class AddServerActivity extends RsActivityBase {
     	editTextUser=(EditText) findViewById(R.id.editTextUser);
     }
     
-    public void addServer(View v){
-    	if(mBound){
+    public void addServer(View v)
+    {
+    	if(mBound)
+    	{
     		RsServerData sd=new RsServerData();
     		sd.name=editTextName.getText().toString();
 	    	sd.hostname=editTextHostname.getText().toString();
@@ -36,20 +40,8 @@ public class AddServerActivity extends RsActivityBase {
     	finish();
     }
     
-    @Override
-    protected void onServiceConnected(){
-    	
-    }
-    
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	
-    }
-    @Override
-    public void onPause(){
-    	super.onPause();
-    	
-    }
+    @Override protected void onServiceConnected(){}
+    @Override public void onResume(){ super.onResume(); } // TODO if we doesn't override this is not super called automatically ?
+    @Override public void onPause(){ super.onPause(); } // TODO if we doesn't override this is not super called automatically ?
 
 }

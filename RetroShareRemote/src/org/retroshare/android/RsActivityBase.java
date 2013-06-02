@@ -10,44 +10,23 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-
-
-/*
-	private static final String TAG="ShowQrCodeActivity";
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-    
-    @Override
-    protected void onServiceConnected(){
-    	
-    }
-    
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	
-    }
-    @Override
-    public void onPause(){
-    	super.onPause();
-    	
-    }
-
-*/
-
-public abstract class RsActivityBase extends Activity {
+/**
+ * This class is aimed to be inherited by all Actvity that needs to communicate with RsService
+ * provide out of the box all needed stuff to communicate with RsService
+ * so each activity doesn't need to handle all this common stuff
+ */
+public abstract class RsActivityBase extends Activity
+{
 	protected RsService mRsService;
 	protected boolean mBound=false;
 	
 	private static final String TAG="RsActivityBase";
 	
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
         @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
             RsBinder binder = (RsBinder) service;
             mRsService = binder.getService();
             mBound = true;
@@ -55,30 +34,31 @@ public abstract class RsActivityBase extends Activity {
             RsActivityBase.this.onServiceConnected();
         }
         @Override
-        public void onServiceDisconnected(ComponentName arg0) {
+        public void onServiceDisconnected(ComponentName arg0)
+        {
             mBound = false;
             Log.v(TAG, "onServiceDisconnected");
         }
     };
     
-    //should be overridden by child classes
+    // should be overridden by child classes
+    // TODO maybe it is a good idea to provide an empty default implementation ? ( See AddServerActivity for a case were it would be useful )
     protected abstract void onServiceConnected();
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         Intent intent = new Intent(this, RsService.class);
-        if(bindService(intent, mConnection, Context.BIND_AUTO_CREATE)){
-        	Log.v(TAG, "onCreate: bindService returned true");
-        }
-        else{
-        	Log.e(TAG, "onCreate: bindService returned false");
-        }
+        
+        if(bindService(intent, mConnection, Context.BIND_AUTO_CREATE)){ Log.v(TAG, "onCreate: bindService returned true"); }
+        else{ Log.e(TAG, "onCreate: bindService returned false"); }
 
     }
     
     @Override
-    public void onDestroy(){
+    public void onDestroy()
+    {
     	super.onDestroy();
     	unbindService(mConnection);
     }

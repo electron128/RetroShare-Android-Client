@@ -41,7 +41,8 @@ public class RsCtrlService implements Runnable
 	public enum ConnectionEvent { SERVER_DATA_CHANGED, ERROR_WHILE_CONNECTING, CONNECTED,ERROR_DISCONNECTED }
 
 	/**
-	 * Stuff that need to receive data from RetroShare should implement this interface
+	 * Stuff that need to receive info about connection with RetroShare core
+	 * should implement this interface ( see LoginActivity for example ).
 	 * The fact that we have a public inner interface make perfectly sense because
 	 * we want that only code that can access RSCtrlService can be a Listener
 	 * see http://stackoverflow.com/a/209158 for more details
