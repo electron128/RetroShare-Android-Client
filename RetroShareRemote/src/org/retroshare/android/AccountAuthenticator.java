@@ -26,7 +26,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options)
     {
-        final Intent intent = new Intent(mContext, AccountLoginActivity.class);
+        final Intent intent = new Intent(mContext, AddAccountActivity.class);
         //intent.putExtra(AccountManager.PARAM_AUTHTOKEN_TYPE, authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         final Bundle bundle = new Bundle();
