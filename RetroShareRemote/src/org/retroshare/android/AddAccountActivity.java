@@ -36,7 +36,4 @@ public class AddAccountActivity extends RsActivityBase
     	}
     	finish();
     }
-    
-    @Override protected void onServiceConnected(){}
-
 }

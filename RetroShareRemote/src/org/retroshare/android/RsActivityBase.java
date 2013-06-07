@@ -11,7 +11,7 @@ import android.util.Log;
 
 
 /**
- * This class is aimed to be inherited by all Actvity that needs to communicate with RsService
+ * This class is aimed to be inherited by all Activity that needs to communicate with RsService
  * provide out of the box all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
@@ -41,9 +41,11 @@ public abstract class RsActivityBase extends Activity
         }
     };
     
-    // should be overridden by child classes
-    // TODO maybe it is a good idea to provide an empty default implementation ? ( See AddServerActivity for a case were it would be useful )
-    protected abstract void onServiceConnected();
+    /**
+     * This method should be overridden by child classes that want to do something when connection to RsService is available.
+     */
+    protected void onServiceConnected()
+    {}
 	
     @Override
     public void onCreate(Bundle savedInstanceState)
