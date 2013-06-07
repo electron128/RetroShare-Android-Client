@@ -1,16 +1,12 @@
 package org.retroshare.android;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.retroshare.android.RsCtrlService.ConnectAction;
-import org.retroshare.android.RsCtrlService.ConnectState;
 import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
 
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -32,68 +28,22 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.text.method.PasswordTransformationMethod;
 
-public class LoginActivity extends RsActivityBase implements RsCtrlServiceListener{
 
-	private static final String TAG="LoginActivity";
+public class AccountLoginActivity extends RsActivityBase implements RsCtrlServiceListener
+{
+
+	private static final String TAG = "AccountLoginActivity";
+	
+	AccountAuthenticatorResponse response;
 	
 	private ListView listView;
 	private ListAdapterListener lal;
 	
 	private RsServerData selectedServer;
 	
-	// thread to run bitdht test
-	Thread testThread;
-	
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-    	
-    	
-    	
-    	// run test
-    	// run in own thread to not get killed by activitymanager
-    	testThread=new Thread(new Runnable(){
-			@Override
-			public void run() {
-			    try {
-			    	// copy bdboot.txt
-			    	InputStream in = getResources().openRawResource(R.raw.bdboot);
-					FileOutputStream out=openFileOutput("bdboot.txt", 0);
-					int read=0;
-					//int length=0;
-					byte[] buffer=new byte[1000];
-					while(read!=-1){
-						read=in.read(buffer);
-						if(read!=-1){
-							out.write(buffer, 0, read);
-							//length+=read;
-						}
-					}
-					in.close();
-					out.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			    Log.v(TAG, "java: calling native code");
-			    String path=getFilesDir().getAbsolutePath()+"/bdboot.txt";
-				Log.v(TAG, "native code:"+bitdht.getIp(path));
-				Log.v(TAG, "java: native code returned");
-			}
-		});
-    	//testThread.start();
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         
@@ -101,13 +51,15 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
         lal=new ListAdapterListener(this);
         listView.setAdapter(lal);
         listView.setOnItemClickListener(lal);
+        
+        response = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
     }
     
     @Override
     protected void onServiceConnected()
     {
     	lal.update();
-    	mRsService.mRsCtrlService.registerListener(LoginActivity.this);
+    	mRsService.mRsCtrlService.registerListener(AccountLoginActivity.this);
     }
     
     @Override
@@ -117,9 +69,6 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     	if(mBound) lal.update();
     }
 
-    @Override
-    public void onPause(){ super.onPause(); } // TODO if we doesn't override this is not super called automatically ?
-    
 	@Override
 	public void onDestroy()
 	{
@@ -133,6 +82,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     	startActivity(intent);
     }
     
+    // TODO: Maybe an enum is better ?
     private static final int DIALOG_PASSWORD=0;
     private static final int DIALOG_CONNECT=1;
     private static final int DIALOG_CONNECT_ERROR=2;
@@ -150,57 +100,68 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 	    	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    	View view = inflater.inflate(R.layout.activity_login_dialog, null);
 	    	
-	    	
 	    	final EditText et=(EditText) view.findViewById(R.id.editTextPassword);
 	    	final CheckBox cbvp=(CheckBox) view.findViewById(R.id.checkBoxShowPassword);
-	    	cbvp.setOnClickListener(new View.OnClickListener(){
+	    	cbvp.setOnClickListener(new View.OnClickListener()
+	    	{
 				@Override
-				public void onClick(View v) {
-					if(cbvp.isChecked()){
-						//Log.v(TAG, "checked");
-						et.setTransformationMethod(null);
-					}else{
-						//Log.v(TAG, "not checked");
-						et.setTransformationMethod(new PasswordTransformationMethod());
-					}
+				public void onClick(View v)
+				{
+					if(cbvp.isChecked()) et.setTransformationMethod(null);
+					else et.setTransformationMethod(new PasswordTransformationMethod());
 				}
 	    	});
 	    	final CheckBox cbsp=(CheckBox) view.findViewById(R.id.checkBoxSavePassword);
 	    	
-	    	builder.setView(view)
+	    	builder
+	    		.setView(view)
 	    		.setTitle(R.string.enter_ssh_password)
-	    		.setPositiveButton("login", new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						selectedServer.password=et.getText().toString();
-						selectedServer.savePassword=cbsp.isChecked();
-						connect();
-						//pd=ProgressDialog.show(LoginActivity.this, "", "connecting...", true);
-					}
-	    		});
+	    		.setPositiveButton
+	    		(
+	    				"login",
+	    				new DialogInterface.OnClickListener()
+	    				{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								selectedServer.password=et.getText().toString();
+								selectedServer.savePassword=cbsp.isChecked();
+								connect();
+								//pd=ProgressDialog.show(LoginActivity.this, "", "connecting...", true);
+							}
+						}
+	    		);
+	    	
 	    	return builder.create();
 
 
     	case DIALOG_CONNECT:
-    		ProgressDialog pd=new ProgressDialog(LoginActivity.this);
-    		pd.setMessage("connecting to "+selectedServer.hostname+":"+selectedServer.port);
+    		ProgressDialog pd = new ProgressDialog(AccountLoginActivity.this);
+    		pd.setMessage("Connecting to " + selectedServer.hostname + ":" + selectedServer.port );
     		return pd;
 
 
     	case DIALOG_CONNECT_ERROR:
     		AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-	    	builder2.setTitle(R.string.connection_error)
-	    		// TODO solve the connection error thing
-	    		.setMessage(mRsService.mRsCtrlService.getLasConnectionErrorString())
-	    		.setPositiveButton("ok", new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						//dismissDialog(DIALOG_CONNECT_ERROR);
-					}
-	    		});
+	    	builder2
+	    		.setTitle(R.string.connection_error)
+	    		.setMessage(mRsService.mRsCtrlService.getLasConnectionErrorString()) // TODO solve the connection error thing
+	    		.setPositiveButton
+	    		(
+	    				"ok",
+	    				new DialogInterface.OnClickListener()
+	    				{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								//dismissDialog(DIALOG_CONNECT_ERROR);
+							}
+	    				}
+	    		);
+	    	
 	    	return builder2.create();
     	}
+    	
     	return null;
     }
     
@@ -215,13 +176,13 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
 	{
-		if(ce==RsCtrlService.ConnectionEvent.CONNECTED)
+		if( ce == RsCtrlService.ConnectionEvent.CONNECTED )
 		{
 			dismissDialog(DIALOG_CONNECT);
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
 		}
-		if(ce==RsCtrlService.ConnectionEvent.ERROR_WHILE_CONNECTING)
+		if( ce == RsCtrlService.ConnectionEvent.ERROR_WHILE_CONNECTING)
 		{
 			dismissDialog(DIALOG_CONNECT);
 			showDialog(DIALOG_CONNECT_ERROR);
