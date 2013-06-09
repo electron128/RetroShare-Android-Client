@@ -58,12 +58,13 @@ public class RsService extends Service implements RsCtrlServiceListener
 		mRsCtrlService = new RsCtrlService(new UiThreadHandler());
 		mRsCtrlService.registerListener(this);
 		
-		mNotifyService = new NotifyService( mRsCtrlService.chatService,this );
+		mNotifyService = new NotifyService( mRsCtrlService.chatService, this );
 		
 		// update own State Notification
 		updateNotification();
 		
 		int RESPONSE=(0x01<<24);
+		// TODO CODE REPLICATION this code seems replicated very similar in a lot of parts of the package should try to avoid this replication maybe using a function
 		final int MsgId_EventChatMessage = (RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
 		//mRsCtrlService.registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
 	}
@@ -75,7 +76,7 @@ public class RsService extends Service implements RsCtrlServiceListener
 		mNotifyService.cancelAll();
 		mRsCtrlService.disconnect();
 		mRsCtrlService.destroy();
-		mRsCtrlService=null;
+		mRsCtrlService = null;
 	}
 	
 	/*
@@ -92,10 +93,10 @@ public class RsService extends Service implements RsCtrlServiceListener
 	{
 		try
 		{
-			RsServerData sd=mRsCtrlService.getServerData();
-			mDatapack.serverDataMap.put(sd.name, sd);
+			RsServerData sd = mRsCtrlService.getServerData();
+			mDatapack.serverDataMap.put( sd.name, sd );
 			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
-			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
+			ObjectOutputStream o = new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
 		} catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
 	}
