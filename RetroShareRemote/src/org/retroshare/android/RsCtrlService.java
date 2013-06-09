@@ -166,8 +166,8 @@ public class RsCtrlService implements Runnable
 	public SearchService searchService;
 	
 	/**
-	 * 
-	 * @param h
+	 * Initialize the RetroShare Control Service
+	 * @param h reference to ui thread handler to post notification to GUI when we have something ready
 	 */
 	RsCtrlService(UiThreadHandlerInterface h)
 	{
@@ -198,39 +198,56 @@ public class RsCtrlService implements Runnable
 	
 	public void destroy(){ runThread=false;	}
 	
-	// **************************
-	// todo: clone the server data, so outside thread 
-	// can't change our serverdata which is used in our workerthread
+
+	/**
+	 * Set data of the server we will connect to
+	 * @param d RsServerData containing the data relative to the server you want to connect to ( host, port, user... )
+	 */
 	public void setServerData(RsServerData d)
 	{
+		// The passed RsServerData d is cloned, so the caller ( outside thread ) can't change our serverdata which is used in our workerthread
 		synchronized(mServerData){ mServerData=d.clone(); }
 		notifyListenersOnConnectionStateChanged(ConnectionEvent.SERVER_DATA_CHANGED);
 	}
+
+	/**
+	 * Get Data relative to our RetroShare Server
+	 * @return RsServerData containing data relative to actual RetroShare server ( host, port, user... )
+	 */
 	public RsServerData getServerData()
 	{
 		synchronized(mServerData){ return mServerData.clone(); }
 	}
-	// **************************
-	
+
+	/**
+	 * Connect to the server previously set with setServerData setServerData(RsServerData d)
+	 */
 	public void connect()
 	{
 		if(DEBUG){System.err.println("RsCtrlService: connect()");}
 		
 		synchronized(mConnectAction){ mConnectAction = ConnectAction.CONNECT; }
 	}
+	
+	/**
+	 * Disconnect from the actual connected server
+	 */
 	public void disconnect(){
 		if(DEBUG){System.err.println("RsCtrlService: disconnect()");}
 		
 		synchronized(mConnectAction){ mConnectAction=ConnectAction.DISCONNECT; }
 	}
 	
+	/**
+	 * @return True if we are connecter to RetroShare server, false otherwise
+	 */
 	public boolean isOnline()
 	{
-		synchronized(mConnectState){ return (mConnectState==ConnectState.ONLINE); }
+		synchronized(mConnectState){ return (mConnectState == ConnectState.ONLINE); }
 	}
 	
 	// use with synchronized()
-	private ArrayList<RsMessage> outMsgList=new ArrayList<RsMessage>();
+	private ArrayList<RsMessage> outMsgList = new ArrayList<RsMessage>();
 	private int msgCounter=0;
 	
 	//holds pairs of <reqId,Handler>
@@ -238,17 +255,22 @@ public class RsCtrlService implements Runnable
 	//holds pairs of <msgId,handler>
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
 	
-	public int sendMsg(RsMessage msg){ return sendMsg(msg,null); }
-
+	/**
+	 * Send a message associating to an handler to its reqId
+	 * The RsMessageHandler rsHandleMsg method will be called when a response message ( a received message with same reqId ) is eventually received with the received message as paramether
+	 * @param msg The RsMessage to send
+	 * @param h Handler to handle the eventual response message
+	 * @return the request id associated with the message 
+	 */
 	public int sendMsg(RsMessage msg, RsMessageHandler h)
 	{
 		int reqId=0;
 		synchronized(outMsgList)
 		{
 			msgCounter++;
-			msg.reqId=msgCounter;
+			msg.reqId = msgCounter;
 			outMsgList.add(msg);
-			reqId=msg.reqId;
+			reqId = msg.reqId;
 		}
 		synchronized(msgHandlers)
 		{
@@ -256,6 +278,7 @@ public class RsCtrlService implements Runnable
 		}
 		return reqId;
 	}
+	public int sendMsg(RsMessage msg){ return sendMsg(msg,null); }
 	
 	public void registerMsgHandler(int msgId,RsMessageHandler h)
 	{
@@ -264,32 +287,20 @@ public class RsCtrlService implements Runnable
 	
 	public RsMessageHandler getHandler(int msgId) { return msgHandlersById.get(msgId); }
 	
-	/**
-	 * 
-	 */
 	@Override
 	public void run()
 	{
 		while(runThread)
 		{
+			// TODO It isn't better to make time between update configurable ?
+			try{ Thread.sleep(50); } catch (InterruptedException e) { System.err.print(e); }
 			
-			try
-			{
-				// TODO It is ok to hardcode this ?
-				Thread.sleep(50);
-				//Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				System.err.print(e);
-			}
+			// FIXME initialization not needed
+			boolean connect    = false;
+			boolean disconnect = false;
+			boolean isonline   = false;
 			
-			boolean connect=false;
-			boolean disconnect=false;
-			boolean isonline=false;
-			
-			// TODO isn't it better to use just 2 syncronized statement here ?
+			// TODO isn't it better to use just 2 synchronized statement here ?
 			// check if we have to connect
 			synchronized(mConnectAction){ connect    = (mConnectAction == ConnectAction.CONNECT); }
 			synchronized(mConnectAction){ disconnect = (mConnectAction == ConnectAction.DISCONNECT); }
@@ -299,18 +310,17 @@ public class RsCtrlService implements Runnable
 			
 			if(isonline)
 			{
-				// handle outgoing
+				// Send first outgoing message
 				{
 					RsMessage msg = null;
-					synchronized(outMsgList)
-					{
-						if(!outMsgList.isEmpty()) { msg=outMsgList.remove(0); }
-					}
-					if(msg != null){ _sendMsg(msg); }
+					synchronized(outMsgList) { if( !outMsgList.isEmpty() ) msg = outMsgList.remove(0); }
+					if(msg != null) _sendMsg(msg);
 				}
-				// handle incoming
+				
+				// Receive one incoming message
 				{
-					int msgType=_recvMsg();
+				
+					int msgType = _recvMsg();
 					if(msgType != -1)
 					{
 						final RsMessage msg = new RsMessage();
@@ -318,23 +328,21 @@ public class RsCtrlService implements Runnable
 						msg.reqId = curReqId;
 						msg.body  = curBody;
 						RsMessageHandler h = null;
-						synchronized(msgHandlers) { h=msgHandlers.remove(msg.reqId); }
-						if(h != null)
+						synchronized(msgHandlers) { h = msgHandlers.remove(msg.reqId); }
+						if( h != null )
 						{
 							if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with reqId Handler, will now post Msg to UI Thread");}
 							h.setMsg(msg);
-							// post to ui thread
-							h.post(h);
+							h.post(h); // post to ui thread
 						}
 						else
 						{
-							synchronized(msgHandlersById) { h=msgHandlersById.get(msg.msgId); }
+							synchronized(msgHandlersById) { h = msgHandlersById.get(msg.msgId); }
 							if( h != null )
 							{
 								if(DEBUG){System.err.println("RsCtrlService: run(): received Msg with msgId Handler, will now post Msg to UI Thread");}
 								h.setMsg(msg);
-								// post to ui thread
-								h.post(h);
+								h.post(h); // post to ui thread
 							}
 							else { if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}}
 						}
@@ -344,8 +352,8 @@ public class RsCtrlService implements Runnable
 						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(ServiceInterface service:Services) { service.handleMessage(msg); }}});
 					}
 				}
-				
 			}
+			
 			if(disconnect) { _disconnect(); }
 		}
 	}

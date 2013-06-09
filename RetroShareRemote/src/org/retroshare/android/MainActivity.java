@@ -3,18 +3,9 @@ package org.retroshare.android;
 //import JRS;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 
-import rsctrl.chat.Chat;
 import rsctrl.core.Core;
-import rsctrl.peers.Peers;
-import rsctrl.peers.Peers.RequestPeers;
-import rsctrl.peers.Peers.ResponsePeerList;
 import rsctrl.system.System.RequestSystemStatus;
 import rsctrl.system.System.ResponseSystemStatus;
 
@@ -26,7 +17,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;

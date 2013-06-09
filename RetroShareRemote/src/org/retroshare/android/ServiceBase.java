@@ -1,5 +1,4 @@
 package org.retroshare.android;
 
-public class ServiceBase {
-
-}
+public class ServiceBase
+{}

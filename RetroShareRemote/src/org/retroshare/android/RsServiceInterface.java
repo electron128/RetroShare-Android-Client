@@ -1,8 +1,4 @@
-/**
- * 
- */
-package org.retroshare.android;
-
-public interface RsServiceInterface {
-	
-}
+//package org.retroshare.android;
+//
+//public interface RsServiceInterface
+//{}

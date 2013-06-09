@@ -1,36 +1,22 @@
 package org.retroshare.android;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.retroshare.android.RsCtrlService.ConnectionError;
 import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
-import org.retroshare.android.RsCtrlService.RsMessage;
 
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
 
-import net.lag.jaramiko.Channel;
-import net.lag.jaramiko.ClientTransport;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -158,7 +144,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		*/
 		
 		/*
-		// tut auch, macht die benachrichtigung aber wegen startForeground() unlöschbar
+		// tut auch, macht die benachrichtigung aber wegen startForeground() unlï¿½schbar
 		Notification notification = new Notification(R.drawable.ic_launcher, "blubber",System.currentTimeMillis());
 		
 		Intent notificationIntent = new Intent(this, RsService.class);
@@ -181,7 +167,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	}
 	
 	
-	// neu neu nicht löschen
+	// neu neu nicht lï¿½schen
 	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
 		@Override
 		public void postToUiThread(Runnable r) {
@@ -286,8 +272,8 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	
 	// use with synchronized
 	
-	//is totaler quatsch, weil das object auch außerhalb verändert werden könnte
-	// lösung: serverliste innerhalb RsService verwalten -> ist auch gut wegen PKey in serverdata
+	//is totaler quatsch, weil das object auch auï¿½erhalb verï¿½ndert werden kï¿½nnte
+	// lï¿½sung: serverliste innerhalb RsService verwalten -> ist auch gut wegen PKey in serverdata
 	// addServer
 	// deleteServer
 	// bzw setServerData(hostname,user,passwd ...)
@@ -339,7 +325,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 			connectState=ConnectState.OFFLINE;
 			connectAction=ConnectAction.NONE;
 			
-			//noch zu händeln: Java.net.SocketEception Network unreachable
+			//noch zu hï¿½ndeln: Java.net.SocketEception Network unreachable
 		}
 	}
 	
@@ -475,7 +461,7 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	// blockiert nicht
 	// aber: nicblockierend in einem eigenen thread ist schwachsinn,
 	// deswegen auf blockierend umstellen, oder den thread weglassen und nichtblockierend pollen
-	// problem: rausfinden wie das timeout für die blockierung in jaramiko ist
+	// problem: rausfinden wie das timeout fï¿½r die blockierung in jaramiko ist
 	// nachteil: blockierend blockiert auch alle anderen aktionen im thread
 	private void _sendMsg(RsMessage msg) {
 		//allocate memory

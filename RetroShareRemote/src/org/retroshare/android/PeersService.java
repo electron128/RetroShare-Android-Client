@@ -72,15 +72,12 @@ public class PeersService implements ServiceInterface{
 		return ownPerson;
 	}
 	
-	private class OwnIdReceivedHandler extends RsMessageHandler{
+	private class OwnIdReceivedHandler extends RsMessageHandler
+	{
 		@Override
-		protected void rsHandleMsg(RsMessage msg){
-			try {
-				ownPerson=ResponsePeerList.parseFrom(msg.body).getPeersList().get(0);
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		protected void rsHandleMsg(RsMessage msg)
+		{
+			try { ownPerson = ResponsePeerList.parseFrom(msg.body).getPeersList().get(0); } catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
 		}
 	}
 	
