@@ -256,8 +256,8 @@ public class RsCtrlService implements Runnable
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
 	
 	/**
-	 * Send a message associating an handler to its reqId
-	 * The RsMessageHandler rsHandleMsg method will be called when a response message ( a received message with same reqId ) is eventually received with the received message as paramether
+	 * Send a message associating an handler for the eventual reply
+	 * The RsMessageHandler rsHandleMsg method will be called when a response message ( a received message with same reqId ) is eventually received with the received message as parameter
 	 * @param msg The RsMessage to send
 	 * @param h Handler to handle the eventual response message
 	 * @return the request id associated with the message 
@@ -295,13 +295,7 @@ public class RsCtrlService implements Runnable
 			// TODO It isn't better to make time between update configurable ?
 			try{ Thread.sleep(50); } catch (InterruptedException e) { System.err.print(e); }
 			
-			// FIXME initialization not needed
-			boolean connect    = false;
-			boolean disconnect = false;
-			boolean isonline   = false;
-			
-			// TODO isn't it better to use just 2 synchronized statement here ?
-			// check if we have to connect
+			boolean connect, disconnect, isonline;
 			synchronized(mConnectAction){ connect    = (mConnectAction == ConnectAction.CONNECT); }
 			synchronized(mConnectAction){ disconnect = (mConnectAction == ConnectAction.DISCONNECT); }
 			synchronized(mConnectState) { isonline   = (mConnectState  == ConnectState.ONLINE); }
@@ -395,7 +389,7 @@ public class RsCtrlService implements Runnable
 		} 
 		
 		// catch zeugs tut ned
-		//noch zu h�ndeln:
+		//noch zu hndeln:
 		// WLAN aus: Java.net.SocketException: Network unreachable
 		// wlan an aber falsche ip: Java.net.SocketTimeoutException: Transport endpoint is not connected
 		// rs-nogui hat kein cleanup gemacht: net.lag.jaramiko.SSHException: Timeout
@@ -442,7 +436,6 @@ public class RsCtrlService implements Runnable
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			if(DEBUG){System.err.println(e);}
 			
 			mLastConnectionError=ConnectionError.UNKNOWN;
