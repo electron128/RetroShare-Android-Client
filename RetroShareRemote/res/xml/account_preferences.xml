@@ -4,14 +4,14 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
             android:title="General Settings" />
- 
+ 	<!-- TODO understand and improve this part better ( at moment it seems it is needed for edit previously added accounts ) -->
     <PreferenceScreen
         android:key="account_settings"
-        android:title="Account Settings"
-        android:summary="Sync frequency, notifications, etc."><!-- TODO : Create the right intent
+        android:title="Accounts Settings"
+        android:summary="Servers settings, etc.">
         <intent
-            android:action="fm.last.android.activity.Preferences.ACCOUNT_SETUP"
-            android:targetPackage="fm.last.android"
-            android:targetClass="fm.last.android.activity.Preferences" /> -->
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="org.retroshare.android"
+            android:targetClass="org.retroshare.android.AddAccountActivity" />
     </PreferenceScreen>
 </PreferenceScreen>

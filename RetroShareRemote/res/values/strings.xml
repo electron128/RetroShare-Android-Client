@@ -64,4 +64,5 @@
 
     <string name="authenticator_label">RetroShare Account</string>
     <string name="authenticator_preference_category_server">Server Settings</string>
+    <string name="authenticator_auth_token_type">org.retroshare.android.authToken</string>
 </resources>
