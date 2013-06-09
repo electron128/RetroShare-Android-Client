@@ -17,7 +17,7 @@ import rsctrl.files.Files.ResponseTransferList;
 import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class FilesService implements ServiceInterface
+public class FilesService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
 	

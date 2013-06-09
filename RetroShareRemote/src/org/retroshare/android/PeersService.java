@@ -15,7 +15,7 @@ import rsctrl.peers.Peers.ResponsePeerList;
 import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class PeersService implements ServiceInterface
+public class PeersService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
 	

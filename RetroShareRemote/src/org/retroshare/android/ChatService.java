@@ -25,7 +25,7 @@ import rsctrl.core.Core.Person;
 import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class ChatService implements ServiceInterface, RsCtrlService.RsCtrlServiceListener{
+public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener{
 	RsCtrlService mRsCtrlService;
 	ChatService(RsCtrlService s){
 		mRsCtrlService=s;

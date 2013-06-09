@@ -159,7 +159,7 @@ public class RsCtrlService implements Runnable
 	private OutputStream mOutputStream;
 	/*************************************/
 	
-	private Set<ServiceInterface> Services  =new HashSet<ServiceInterface>();
+	private Set<RsServiceInterface> Services  =new HashSet<RsServiceInterface>();
 	public ChatService chatService;
 	public PeersService peersService;
 	public FilesService filesService;
@@ -343,7 +343,7 @@ public class RsCtrlService implements Runnable
 						
 						// TODO it seams to me that we write code similar to this more than 1 time, check if it is generalizable and find a solution to avoid rewriting same code
 						// tell every service about the message
-						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(ServiceInterface service:Services) { service.handleMessage(msg); }}});
+						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(RsServiceInterface service:Services) { service.handleMessage(msg); }}});
 					}
 				}
 			}

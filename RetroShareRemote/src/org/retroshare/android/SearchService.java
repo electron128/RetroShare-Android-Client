@@ -20,7 +20,7 @@ import android.annotation.SuppressLint;
 import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class SearchService implements ServiceInterface {
+public class SearchService implements RsServiceInterface {
 	
 	RsCtrlService mRsCtrlService;
 	
