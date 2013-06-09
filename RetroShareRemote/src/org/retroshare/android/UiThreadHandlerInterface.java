@@ -1,6 +1,6 @@
 package org.retroshare.android;
 
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.RsCtrlService.RsMessage;
 
 public interface UiThreadHandlerInterface {
 	/**

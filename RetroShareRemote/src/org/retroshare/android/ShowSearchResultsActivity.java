@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.retroshare.android.SearchService.SearchServiceListener;
+import org.retroshare.java.SearchService.SearchServiceListener;
 
 import rsctrl.search.Search.SearchHit;
 

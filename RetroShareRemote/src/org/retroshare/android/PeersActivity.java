@@ -16,8 +16,8 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import org.retroshare.android.ChatService.ChatServiceListener;
-import org.retroshare.android.PeersService.PeersServiceListener;
+import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.java.PeersService.PeersServiceListener;
 
 import android.content.Context;
 import android.content.Intent;

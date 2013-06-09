@@ -13,14 +13,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.retroshare.android.ChatService.ChatServiceListener;
+import org.retroshare.java.ChatService;
+import org.retroshare.java.ChatService.ChatServiceListener;
 
 /**
  * The only service class which relies on Android
  * @author till
  *
  */
-public class NotifyService implements ChatServiceListener{
+public class NotifyService implements ChatServiceListener
+{
 	private final static String TAG="NotifyService";
 	
 	

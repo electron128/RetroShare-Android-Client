@@ -9,9 +9,12 @@ import rsctrl.core.Core;
 import rsctrl.system.System.RequestSystemStatus;
 import rsctrl.system.System.ResponseSystemStatus;
 
-import org.retroshare.android.RsCtrlService.ConnectionError;
-import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.RsCtrlService;
+import org.retroshare.java.RsServerData;
+import org.retroshare.java.RsCtrlService.ConnectionError;
+import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.java.RsCtrlService.RsMessage;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.os.Bundle;

@@ -1,9 +1,9 @@
 package org.retroshare.android;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import org.retroshare.android.FilesService.FilesServiceListener;
+
+import org.retroshare.java.FilesService.FilesServiceListener;
 
 import rsctrl.core.Core;
 import rsctrl.files.Files;
@@ -32,7 +32,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 public class FilesActivity extends RsActivityBase {
-	private static final String TAG="FilesActivity";
+	//private static final String TAG="FilesActivity";
 	
 	private static final int UPDATE_INTERVALL=1000;
 	
@@ -90,19 +90,27 @@ public class FilesActivity extends RsActivityBase {
     private Core.File clickedFile;
     
     @Override
-    protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		switch(id) {
-		case FILE_ACTION_DIALOG:
+    protected Dialog onCreateDialog(int id)
+    {
+		Dialog dialog = null;
+		if( id == FILE_ACTION_DIALOG )
+		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("action")
-				   .setItems(R.array.file_actions, new  DialogInterface.OnClickListener(){
+			builder
+			.setTitle("action")
+			.setItems
+			(
+				R.array.file_actions,
+				new  DialogInterface.OnClickListener()
+				{
 
 					@Override
-					public void onClick(DialogInterface arg0, int arg1) {
+					public void onClick(DialogInterface arg0, int arg1)
+					{
 						RequestControlDownload.Action action=null;
 						
-						switch(arg1){
+						switch(arg1)
+						{
 						// continue
 						case 0:
 							action=Action.ACTION_CONTINUE;
@@ -144,48 +152,45 @@ public class FilesActivity extends RsActivityBase {
 							
 						default:
 						}
-						if(action!=null){
-							mRsService.mRsCtrlService.filesService.sendRequestControlDownload(clickedFile,action);
-						}
-					}});
+						if( action != null ){ mRsService.mRsCtrlService.filesService.sendRequestControlDownload(clickedFile,action); }
+					}
+				}
+			);
+
 			dialog=builder.create();
-			break;
-		default:
-			dialog = null;
 		}
+
 		return dialog;
     }
     
-	private class requestFilesRunnable implements Runnable{
+	private class requestFilesRunnable implements Runnable
+	{
 		@Override
-		public void run() {
-			if(isInForeground && mBound && mRsService.mRsCtrlService.isOnline()){
-				mRsService.mRsCtrlService.filesService.updateTransfers(mDirection);
-			}
-			mHandler.postAtTime(new requestFilesRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+		public void run()
+		{
+			if(isInForeground && mBound && mRsService.mRsCtrlService.isOnline()) { mRsService.mRsCtrlService.filesService.updateTransfers(mDirection); }
+			mHandler.postAtTime( new requestFilesRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVALL );
 		}
 	}
     
-    private class FilesListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,FilesServiceListener{
-    	
+    private class FilesListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,FilesServiceListener
+    {
     	private List<FileTransfer> transferList=new ArrayList<FileTransfer>();
     	
     	private List<DataSetObserver> observerList=new ArrayList<DataSetObserver>();
     	
     	private LayoutInflater mInflater;
     	
-    	public FilesListAdapterListener(Context context) {
-    		 mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	}
+    	public FilesListAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
     	
     	@Override
-    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    	{
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
     		//Location loc=locationList.get(position);
     		
     		//Intent i=new Intent(PeersActivity.this,ChatActivity.class);
     		//i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
-    		// keine lobby info
     		//i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
     		//startActivity(i);
     		
@@ -194,7 +199,8 @@ public class FilesActivity extends RsActivityBase {
     	}
     	
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
+		{
 			/*Location loc=locationList.get(position);
 			Person p=mapLocationToPerson.get(loc);
     		Intent i=new Intent(PeersActivity.this,PeerDetailsActivity.class);
@@ -205,28 +211,20 @@ public class FilesActivity extends RsActivityBase {
 		}
 
 		@Override
-		public int getCount() {
-			return transferList.size();
-		}
+		public int getCount() { return transferList.size(); }
 
 		@Override
-		public Object getItem(int position) {
-			return transferList.get(position);
-		}
+		public Object getItem(int position) { return transferList.get(position); }
 
 		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+		public long getItemId(int position) { return 0; } // TODO Auto-generated method stub
 
 		@Override
-		public int getItemViewType(int position) {
-			return 0;
-		}
+		public int getItemViewType(int position) { return 0; }
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
 			FileTransfer ft=transferList.get(position);
 	        
 	        View view = mInflater.inflate(R.layout.activity_files_file_item, parent, false);
@@ -259,47 +257,32 @@ public class FilesActivity extends RsActivityBase {
 		}
 
 		@Override
-		public int getViewTypeCount() {
-			return 1;
-		}
+		public int getViewTypeCount() { return 1; }
 
 		@Override
-		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+		public boolean hasStableIds() { return false; } // TODO Auto-generated method stub
+		
+		@Override
+		public boolean isEmpty() { return transferList.isEmpty(); }
 
 		@Override
-		public boolean isEmpty() {
-			return transferList.isEmpty();
-		}
+		public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
 
 		@Override
-		public void registerDataSetObserver(DataSetObserver observer) {
-			observerList.add(observer);
-		}
-
-		@Override
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-			observerList.remove(observer);
-		}
+		public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
 		
 		@Override
-		public void update() {
-	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)){
-				transferList=mRsService.mRsCtrlService.filesService.transfersDown;
-	        }else{
-				transferList=mRsService.mRsCtrlService.filesService.transfersUp;
-	        }
+		public void update()
+		{
+	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD))
+	        { transferList = mRsService.mRsCtrlService.filesService.getTransfersDown(); }
+	        else
+	        { transferList = mRsService.mRsCtrlService.filesService.getTransfersUp(); }
 	        
-    		for(DataSetObserver obs:observerList){
-    			obs.onChanged();
-    		}
+    		for(DataSetObserver obs:observerList) { obs.onChanged(); }
 		}
-    	
     }
-
 }

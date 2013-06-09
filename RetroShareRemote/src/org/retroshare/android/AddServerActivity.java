@@ -1,5 +1,7 @@
 package org.retroshare.android;
 
+import org.retroshare.java.RsServerData;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;

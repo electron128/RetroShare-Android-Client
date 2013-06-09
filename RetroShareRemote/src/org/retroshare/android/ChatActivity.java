@@ -28,8 +28,8 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.retroshare.android.ChatService.ChatServiceListener;
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.java.RsCtrlService.RsMessage;
 //import org.retroshare.android.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -257,7 +257,7 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 			mListeners.remove(id);
 		}
 		
-		//ad meta to define encoding, needed to display öäü
+		//ad meta to define encoding, needed to display ï¿½ï¿½ï¿½
 		//public String ChatHistory="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">";
 		// chatId,ChatHistory
 		public Map<String,String> ChatHistories=new HashMap<String,String>();
@@ -287,7 +287,7 @@ public class ChatActivity extends RsActivityBase implements ChatServiceListener{
 		List<ChatMessage> ChatHistory=mRsService.mRsCtrlService.chatService.getChatHistoryForChatId(mChatId);
 		
 		String historyString="";
-		//ad meta to define encoding, needed to display öäü
+		//ad meta to define encoding, needed to display ï¿½ï¿½ï¿½
 		historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">";
 		
 		for(ChatMessage msg:ChatHistory){

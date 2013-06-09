@@ -6,7 +6,8 @@ import rsctrl.peers.Peers.RequestAddPeer;
 import rsctrl.peers.Peers.RequestAddPeer.AddCmd;
 import rsctrl.peers.Peers.ResponseAddPeer;
 
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.RsCtrlService.RsMessage;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.net.Uri;

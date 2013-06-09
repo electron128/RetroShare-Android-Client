@@ -1,15 +1,15 @@
 package org.retroshare.android;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.retroshare.android.RsCtrlService.ConnectionError;
-import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.java.RsCtrlService;
+import org.retroshare.java.RsServerData;
+import org.retroshare.java.RsCtrlService.ConnectionError;
+import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
 
 import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
@@ -24,12 +24,14 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-public class RsService extends Service implements RsCtrlServiceListener{
+public class RsService extends Service implements RsCtrlServiceListener
+{
 	private static final String TAG="RsService";
-	private static final int MAGIC_CODE = 0x137f0001;
+	//private static final int MAGIC_CODE = 0x137f0001;
 	
 	
-	private static class Datapack implements Serializable{
+	private static class Datapack implements Serializable
+	{
 		static final long serialVersionUID = 1L;
 		// index: server name
 		Map<String,RsServerData> serverDataMap=new HashMap<String,RsServerData>();
@@ -39,44 +41,36 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	
 	//private Handler mHandler;
 	@Override
-	public void onCreate(){
-		try {
-			ObjectInputStream i=new ObjectInputStream(openFileInput("RsService"+Long.toString(Datapack.serialVersionUID)));
-			mDatapack=(Datapack) i.readObject();
+	public void onCreate()
+	{
+		try
+		{
+			ObjectInputStream i = new ObjectInputStream(openFileInput("RsService" + Long.toString(Datapack.serialVersionUID)));
+			mDatapack = (Datapack) i.readObject();
 			
 			Log.v(TAG, "read Datapack, Datapack.serverDataMap="+mDatapack.serverDataMap);
-		} catch (StreamCorruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		if(mDatapack==null){mDatapack=new Datapack();}
+		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
 		
-		mRsCtrlService=new RsCtrlService(new UiThreadHandler());
+		
+		if( mDatapack == null ) { mDatapack = new Datapack(); }
+		
+		mRsCtrlService = new RsCtrlService(new UiThreadHandler());
 		mRsCtrlService.registerListener(this);
 		
-		mNotifyService=new NotifyService(mRsCtrlService.chatService,this);
+		mNotifyService = new NotifyService( mRsCtrlService.chatService,this );
 		
 		// update own State Notification
 		updateNotification();
 		
 		int RESPONSE=(0x01<<24);
-		final int MsgId_EventChatMessage=(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
+		final int MsgId_EventChatMessage = (RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE);
 		//mRsCtrlService.registerMsgHandler(MsgId_EventChatMessage, new ChatlobbyChatActivity.ChatHandler());
-		
-		
 	}
 	
 	@Override
-	public void onDestroy(){
+	public void onDestroy()
+	{
 		Log.v(TAG, "onDestroy()");
 		mNotifyService.cancelAll();
 		mRsCtrlService.disconnect();
@@ -94,31 +88,26 @@ public class RsService extends Service implements RsCtrlServiceListener{
 	}
 	*/
 	
-	public void saveData(){
-		try {
+	public void saveData()
+	{
+		try
+		{
 			RsServerData sd=mRsCtrlService.getServerData();
 			mDatapack.serverDataMap.put(sd.name, sd);
 			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
 			ObjectOutputStream o=new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
 	}
 	
-	public Map<String,RsServerData> getServers(){
-		return mDatapack.serverDataMap;
-	}
+	public Map<String,RsServerData> getServers() { return mDatapack.serverDataMap; }
 	
 	//---------------------------------------------
 	// Binder
 	private final IBinder mBinder=new RsBinder();
 	@Override
-	public IBinder onBind(Intent arg0) {
+	public IBinder onBind(Intent arg0)
+	{
 		/*
 		// tut
 		String ns = Context.NOTIFICATION_SERVICE;
@@ -160,30 +149,29 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		return mBinder;
 	}
 	
-	public class RsBinder extends Binder {
-		RsService getService(){
-			return RsService.this;
-		}
+	public class RsBinder extends Binder
+	{
+		RsService getService() { return RsService.this; }
 	}
 	
-	
-	// neu neu nicht l�schen
-	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface{
+	// neu neu nicht lschen
+	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface
+	{
 		@Override
-		public void postToUiThread(Runnable r) {
-			post(r);
-		}
+		public void postToUiThread(Runnable r) { post(r); }
 	}
 	
 	public RsCtrlService mRsCtrlService;
 
 	@Override
-	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) {
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
+	{
 		saveData();
 		updateNotification();
 	}
 	
-	private void updateNotification(){
+	private void updateNotification()
+	{
 		int icon;
 		String tickerText;
 		String contentTitle=(String) getResources().getText(R.string.app_name);
@@ -191,18 +179,24 @@ public class RsService extends Service implements RsCtrlServiceListener{
 		
 		//=(String) getResources().getText(R.string.error)
 		
-		if(mRsCtrlService.isOnline()){
-			icon=R.drawable.rstray3;
+		if(mRsCtrlService.isOnline())
+		{
+			icon = R.drawable.rstray3;
 			tickerText=(String) getResources().getText(R.string.connected);
 			//contentTitle=(String) getResources().getText(R.string.app_name);
 			contentMessage=(String) getResources().getText(R.string.connected);
-		}else{
-			if(mRsCtrlService.getLastConnectionError()==ConnectionError.NONE){
+		}
+		else
+		{
+			if(mRsCtrlService.getLastConnectionError() == ConnectionError.NONE)
+			{
 				icon=R.drawable.rstray0;				
 				tickerText=(String) getResources().getText(R.string.not_connected);
 				//contentTitle="RetroShare Remote";
 				contentMessage=(String) getResources().getText(R.string.not_connected);
-			}else{
+			}
+			else
+			{
 				icon=R.drawable.rstray0_err2;
 				tickerText=(String) getResources().getText(R.string.connection_error);
 				//contentTitle="RetroShare Remote";

@@ -1,6 +1,7 @@
 package org.retroshare.android;
 
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.RsCtrlService.RsMessage;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import rsctrl.core.Core;

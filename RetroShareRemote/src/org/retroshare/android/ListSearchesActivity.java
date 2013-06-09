@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.retroshare.android.SearchService.SearchResponseHandler;
+import org.retroshare.java.SearchService.SearchResponseHandler;
 
 import android.content.Context;
 import android.content.Intent;

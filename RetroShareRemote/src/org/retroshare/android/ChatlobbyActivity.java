@@ -28,8 +28,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.retroshare.android.ChatService.ChatServiceListener;
-import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.java.RsCtrlService.RsMessage;
 //import org.retroshare.android.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
