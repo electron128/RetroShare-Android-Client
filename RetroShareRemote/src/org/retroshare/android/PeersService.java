@@ -15,59 +15,46 @@ import rsctrl.peers.Peers.ResponsePeerList;
 import org.retroshare.android.RsCtrlService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class PeersService implements ServiceInterface{
+public class PeersService implements ServiceInterface
+{
 	RsCtrlService mRsCtrlService;
-	PeersService(RsCtrlService s){
-		mRsCtrlService=s;
-	}
 	
-	public static interface PeersServiceListener{
+	PeersService(RsCtrlService s) { mRsCtrlService = s; }
+	
+	public static interface PeersServiceListener
+	{
 		public void update();
 	}
 	
 	private Set<PeersServiceListener>mListeners=new HashSet<PeersServiceListener>();
-	public void registerListener(PeersServiceListener l){
-		mListeners.add(l);
-	}
-	public void unregisterListener(PeersServiceListener l){
-		mListeners.remove(l);
-	}
-	private void _notifyListeners(){
-		for(PeersServiceListener l:mListeners){
-			l.update();
-		}
-	}
+	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
+	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
+	private void _notifyListeners() { for(PeersServiceListener l:mListeners){ l.update(); } }
 	
 	private List<Person> Persons=new ArrayList<Person>();
-	
-	public List<Person> getPeersList(){
-		return Persons;
-	}
-	public Person getPersonFromSslId(String sslId){
-		for(Person p:Persons){
-			for(Location l:p.getLocationsList()){
-				if(l.getSslId().equals(sslId)){
-					return p;
-				}
-			}
-		}
+	public List<Person> getPeersList(){ return Persons; }
+	public Person getPersonFromSslId(String sslId)
+	{
+		for(Person p:Persons){for(Location l:p.getLocationsList()){ if(l.getSslId().equals(sslId)){ return p; } }}
 		return null;
 	}
 	
 	private Person ownPerson;
-	public Person getOwnPerson(){
-		if(ownPerson==null){
-			RequestPeers.Builder reqb= RequestPeers.newBuilder();
+	public Person getOwnPerson()
+	{
+		if(ownPerson == null)
+		{
+			RequestPeers.Builder reqb = RequestPeers.newBuilder();
 			reqb.setSet(RequestPeers.SetOption.OWNID);
 			reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
-			RequestPeers req=reqb.build();
+			RequestPeers req = reqb.build();
 			byte[] b;
-			b=req.toByteArray();
-			//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
-	    	RsMessage msg= new RsMessage();
-	    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
+			b = req.toByteArray();
+	    	RsMessage msg = new RsMessage();
+	    	//          TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
+	    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
 	    	msg.body=b;
-	    	mRsCtrlService.sendMsg(msg,new OwnIdReceivedHandler());
+	    	mRsCtrlService.sendMsg(msg, new OwnIdReceivedHandler());
 		}
 		return ownPerson;
 	}
@@ -81,15 +68,16 @@ public class PeersService implements ServiceInterface{
 		}
 	}
 	
-	public void updatePeersList(){
-		RequestPeers.Builder reqb= RequestPeers.newBuilder();
+	public void updatePeersList()
+	{
+		RequestPeers.Builder reqb = RequestPeers.newBuilder();
 		reqb.setSet(RequestPeers.SetOption.FRIENDS);
 		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
 		RequestPeers req=reqb.build();
 		byte[] b;
 		b=req.toByteArray();
-		//mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
     	RsMessage msg= new RsMessage();
+    	//         TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
     	msg.body=b;
     	mRsCtrlService.sendMsg(msg);
@@ -97,24 +85,22 @@ public class PeersService implements ServiceInterface{
 	
 	
 	@Override
-	public void handleMessage(RsMessage msg) {
+	public void handleMessage(RsMessage msg)
+	{
    		System.err.println("PeersHandler:rsHandleMessage");
    		
-		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.PEERS_VALUE<<8)|Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE)){
+   		//            TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
+		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.PEERS_VALUE<<8)|Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE))
+		{
 			System.err.println("received Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE");
-			try {
-				Persons=ResponsePeerList.parseFrom(msg.body).getPeersList();
+			
+			try
+			{
+				Persons = ResponsePeerList.parseFrom(msg.body).getPeersList();
 				System.err.println(Persons);
 				_notifyListeners();
-				
-				//System.err.println(Persons);
-				
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			catch (InvalidProtocolBufferException e) { e.printStackTrace();	}
 		}
-		
 	}
-	
 }

@@ -256,7 +256,7 @@ public class RsCtrlService implements Runnable
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
 	
 	/**
-	 * Send a message associating to an handler to its reqId
+	 * Send a message associating an handler to its reqId
 	 * The RsMessageHandler rsHandleMsg method will be called when a response message ( a received message with same reqId ) is eventually received with the received message as paramether
 	 * @param msg The RsMessage to send
 	 * @param h Handler to handle the eventual response message

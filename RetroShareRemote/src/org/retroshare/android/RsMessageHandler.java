@@ -18,10 +18,20 @@ public abstract class RsMessageHandler extends Handler implements Runnable
 	 */
 	protected void rsHandleMsg(RsMessage msg) {}
 	
+	/**
+	 * Contain the message to handle
+	 */
 	private RsMessage mMsg;
 	
-	public void setMsg(RsMessage m) { mMsg=m; }
+	/**
+	 * Set the message to handle
+	 * @param m message to set
+	 */
+	public void setMsg(RsMessage m) { mMsg = m; }
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() { rsHandleMsg(mMsg); }
 }
