@@ -524,17 +524,16 @@ public class RsCtrlService implements Runnable
 	private int curBodySize;
 	private byte[] curBody;
 	
-	// blockiert nicht
-	// aber: nicblockierend in einem eigenen thread ist schwachsinn,
-	// deswegen auf blockierend umstellen, oder den thread weglassen und nichtblockierend pollen
-	// problem: rausfinden wie das timeout f�r die blockierung in jaramiko ist
-	// nachteil: blockierend blockiert auch alle anderen aktionen im thread
+	// don't block
+	// But: non-blocking in a separate thread is bullshit,
+	// so Switch on blocking, or non-blocking and omit the thread and poll non-blocking
+	// Problem: find out how the timeout for the blocking is in jaramiko
+	// Cons: blocking also blocks all other actions in the thread
 	//
-	// neue erkenntnis:
-	// http://lag.net/jaramiko/docs/net/lag/jaramiko/Channel.html#setTimeout(int)
+	// New cognition:
+	// http://lag.net/jaramiko/docs/net/lag/jaramiko/Channel.html # setTimeout (int)
 	//
-	// update: blockiert jetzt, jetzt weil ich auf bulk read umgestellt habe
-	//
+	// Update:is blocking, because now I have switched to bulk read
 	private int _recvMsg(){
 		try {
 			switch(inputState){
