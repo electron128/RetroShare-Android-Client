@@ -13,11 +13,25 @@ import android.util.Log;
 public class AuthenticationService extends Service
 {
     private static final String TAG = "AuthenticationService";
+    private AccountAuthenticator mAuthenticator;
+
+    @Override
+    public void onCreate()
+    {
+        Log.v(TAG, "Authentication Service started.");
+        mAuthenticator = new AccountAuthenticator(this);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+    	Log.v(TAG, "Authentication Service stopped.");
+    }
 
     @Override
     public IBinder onBind(Intent intent)
     {
         Log.v(TAG, "getBinder()...  returning the AccountAuthenticator binder for intent " + intent);
-        return (new AccountAuthenticator(this).getIBinder());
+        return mAuthenticator.getIBinder();
     }
 }

@@ -71,7 +71,7 @@
 	    <activity android:name=".AddServerActivity"></activity>
 	    
 	    <activity
-            android:name=".AccountLoginActivity"
+            android:name=".authenticator.AccountActivity"
             android:label="@string/authenticator_preference_category_server"> <!-- 
             android:taskAffinity=".AccountTask" >
             <intent-filter>

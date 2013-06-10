@@ -62,7 +62,19 @@
     <string name="ssh_port">ssh port</string>
     <string name="new_retroshare_nogui_server">new retroshare-nogui server</string>
 
-    <string name="authenticator_label">RetroShare Account</string>
+    
+    <!-- Atuthenticator Experiment BEGIN -->
+	<string name="authenticator_label">RetroShare Account</string>
     <string name="authenticator_preference_category_server">Server Settings</string>
-    <string name="authenticator_auth_token_type">org.retroshare.android.authToken</string>
+    <string name="authenticator_activity_hostname_default">127.0.0.1</string>
+    <string name="authenticator_activity_hostname_summary">Retroshare server hostname could be an IP or a domain name like myserver.mydomain.net</string>
+    <string name="authenticator_activity_hostname_label">Server Hostname</string>
+    <string name="authenticator_activity_port_default">7022</string>
+    <string name="authenticator_activity_port_label">Port</string>
+    <string name="authenticator_activity_userid_default">user</string>
+    <string name="authenticator_activity_userid_label">Username</string>
+    <string name="authenticator_activity_password_label">Password</string>
+    <string name="authenticator_activity_password_hint">password</string>
+    <!-- Atuthenticator Experiment END -->
+    
 </resources>
