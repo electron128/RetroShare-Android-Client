@@ -1,8 +1,8 @@
 package org.retroshare.android;
 
-import org.retroshare.java.RsCtrlService.RsMessage;
 
-public interface UiThreadHandlerInterface {
+public interface UiThreadHandlerInterface
+{
 	/**
 	 * Posts a Runnable Object to the UI Thread and calls r.run() in UI Thread
 	 * @param r Runnable to run in UI Thread

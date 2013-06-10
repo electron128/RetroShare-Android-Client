@@ -22,21 +22,21 @@ public class AddServerActivity extends RsActivityBase
         
         setContentView(R.layout.activity_add_server);
         
-        editTextName=(EditText) findViewById(R.id.editTextName);
-        editTextHostname=(EditText) findViewById(R.id.editTextHostname);
-        editTextPort=(EditText) findViewById(R.id.editTextPort);
-    	editTextUser=(EditText) findViewById(R.id.editTextUser);
+        editTextName     = (EditText) findViewById(R.id.editTextName);
+        editTextHostname = (EditText) findViewById(R.id.editTextHostname);
+        editTextPort     = (EditText) findViewById(R.id.editTextPort);
+    	editTextUser     = (EditText) findViewById(R.id.editTextUser);
     }
     
     public void addServer(View v)
     {
     	if(mBound)
     	{
-    		RsServerData sd=new RsServerData();
-    		sd.name=editTextName.getText().toString();
-	    	sd.hostname=editTextHostname.getText().toString();
-	    	sd.port=Integer.parseInt(editTextPort.getText().toString());
-	    	sd.user=editTextUser.getText().toString();
+    		RsServerData sd = new RsServerData();
+    		sd.name     = editTextName.getText().toString();
+	    	sd.hostname = editTextHostname.getText().toString();
+	    	sd.port     = Integer.parseInt(editTextPort.getText().toString());
+	    	sd.user     = editTextUser.getText().toString();
 	    	mRsService.mRsCtrlService.setServerData(sd);
     	}
     	finish();

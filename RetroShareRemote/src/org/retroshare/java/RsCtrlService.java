@@ -163,7 +163,7 @@ public class RsCtrlService implements Runnable
 	private OutputStream mOutputStream;
 	/*************************************/
 	
-	private Set<RsServiceInterface> Services  =new HashSet<RsServiceInterface>();
+	private Set<RsServiceInterface> Services = new HashSet<RsServiceInterface>();
 	public ChatService chatService;
 	public PeersService peersService;
 	public FilesService filesService;
@@ -236,10 +236,11 @@ public class RsCtrlService implements Runnable
 	/**
 	 * Disconnect from the actual connected server
 	 */
-	public void disconnect(){
+	public void disconnect()
+	{
 		if(DEBUG){System.err.println("RsCtrlService: disconnect()");}
 		
-		synchronized(mConnectAction){ mConnectAction=ConnectAction.DISCONNECT; }
+		synchronized(mConnectAction){ mConnectAction = ConnectAction.DISCONNECT; }
 	}
 	
 	/**
@@ -363,7 +364,7 @@ public class RsCtrlService implements Runnable
 			{
 				if(DEBUG){System.err.println("RsCtrlService: _connect() ...");}
 				
-				boolean newHostKey=false;
+				boolean newHostKey = false;
 				if( mServerData.hostkey == null ){ newHostKey = true; }
 				
 				mSocket = new Socket();
@@ -376,15 +377,19 @@ public class RsCtrlService implements Runnable
 				// no more error here
 				System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport.start(mServerData.hostkey, 2000);
-				if(newHostKey){ mServerData.hostkey = mTransport.getRemoteServerKey(); }
+				if(newHostKey)
+				{
+					mServerData.hostkey = mTransport.getRemoteServerKey();
+					notifyListenersOnConnectionStateChanged(ConnectionEvent.SERVER_DATA_CHANGED);
+				}
 				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
 				mChannel = mTransport.openSession(2000);
 				mChannel.invokeShell(2000);
 				mInputStream = mChannel.getInputStream();
 				mOutputStream = mChannel.getOutputStream();
 				
-				synchronized(mConnectState){  mConnectState = ConnectState.ONLINE; }
-				synchronized(mConnectAction){ mConnectAction = ConnectAction.NONE; }
+				synchronized(mConnectState)  { mConnectState  = ConnectState.ONLINE; }
+				synchronized(mConnectAction) { mConnectAction = ConnectAction.NONE;  }
 
 				postNotifyListenersToUiThreadOnConnectionStateChanged(ConnectionEvent.CONNECTED);
 
@@ -512,9 +517,7 @@ public class RsCtrlService implements Runnable
 	// allocate 4 Bytes for Magic Code
 	private ByteBuffer inbuf=ByteBuffer.allocate(4);
 	
-	private enum InputState{
-		BEGIN,HAVE_MAGIC_CODE,HAVE_MSG_ID,HAVE_REQ_ID,HAVE_BODY_SIZE
-	}
+	private enum InputState { BEGIN, HAVE_MAGIC_CODE, HAVE_MSG_ID, HAVE_REQ_ID, HAVE_BODY_SIZE }
 	private InputState inputState=InputState.BEGIN;
 	private int curMsgId;
 	private int curReqId;
