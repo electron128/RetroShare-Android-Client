@@ -1,17 +1,18 @@
 package org.retroshare.android.authenticator;
 
 import org.retroshare.android.R;
+import org.retroshare.android.RsActivityBase;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-public class AccountActivity extends Activity
+public class AccountActivity extends RsActivityBase
 {
 	String TAG = "AccountActivity";
 	
@@ -49,6 +50,14 @@ public class AccountActivity extends Activity
 		if(accountCreated)
 		{
 			Log.d(TAG, "saveAccount(View v) reponse with account " + mAccountType + "%%" + mUsername + "%%" + mPassword);
+			
+			// Now we tell our caller, could be the Android Account Manager or even our own application that the process was successful
+			final Intent intent = new Intent();
+			intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, mHostName);
+			intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
+
+			setResult(RESULT_OK, intent);
+			
 			response.onResult(result);
 		}
 		

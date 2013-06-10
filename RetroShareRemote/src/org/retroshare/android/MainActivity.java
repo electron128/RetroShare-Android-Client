@@ -33,7 +33,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	
 	private static final int UPDATE_INTERVALL=1000;
 	
-	ByteArrayOutputStream output=new ByteArrayOutputStream();
+	ByteArrayOutputStream output = new ByteArrayOutputStream();
 	
    	EditText editTextHostname;
    	EditText editTextPort;
@@ -48,7 +48,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	
 	Handler mHandler;
 	
-	boolean isInForeground=false;
+	boolean isInForeground = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -76,91 +76,9 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	
     	mHandler=new Handler();
     	mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
-        
-        /*
-    	RsServerData[] d=new RsServerData[2];
-    	d[0]=new RsServerData();
-    	d[0].hostname="192.168.16.2";
-    	d[0].port=7022;
-    	d[0].user="user";
-    	d[0].password="ubuntu123";
-    	RsServerData[] x=new RsServerData[2];
-    	x=d.clone();
-    	Log.v(TAG,"d[0]"+d[0]);
-    	Log.v(TAG,"x[0]"+d[0]);
-    	*/
-    	
-        /*
-    	EditText text=(EditText) findViewById(R.id.editTextHostname);
-    	text.setText("192.168.137.1");
-    	
-    	text=(EditText) findViewById(R.id.editTextPort);
-    	text.setText("7022");
-    	
-    	text=(EditText) findViewById(R.id.editTextUser);
-    	text.setText("user");
-    	
-    	text=(EditText) findViewById(R.id.editTextPassword);
-    	text.setText("ubuntu123");
-        */
-        
-       // PrintStream printStream =new PrintStream(output);
-        //System.setOut(printStream);
-        
-        //System.out.println("Hallo Welt");
-        
-        
-		/*
-		final int RESPONSE=(0x01<<24);
-		
-		
-		//System.out.println(Integer.toString(0x000000ff, 16));
-		
-		System.out.println("init jrs");
-		JRS mjrs=new JRS("192.168.16.2", 7022, null, "user", "ubuntu123");
-		System.out.println("jrs ok");
-		//System.out.println("jrs.get:");
-		//mjrs.get();
-		
-		RequestPeers.Builder reqb= RequestPeers.newBuilder();
-		reqb.setSet(RequestPeers.SetOption.FRIENDS);
-		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
-		RequestPeers req=reqb.build();
-		byte[] b;
-		b=req.toByteArray();
-		mjrs.sendRpc((Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, b);
-		
-		// 13 7f 00 01 
-		// 00 00 00 01
-		// 00 00 00 01
-		// 00 00 00 04 
-		// 08 04 10 04
-		// 137f000100000001000000010000000408041004
-		//mjrs.recvToHex();
-		
-		
-		int msgId;
-		while((msgId=mjrs.recvRpcs())==0){
-		}
-		if(msgId==(RESPONSE|(Core.PackageId.PEERS_VALUE<<8)|Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE)){
-			System.out.println("received Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE");
-			try {
-				ResponsePeerList peers = ResponsePeerList.parseFrom(mjrs.getNextRpc());
-				for(Core.Person person:peers.getPeersList()){
-					System.out.println(person.getName());
-				}
-				
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
-        
-        //EditText text=(EditText) findViewById(R.id.editText1);
-        //text.setText(output.toString());
-        
     }
-   private RsServerData mServerData;
+    
+    private RsServerData mServerData;
     
     @Override
     protected void onServiceConnected()
@@ -290,8 +208,9 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	}
     }
     
-    public void deleteServerKey(View v){
-    	mServerData.hostkey=null;
+    public void deleteServerKey(View v)
+    {
+    	mServerData.hostkey = null;
     	mRsService.mRsCtrlService.setServerData(mServerData);
     }
     
@@ -300,10 +219,6 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     	Log.v(TAG, "connect");
         if(mBound)
         {
-        	//mRsService.startThread();
-        	
-        	//RsServerData mServerData=new RsServerData();
-        	
         	mServerData.hostname=editTextHostname.getText().toString();
         	mServerData.port=Integer.parseInt(editTextPort.getText().toString());
         	mServerData.user=editTextUser.getText().toString();
@@ -319,12 +234,10 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
         	textViewConnectionState.setTextColor(Color.BLACK);
         	textViewConnectionState.setText("connecting...");
         	textViewConnectionState.setVisibility(View.VISIBLE);
-            //EditText text2=(EditText) findViewById(R.id.editText1);
-            //text2.setText(output.toString());
         }
         else
         {
-        	EditText text=(EditText) findViewById(R.id.editText1);
+        	EditText text = (EditText) findViewById(R.id.editText1);
         	text.setText("Error: not bound");
         }
     }
