@@ -11,8 +11,9 @@ import net.lag.jaramiko.SSHException;
 
 // TODO: test serialization and clone()
 // http://java.sun.com/developer/technicalArticles/Programming/serialization/
-public class RsServerData implements Serializable, Cloneable{
-	private static final boolean DEBUG=false;
+public class RsServerData implements Serializable, Cloneable
+{
+	private static final boolean DEBUG = false;
 	private static final long serialVersionUID = 0;
 	
 	// name to identify this server
@@ -20,7 +21,7 @@ public class RsServerData implements Serializable, Cloneable{
 	
 	public String user;
 	public String password;
-	public boolean savePassword=false;
+	public boolean savePassword = false;
 	public String hostname;
 	public String dhtKey;
 	public int port;

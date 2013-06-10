@@ -88,58 +88,13 @@ public class RsService extends Service implements RsCtrlServiceListener
 	}
 	
 	public Map<String,RsServerData> getServers() { return mDatapack.serverDataMap; }
-	
-	private final IBinder mBinder=new RsBinder();
+
+	public class RsBinder extends Binder { RsService getService() { return RsService.this; } }
+	private final IBinder mBinder = new RsBinder();
 	@Override
-	public IBinder onBind(Intent arg0)
-	{
-		/*
-		// tut
-		String ns = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-		
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = "Hello";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		
-		Context context = getApplicationContext();
-		CharSequence contentTitle = "My notification";
-		CharSequence contentText = "Hello World!";
-		Intent notificationIntent = new Intent(this, RsService.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-		
-		int HELLO_ID = 1;
-
-		mNotificationManager.notify(HELLO_ID, notification);
-		*/
-		
-		/*
-		// tut auch, macht die benachrichtigung aber wegen startForeground() unl�schbar
-		Notification notification = new Notification(R.drawable.ic_launcher, "blubber",System.currentTimeMillis());
-		
-		Intent notificationIntent = new Intent(this, RsService.class);
-		
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		
-		notification.setLatestEventInfo(this, "rsremote","rs remote wurde gestartet", pendingIntent);
-		
-		//first param has to be greater 0, dont know why
-		startForeground(1, notification);
-		*/
-		
-		return mBinder;
-	}
+	public IBinder onBind(Intent arg0) { return mBinder; }
 	
-	public class RsBinder extends Binder
-	{
-		RsService getService() { return RsService.this; }
-	}
-	
-	// neu neu nicht lschen
+	// new new don't delete
 	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface
 	{
 		@Override
@@ -149,9 +104,9 @@ public class RsService extends Service implements RsCtrlServiceListener
 	public RsCtrlService mRsCtrlService;
 
 	@Override
-	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
+	public void onConnectionStateChanged(ConnectionEvent ce)
 	{
-		saveData(); // FIXME to avoid unnecessary write in flash memory it isn't better to save config only if ce == ConnectionEvent.SERVER_DATA_CHANGED ?
+		if( ce == ConnectionEvent.SERVER_DATA_CHANGED ) saveData();
 		updateNotification();
 	}
 	
@@ -168,7 +123,6 @@ public class RsService extends Service implements RsCtrlServiceListener
 		{
 			icon = R.drawable.rstray3;
 			tickerText=(String) getResources().getText(R.string.connected);
-			//contentTitle=(String) getResources().getText(R.string.app_name);
 			contentMessage=(String) getResources().getText(R.string.connected);
 		}
 		else
@@ -177,14 +131,12 @@ public class RsService extends Service implements RsCtrlServiceListener
 			{
 				icon=R.drawable.rstray0;				
 				tickerText=(String) getResources().getText(R.string.not_connected);
-				//contentTitle="RetroShare Remote";
 				contentMessage=(String) getResources().getText(R.string.not_connected);
 			}
 			else
 			{
 				icon=R.drawable.rstray0_err2;
 				tickerText=(String) getResources().getText(R.string.connection_error);
-				//contentTitle="RetroShare Remote";
 				contentMessage=(String) getResources().getText(R.string.connection_error);
 			}
 		}
