@@ -1,5 +1,5 @@
 
-package org.retroshare.android;
+package org.retroshare.android.authenticator;
 
 import android.app.Service;
 import android.content.Intent;

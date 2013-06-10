@@ -25,20 +25,19 @@ import android.util.Log;
 /**
  * This class represents RetroShare as an android service,
  * Notify RetroShare events interesting for the user ( such as connection status and chat messages ) to the android system
- * And stores on disk RetroShare servers connection data like hostname, port, user...
+ * And stores as an android file RetroShare servers connection data like hostname, port, user...
  */
 public class RsService extends Service implements RsCtrlServiceListener
 {
 	private static final String TAG="RsService";
-	
-	//TODO it is reasonable to use android way of save config instead of use a "raw" file ?
+
 	private static class Datapack implements Serializable
 	{
 		static final long serialVersionUID = 1L;
-		// index: server name // TODO specify better what server name mean ( hostname or arbitrary server name or hostname + port... )
-		Map<String,RsServerData> serverDataMap = new HashMap<String,RsServerData>();
+		Map<String,RsServerData> serverDataMap = new HashMap<String,RsServerData>(); // index: server name ( the one called arbitrary name on the ui )
 	}
 	private Datapack mDatapack;
+	
 	private NotifyService mNotifyService;
 	
 	@Override

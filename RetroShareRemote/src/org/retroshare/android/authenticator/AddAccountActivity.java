@@ -1,4 +1,9 @@
-package org.retroshare.android;
+package org.retroshare.android.authenticator;
+
+import org.retroshare.android.R;
+import org.retroshare.android.R.id;
+import org.retroshare.android.R.layout;
+import org.retroshare.android.R.string;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -37,9 +42,6 @@ public class AddAccountActivity extends AccountAuthenticatorActivity
     {
 		String mAccountType = getString(R.string.ACCOUNT_TYPE);
 		String mAccountName = ((EditText) findViewById(R.id.editTextName)).getText().toString();
-		String mHostName    = ((EditText) findViewById(R.id.editTextHostname)).getText().toString();
-		String mPort        = ((EditText) findViewById(R.id.editTextPort)).getText().toString();
-		String mUsername    = ((EditText) findViewById(R.id.editTextUser)).getText().toString();
 
 		/*//save account to retroshare
 		RsServerData sd = new RsServerData();

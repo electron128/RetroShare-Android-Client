@@ -1,4 +1,7 @@
-package org.retroshare.android;
+package org.retroshare.android.authenticator;
+
+import org.retroshare.android.R;
+import org.retroshare.android.R.string;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

@@ -80,7 +80,7 @@
             </intent-filter> -->
         </activity>
         <service
-            android:name=".AuthenticationService"
+            android:name=".authenticator.AuthenticationService"
             android:exported="true"
             android:permission="org.retroshare.android.auth">
             <intent-filter>
