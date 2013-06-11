@@ -467,13 +467,13 @@ public class RsCtrlService implements Runnable
 		mInputStream=null;
 		mOutputStream=null;
 		
-		if(mChannel != null){ mChannel.close(); }
+		if(mChannel != null) mChannel.close();
 		mChannel = null;
 		
-		if(mTransport != null){ mTransport.close(); }
+		if(mTransport != null) mTransport.close();
 		mTransport=null;
 		
-		try { mSocket.close(); } catch (Exception e) { e.printStackTrace(); }
+		if(mSocket != null) try { mSocket.close(); } catch (IOException e) { e.printStackTrace(); }
 		mSocket=null;
 		
 		/*

@@ -54,7 +54,7 @@ public class AccountActivity extends RsActivityBaseNG
             if(rsAvailableServers.size() < 1) return;
 
             // Put available servers inside the Spinner
-            spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, R.layout.text_view, R.id.available_account_spinner, rsAvailableServers);
+            spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, R.layout.text_view, rsAvailableServers);
             Spinner accountSpinner = (Spinner) this.findViewById(R.id.available_account_spinner);
             accountSpinner.setAdapter(spinnerAdapter);
 
