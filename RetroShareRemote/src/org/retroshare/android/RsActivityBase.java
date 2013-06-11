@@ -18,11 +18,11 @@ import android.util.Log;
 public abstract class RsActivityBase extends Activity
 {
 	protected RsService mRsService;
-	protected boolean mBound=false;
+	protected boolean mBound = false;
 	
 	private static final String TAG="RsActivityBase";
 	
-    private ServiceConnection mConnection = new ServiceConnection()
+    private class RsServiceConnection implements ServiceConnection
     {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
@@ -41,6 +41,25 @@ public abstract class RsActivityBase extends Activity
         }
     };
     
+    private RsServiceConnection mConnection = null;
+    private void _bindRsService()
+    {
+    	if(mConnection == null)
+    	{
+	    	mConnection = new RsServiceConnection();
+	        Intent intent = new Intent(this, RsService.class);
+	        if(bindService(intent, mConnection, Context.BIND_AUTO_CREATE)){ Log.v(TAG, "onCreate: bindService returned true"); }
+	        else{ Log.e(TAG, "onCreate: bindService returned false"); }
+    	}
+    }
+    
+    
+    /**
+     * This method should be overridden by child classes that want to do something between Activity.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected
+     */
+    protected void onCreateBeforeConnectionInit()
+    {}
+    
     /**
      * This method should be overridden by child classes that want to do something when connection to RsService is available.
      */
@@ -51,11 +70,8 @@ public abstract class RsActivityBase extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(this, RsService.class);
-        
-        if(bindService(intent, mConnection, Context.BIND_AUTO_CREATE)){ Log.v(TAG, "onCreate: bindService returned true"); }
-        else{ Log.e(TAG, "onCreate: bindService returned false"); }
-
+        onCreateBeforeConnectionInit();
+        _bindRsService();
     }
     
     @Override

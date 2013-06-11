@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -6,64 +7,13 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/authenticator_activity_hostname_label"
+        android:text="@string/authenticator_activity_localname_label"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <EditText
-        android:id="@+id/hostname_edit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textNoSuggestions"
-        android:scrollHorizontally="true"
-        android:singleLine="true"
-        android:summary="@string/authenticator_activity_hostname_summary"
-        android:text="@string/authenticator_activity_hostname_default" >
-    </EditText>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/authenticator_activity_port_label"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/port_edit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number|textNoSuggestions"
-        android:singleLine="true"
-        android:text="@string/authenticator_activity_port_default" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/authenticator_activity_userid_label"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/userid_edit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textNoSuggestions"
-        android:scrollHorizontally="true"
-        android:singleLine="true"
-        android:text="@string/authenticator_activity_userid_default" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/authenticator_activity_password_label"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/password_edit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/authenticator_activity_password_hint"
-        android:inputType="textNoSuggestions|textPassword"
-        android:scrollHorizontally="true"
-        android:singleLine="true" >
-    </EditText>
+    <Spinner
+        android:id="@+id/available_account_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/buttonOK"

@@ -1,6 +1,5 @@
 package org.retroshare.android;
 
-import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
 
 import rsctrl.core.Core;
@@ -32,8 +31,6 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	private static final String TAG="MainActivity";
 	
 	private static final int UPDATE_INTERVALL=1000;
-	
-	ByteArrayOutputStream output = new ByteArrayOutputStream();
 	
    	EditText editTextHostname;
    	EditText editTextPort;

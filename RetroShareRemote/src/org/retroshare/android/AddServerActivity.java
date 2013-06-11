@@ -41,9 +41,4 @@ public class AddServerActivity extends RsActivityBase
     	}
     	finish();
     }
-    
-    @Override protected void onServiceConnected(){}
-    @Override public void onResume(){ super.onResume(); } // TODO if we doesn't override this is not super called automatically ?
-    @Override public void onPause(){ super.onPause(); } // TODO if we doesn't override this is not super called automatically ?
-
 }

@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.retroshare.java.RsCtrlService;
 import org.retroshare.java.RsServerData;
-import org.retroshare.java.RsCtrlService.ConnectAction;
-import org.retroshare.java.RsCtrlService.ConnectState;
 import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
 
 import android.app.AlertDialog;
