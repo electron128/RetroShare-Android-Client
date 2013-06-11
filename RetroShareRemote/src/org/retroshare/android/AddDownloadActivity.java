@@ -51,7 +51,7 @@ public class AddDownloadActivity extends RsActivityBase {
 		*/
     	if(getIntent().hasExtra("File")){
     		try {
-				mFile=File.parseFrom(getIntent().getByteArrayExtra("File"));
+				mFile = File.parseFrom(getIntent().getByteArrayExtra("File"));
 			} catch (InvalidProtocolBufferException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

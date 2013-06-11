@@ -25,14 +25,14 @@ public class ShowQrCodeActivity extends RsActivityBase {
 	
 	/*
 	 *
-länge eines schlüssels:
+lnge eines schlssels:
 
 neues format: 894 zeichen
 
 base 64 decodiert:
 649 bytes
 
-macht 944 alfanumerische zeichen für den qrcode
+macht 944 alfanumerische zeichen fr den qrcode
 
 http://en.wikipedia.org/wiki/QR_code#Encoding
 
