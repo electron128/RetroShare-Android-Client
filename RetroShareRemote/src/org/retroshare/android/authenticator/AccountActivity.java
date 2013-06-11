@@ -37,7 +37,8 @@ public class AccountActivity extends RsActivityBaseNG
 
 		setContentView(R.layout.activity_account);
 	}
-	
+
+    @Override
 	protected void onServiceConnected()
     {
 		Log.d(TAG, "onServiceConnected()");

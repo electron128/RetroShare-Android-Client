@@ -58,6 +58,7 @@ public abstract class RsActivityBaseNG extends Activity
 
     /**
      * This method should be overridden by child classes that want to do something between Activity.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected
+     * It is suggested for inflating your activity layout, so you are sure that your widget are in the right place when onServiceConnected() is called
      */
     protected void onCreateBeforeConnectionInit(Bundle savedInstanceState)
     {}

@@ -473,7 +473,7 @@ public class RsCtrlService implements Runnable
 		if(mTransport != null){ mTransport.close(); }
 		mTransport=null;
 		
-		try { mSocket.close(); } catch (IOException e) { e.printStackTrace(); }
+		try { mSocket.close(); } catch (Exception e) { e.printStackTrace(); }
 		mSocket=null;
 		
 		/*
