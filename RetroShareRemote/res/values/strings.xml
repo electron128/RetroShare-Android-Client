@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">RetroShare</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">RetroShare</string>
     <string name="connect">connect</string>
@@ -67,6 +66,9 @@
 	<string name="authenticator_label">RetroShare Account</string>
     <string name="authenticator_activity_localname_summary">Chose between available RetroShare account to enable sync</string>
     <string name="authenticator_activity_localname_label">Account Local Name</string>
+    <string name="authenticator_activity_accounts_not_available_title">No Account to Add</string>
+    <string name="authenticator_activity_accounts_not_available_message">Create another RetroShare account before adding it for sync</string>
+
     <string name="authenticator_preference_category_server">Server Settings</string>
     <!-- Authenticator Experiment END -->
     

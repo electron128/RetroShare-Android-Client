@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.retroshare.android.AddServerActivity;
 import org.retroshare.android.R;
 import org.retroshare.android.RsActivityBaseNG;
 import org.retroshare.android.RsService;
@@ -11,13 +12,16 @@ import org.retroshare.android.RsService;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class AccountActivity extends RsActivityBaseNG
 {
@@ -57,30 +61,64 @@ public class AccountActivity extends RsActivityBaseNG
 	public void saveAccount(View v)
 	{
 		Log.d(TAG, "saveAccount(View v)");
-		
-		String mAccountType = getString(R.string.ACCOUNT_TYPE);
-		String accountName  = ((Spinner) findViewById(R.id.available_account_spinner)).getSelectedItem().toString();
-		
-		Account account = new Account(accountName, mAccountType);
-		AccountManager am = AccountManager.get(this);
-		
-		Bundle result = new Bundle();
-		result.putString(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
-		result.putString(AccountManager.KEY_ACCOUNT_NAME, accountName );
-		
-		boolean accountCreated = am.addAccountExplicitly(account, null, result);
 
-		if(accountCreated)
+		TextView selectedItem = (TextView) ((Spinner) findViewById(R.id.available_account_spinner)).getSelectedItem();
+		if(selectedItem != null)
 		{
-			// Now we tell our caller, could be the Android Account Manager or even our own application that the process was successful
-			final Intent intent = new Intent();
-			intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
-			intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
+			String accountName  = selectedItem.toString();
 
-			setResult(RESULT_OK, intent);
-			
-			response.onResult(result);
+			String mAccountType = getString(R.string.ACCOUNT_TYPE);
+			Account account = new Account(accountName, mAccountType);
+			AccountManager am = AccountManager.get(this);
+
+			Bundle result = new Bundle();
+			result.putString(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
+			result.putString(AccountManager.KEY_ACCOUNT_NAME, accountName );
+
+			boolean accountCreated = am.addAccountExplicitly(account, null, result);
+
+			if(accountCreated)
+			{
+				// Now we tell our caller, could be the Android Account Manager or even our own application that the process was successful
+				final Intent intent = new Intent();
+				intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
+				intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
+
+				setResult(RESULT_OK, intent);
+
+				response.onResult(result);
+			}
+
+			finish();
+        }
+        else
+		{
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.authenticator_activity_accounts_not_available_title)
+					.setMessage(R.string.authenticator_activity_accounts_not_available_message)
+					.setPositiveButton
+					(
+							android.R.string.yes,
+							new DialogInterface.OnClickListener()
+							{
+								public void onClick(DialogInterface dialog, int which)
+								{
+									Intent intent = new Intent(AccountActivity.this, AddServerActivity.class);
+									startActivity(intent);
+								}
+							}
+					)
+                    .setNegativeButton
+                            (android.R.string.no,
+                                    new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            AccountActivity.this.finish();
+                                        }
+                                    }
+                            )
+                    .show();
 		}
-		finish();
 	}
 }
