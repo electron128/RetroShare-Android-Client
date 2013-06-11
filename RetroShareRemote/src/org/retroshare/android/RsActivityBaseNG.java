@@ -13,8 +13,8 @@ import android.util.Log;
 
 /**
  * @author G10h4ck
- * This class is aimed to be inherited by all Activity that needs to communicate with RsService
- * provide out of the box all needed stuff to communicate with RsService
+ * This class is aimed to be inherited by Activityes that needs to communicate with RsService
+ * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
 public abstract class RsActivityBaseNG extends Activity

@@ -24,9 +24,6 @@ public class AccountActivity extends RsActivityBaseNG
 	private static final String TAG = "AccountActivity";
 	
 	AccountAuthenticatorResponse response;
-	
-	ArrayList<String> rsAvailableServers;
-    ArrayAdapter<String> spinnerAdapter;
 
 	@Override
     protected void onCreateBeforeConnectionInit(Bundle savedInstanceState)
@@ -42,24 +39,19 @@ public class AccountActivity extends RsActivityBaseNG
 	protected void onServiceConnected()
     {
 		Log.d(TAG, "onServiceConnected()");
-		if(mBound)
-		{
-	        // Get RetroShare servers
-            rsAvailableServers = new ArrayList<String>();
-			rsAvailableServers.addAll(mRsService.getServers().keySet());
-            if(rsAvailableServers.size() < 1) return;
+        // Get RetroShare servers
+        ArrayList<String> rsAvailableServers = new ArrayList<String>();
+        rsAvailableServers.addAll(mRsService.getServers().keySet());
+        if(rsAvailableServers.size() < 1) return;
 
-	        // Remove servers already associated with an android account
-	        for(Account account : (AccountManager.get(this)).getAccountsByType(getString(R.string.ACCOUNT_TYPE))) rsAvailableServers.remove(account.name);
-            if(rsAvailableServers.size() < 1) return;
+        // Remove servers already associated with an android account
+        for(Account account : (AccountManager.get(this)).getAccountsByType(getString(R.string.ACCOUNT_TYPE))) rsAvailableServers.remove(account.name);
+        if(rsAvailableServers.size() < 1) return;
 
-            // Put available servers inside the Spinner
-            spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, R.layout.text_view, rsAvailableServers);
-            Spinner accountSpinner = (Spinner) this.findViewById(R.id.available_account_spinner);
-            accountSpinner.setAdapter(spinnerAdapter);
-
-            //spinnerAdapter.notifyDataSetChanged();
-		}
+        // Put available servers inside the Spinner
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, R.layout.text_view, rsAvailableServers);
+        Spinner accountSpinner = (Spinner) this.findViewById(R.id.available_account_spinner);
+        accountSpinner.setAdapter(spinnerAdapter);
     }
 	
 	public void saveAccount(View v)
@@ -80,8 +72,6 @@ public class AccountActivity extends RsActivityBaseNG
 
 		if(accountCreated)
 		{
-			Log.d(TAG, "saveAccount(View v) response with account " + mAccountType);
-			
 			// Now we tell our caller, could be the Android Account Manager or even our own application that the process was successful
 			final Intent intent = new Intent();
 			intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
@@ -91,9 +81,6 @@ public class AccountActivity extends RsActivityBaseNG
 			
 			response.onResult(result);
 		}
-		
-		Log.d(TAG, am.getAccounts().toString());
-		
 		finish();
 	}
 }
