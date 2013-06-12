@@ -8,21 +8,24 @@
     
     <uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	
+
+	<!-- Android Authenticator Permission BEGIN -->
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+	<permission android:name="org.retroshare.android.auth" android:label="Retroshare Authentication" android:protectionLevel="dangerous" />
+	<!-- Android Authenticator Permission BEGIN -->
+
+	<!-- Android Sync Provider Permission BEGIN -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+	<!-- Android Sync Provider Permission END -->
 
-    <permission android:name="org.retroshare.android.auth" android:label="Retroshare Authentication" android:protectionLevel="dangerous"></permission>
-    
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -69,15 +72,12 @@
             </intent-filter>
         </activity>
 	    <activity android:name=".AddServerActivity"></activity>
-	    
+
+
+		<!-- Android Authenticator BEGIN -->
 	    <activity
             android:name=".authenticator.AccountActivity"
-            android:label="@string/authenticator_preference_category_server"> <!-- 
-            android:taskAffinity=".AccountTask" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> -->
+            android:label="@string/authenticator_preference_category_server">
         </activity>
         <service
             android:name=".authenticator.AuthenticationService"
@@ -96,6 +96,16 @@
                 <action android:name="org.retroshare.android.authenticator.AccountPreferencesActivity.ACCOUNT_SETUP" />
             </intent-filter>
         </activity>
+		<!-- Android Authenticator END -->
+
+		<!-- Android Sync Provide BEGIN -->
+		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true" android:process=":contacts">
+			<intent-filter>
+				<action android:name="android.content.SyncAdapter" />
+			</intent-filter>
+			<meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
+		</service>
+		<!-- Android Sync Provide END -->
 
 	    
     </application>

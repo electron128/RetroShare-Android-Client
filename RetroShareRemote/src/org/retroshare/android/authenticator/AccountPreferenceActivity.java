@@ -6,7 +6,7 @@ import android.preference.PreferenceActivity;
 import org.retroshare.android.R;
 
 /**
- * Created by G10h4ck on 6/12/13.
+ * @author G10h4ck
  */
 public class AccountPreferenceActivity extends PreferenceActivity
 {
