@@ -90,6 +90,13 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+        <activity
+            android:name=".authenticator.AccountPreferenceActivity">
+            <intent-filter>
+                <action android:name="org.retroshare.android.authenticator.AccountPreferencesActivity.ACCOUNT_SETUP" />
+            </intent-filter>
+        </activity>
+
 	    
     </application>
 

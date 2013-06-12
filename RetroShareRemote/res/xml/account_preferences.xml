@@ -8,10 +8,10 @@
     <PreferenceScreen
         android:key="account_settings"
         android:title="Account Settings"
-        android:summary="Sync frequency, notifications, etc."><!-- TODO : Creare intent giusto
+        android:summary="Sync frequency, notifications, etc.">
         <intent
-            android:action="fm.last.android.activity.Preferences.ACCOUNT_SETUP"
-            android:targetPackage="fm.last.android"
-            android:targetClass="fm.last.android.activity.Preferences" /> -->
+            android:action="org.retroshare.android.authenticator.AccountPreferencesActivity.ACCOUNT_SETUP"
+            android:targetPackage="org.retroshare.android"
+            android:targetClass="org.retroshare.android.authenticator.AccountPreferencesActivity" />
     </PreferenceScreen>
 </PreferenceScreen>
