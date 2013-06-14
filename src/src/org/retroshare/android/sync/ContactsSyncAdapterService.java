@@ -34,7 +34,6 @@ import java.util.Map;
 
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
-
 public class ContactsSyncAdapterService extends RsServiceBaseNG
 {
 	private static final String TAG = "ContactsSyncAdapterService";
@@ -56,6 +55,11 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 
     // We should try to keep it updated every edit
     HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
+
+    public ContactsSyncAdapterService(){
+        super();
+    }
+
 
 
 	private class SyncAdapterImpl extends AbstractThreadedSyncAdapter
@@ -137,14 +141,17 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
                         updateContactList(account);
                     } else {
                         name=peer.getName();
-
+                        online=false;
                         for(Location l:locationList){
                             Person p=mapLocationToPerson.get(l);
                             if(p.equals(peer)){
-                                if((l.getState()&Location.StateFlags.CONNECTED_VALUE)==Location.StateFlags.CONNECTED_VALUE){online=true; lfound=l;}
+                                if((l.getState()&Location.StateFlags.CONNECTED_VALUE)==Location.StateFlags.CONNECTED_VALUE){online=true; lfound=l; break;}
+                                lfound=l;
                             }
                         }
-                        if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
+                        //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
+                          if(true){  //bisogna trovare il modo di capire se e' lo stato del peer e' cambiato oppure come sopra
+                                     //aggiornare ogni tot invece che ogni volta
                             //You would probably download an image file and just pass the bytes, but this sample doesn't use network so we'll decode and re-compress the icon resource to get the bytes
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
