@@ -2,13 +2,13 @@ package org.retroshare.android;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-
+/*
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
-
+*/
 public class util {
 	
 	// stolen from the internet
@@ -25,10 +25,10 @@ public class util {
 	}
 	
 	
-	
+	/*
 	static Bitmap encodeQrCode(String contents) throws WriterException {
 		QRCode qrCode=new QRCode();
-		Encoder.encode(contents, ErrorCorrectionLevel.L, qrCode);
+		Encoder.encode(contents, ErrorCorrectionLevel.L, qrCode); // commented momentanuesly because raises ErrorCorrectionLevel cannot find simbol ( no time to understand what zxing related library is missing... )
 		
 		System.out.println("encoded qrCode: "+qrCode);
 
@@ -63,5 +63,5 @@ public class util {
 		bitmap.setPixels(pixels, 0, imagewidth, 0, 0, imagewidth, imageheight);
 		bitmap=Bitmap.createScaledBitmap(bitmap, imagewidth*6, imageheight*6, false);
 		return bitmap;
-		}
+		}*/
 }

@@ -23,14 +23,13 @@
 # Locally stored "Eclipse launch configurations"
 *.launch
 
-RetroShareRemote/.classpath
-RetroShareRemote/.settings
-RetroShareRemote/gen/
+src/.classpath
+src/.settings
+src/gen/
 out/
 lib/
-Releases/
-RetroShareRemote/.externalToolBuilders/
-RetroShareRemote/.settings/
-RetroShareRemote/.project
-RetroShareRemote/.cproject
-RetroShareRemote/.buildpath
+src/.externalToolBuilders/
+src/.settings/
+src/.project
+src/.cproject
+src/.buildpath

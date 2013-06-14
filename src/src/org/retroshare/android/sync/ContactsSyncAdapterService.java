@@ -42,22 +42,19 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 	private static ContentResolver mContentResolver = null;
     private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
     private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
-    private static String MIME="retroshare.android.cursor.item/org.retroshare.android.sync.profile";
+    private static String MIME="retroshare.android.cursor.item/org.retroshare.android.sync.profile"; // TODO Shouldn't this be of the form vnd.*/vnd.* ? // TODO Move to string.xml
     private List<Location> locationList=new ArrayList<Location>();
     private Map<Location,Person> mapLocationToPerson=new HashMap<Location,Person>();
     private List<Person> peers=null;
 
-    /*
-    * da rivedere cosa ci serve, possiamo farla moolto piu' furba
-    * */
-    private static class SyncEntry {
+    // TODO Check if we can to it smarter
+    private static class SyncEntry
+	{
         public Long raw_id = 0L;
         public Long photo_timestamp = null;
     }
 
-    /*
-    * Vediamo di tenerla aggiornata ad ogni modifica
-    * */
+    // We should try to keep it updated every edit
     HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 
 
@@ -95,31 +92,22 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 	}
 
 
-    private void updateContactList(Account account){
-
-        Uri rawContactUri = ContactsContract.RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
-                ContactsContract.RawContacts.ACCOUNT_TYPE, account.type).build();
+    private void updateContactList(Account account)
+	{
+		Uri rawContactUri = ContactsContract.RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type).build();
         Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, UsernameColumn, PhotoTimestampColumn }, null, null, null);
-        while (c1.moveToNext()) {
+        while (c1.moveToNext())
+		{
             SyncEntry entry = new SyncEntry();
             entry.raw_id = c1.getLong(c1.getColumnIndex(BaseColumns._ID));
             entry.photo_timestamp = c1.getLong(c1.getColumnIndex(PhotoTimestampColumn));
             localContacts.put(c1.getString(1), entry);
         }
-
-
-
     }
-
-
-
-
 
 	private void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) throws OperationCanceledException
 	{
-		Log.i(TAG, "performSync: " + account.toString());
-
-		//This is where the magic will happen!
+		Log.i(TAG, "performSync( .., " + account.toString() + ", .. )");
 
 		if(mBound)
 		{
@@ -130,10 +118,12 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
             locationList.clear();
             mapLocationToPerson.clear();
             String name;
-            boolean online=false;
-            Location lfound=null;
-			for (Person peer:peers){
-                for(Location l:peer.getLocationsList()){
+            boolean online = false;
+            Location lfound = null;
+			for (Person peer:peers)
+			{
+                for(Location l:peer.getLocationsList())
+				{
                     locationList.add(l);
                     mapLocationToPerson.put(l, peer);
                 }
@@ -184,26 +174,23 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 		}
 	}
 
-    /*
-    * Return true if this person is already in contact list
-    * */
+    /**
+	 * @param peer Person to check if is already existend on android contact list
+	 * @param account Android Account to check if the peer is already added
+	 * @return true if this peer is already in contact list, false otherwise
+	 */
+    private boolean _contactExist(Account account, Person peer){ return localContacts.containsKey(peer.getName()); }
 
-    private boolean _contactExist(Account account, Person peer){
-        return localContacts.containsKey(peer.getName());
-    }
-
-
-
-
-
-    private static void _updateContactPhoto(ArrayList<ContentProviderOperation> operationList, long rawContactId, byte[] photo) {
+    private static void _updateContactPhoto(ArrayList<ContentProviderOperation> operationList, long rawContactId, byte[] photo)
+	{
         ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI);
-        builder.withSelection(ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId
-                + "' AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'", null);
+        builder.withSelection( ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId + "' AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'", null);
         operationList.add(builder.build());
 
-        try {
-            if(photo != null) {
+        try
+		{
+            if(photo != null)
+			{
                 builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
                 builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
                 builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
@@ -215,12 +202,9 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
                 builder.withValue(PhotoTimestampColumn, String.valueOf(System.currentTimeMillis()));
                 operationList.add(builder.build());
             }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
+		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
     }
-
 
 	private static void _addContact(Account account, Person peer)
 	{
@@ -265,17 +249,21 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 		}
 	}
 
-
-    private static void _updateContactStatus(ArrayList<ContentProviderOperation> operationList, long rawContactId, String status) {
+    private static void _updateContactStatus(ArrayList<ContentProviderOperation> operationList, long rawContactId, String status)
+	{
         Uri rawContactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, rawContactId);
         Uri entityUri = Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.Entity.CONTENT_DIRECTORY);
         Cursor c = mContentResolver.query(entityUri, new String[] { ContactsContract.RawContacts.SOURCE_ID, ContactsContract.RawContacts.Entity.DATA_ID, ContactsContract.RawContacts.Entity.MIMETYPE, ContactsContract.RawContacts.Entity.DATA1 }, null, null, null);
-        try {
-            while (c.moveToNext()) {
-                if (!c.isNull(1)) {
+        try
+		{
+            while (c.moveToNext())
+			{
+                if (!c.isNull(1))
+				{
                     String mimeType = c.getString(2);
 
-                    if (mimeType.equals(MIME)) {
+                    if (mimeType.equals(MIME)) // TODO Cannot we enforce this on the query ?
+					{
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
                         builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(1));
                         builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
@@ -285,9 +273,9 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
                         builder.withValue(ContactsContract.StatusUpdates.STATUS_TIMESTAMP, System.currentTimeMillis());
                         operationList.add(builder.build());
 
-                        //Only change the text of our custom entry to the status message pre-Honeycomb, as the newer contacts app shows
-                        //statuses elsewhere
-                        if(Integer.decode(Build.VERSION.SDK) < 11) {
+                        //Only change the text of our custom entry to the status message pre-Honeycomb, as the newer contacts app shows statuses elsewhere
+                        if(Build.VERSION.SDK_INT < 11)
+						{
                             builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
                             builder.withSelection(BaseColumns._ID + " = '" + c.getLong(1) + "'", null);
                             builder.withValue(ContactsContract.Data.DATA3, status);
@@ -296,11 +284,7 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
                     }
                 }
             }
-        } finally {
-            c.close();
         }
+		finally { c.close(); }
     }
-
-
-
 }

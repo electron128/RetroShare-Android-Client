@@ -1,6 +1,6 @@
 package org.retroshare.android;
 
-import com.google.zxing.WriterException;
+//import com.google.zxing.WriterException;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -55,7 +55,7 @@ rs cert url: 993 zeichen (bytes)
         
         mTextView.setText(getIntent().getStringExtra("Description"));
     	//data=getIntent().getStringExtra("Data");
-        
+        /*
         try {
 	        Bitmap bm = util.encodeQrCode(data);
 	
@@ -63,7 +63,7 @@ rs cert url: 993 zeichen (bytes)
 	        	mImageView.setImageBitmap(bm);
 	        }
         } catch (WriterException e) { }
-        
+        */
     }
     
     @Override
