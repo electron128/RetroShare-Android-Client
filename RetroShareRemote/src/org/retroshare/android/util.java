@@ -2,6 +2,7 @@ package org.retroshare.android;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.widget.EditText;
 
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
@@ -23,10 +24,13 @@ public class util {
 		}
 		return sb.toString().toUpperCase();
 	}
-	
-	
-	
-	static Bitmap encodeQrCode(String contents) throws WriterException {
+
+    static boolean hasContent(EditText et) {
+        return (et.getText().toString().trim().length() > 0);
+    }
+
+
+    static Bitmap encodeQrCode(String contents) throws WriterException {
 		QRCode qrCode=new QRCode();
 		Encoder.encode(contents, ErrorCorrectionLevel.L, qrCode);
 		

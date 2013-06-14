@@ -1,10 +1,11 @@
 package org.retroshare.android;
 
-import org.retroshare.java.RsServerData;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import org.retroshare.java.RsServerData;
 
 public class AddServerActivity extends RsActivityBase
 {
@@ -30,15 +31,18 @@ public class AddServerActivity extends RsActivityBase
     
     public void addServer(View v)
     {
-    	if(mBound)
-    	{
-    		RsServerData sd = new RsServerData();
-    		sd.name     = editTextName.getText().toString();
-	    	sd.hostname = editTextHostname.getText().toString();
-	    	sd.port     = Integer.parseInt(editTextPort.getText().toString());
-	    	sd.user     = editTextUser.getText().toString();
-	    	mRsService.mRsCtrlService.setServerData(sd);
-    	}
-    	finish();
-    }
+        if(mBound){
+            RsServerData sd=new RsServerData();
+            sd.name=editTextName.getText().toString();
+            sd.hostname=editTextHostname.getText().toString();
+            if(util.hasContent(editTextPort)) sd.port=Integer.parseInt(editTextPort.getText().toString());
+            sd.user=editTextUser.getText().toString();
+            if(!util.hasContent(editTextPort) || !util.hasContent(editTextName) || !util.hasContent(editTextHostname) || !util.hasContent(editTextUser)){
+                Toast.makeText(getApplicationContext(), "Please fill in all fields.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            mRsService.mRsCtrlService.setServerData(sd);
+        }
+        finish();
+}
 }
