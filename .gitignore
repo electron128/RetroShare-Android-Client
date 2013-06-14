@@ -1,3 +1,36 @@
+#tmp
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
 RetroShareRemote/.classpath
 RetroShareRemote/.settings
 RetroShareRemote/gen/
+out/
+lib/
+Releases/
+RetroShareRemote/.externalToolBuilders/
+RetroShareRemote/.settings/
+RetroShareRemote/.project
+RetroShareRemote/.cproject
+RetroShareRemote/.buildpath
