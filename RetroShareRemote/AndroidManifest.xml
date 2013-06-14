@@ -100,7 +100,11 @@
 
 		<!-- Android Sync Provide BEGIN -->
 <<<<<<< HEAD
+<<<<<<< HEAD
 		<service android:name=".ContactsSyncAdapterService" android:exported="true">
+=======
+		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
+>>>>>>> c961921... Now RetroShare peers are added to android contact list
 =======
 		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
 >>>>>>> c961921... Now RetroShare peers are added to android contact list
