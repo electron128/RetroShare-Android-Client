@@ -1,124 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.retroshare.android"
-    android:versionCode="1"
-    android:versionName="1.0" >
-    
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
-    
-    <uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+          package="org.retroshare.android"
+          android:versionCode="1"
+          android:versionName="1.0" >
 
-	<!-- Android Authenticator Permission BEGIN -->
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Android Authenticator Permission BEGIN -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-	<permission android:name="org.retroshare.android.auth" android:label="Retroshare Authentication" android:protectionLevel="dangerous" />
-	<!-- Android Authenticator Permission BEGIN -->
+    <permission android:name="org.retroshare.android.auth" android:label="Retroshare Authentication" android:protectionLevel="dangerous" />
+    <!-- Android Authenticator Permission BEGIN -->
 
-	<!-- Android Sync Provider Permission BEGIN -->
+    <!-- Android Sync Provider Permission BEGIN -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-	<!-- Android Sync Provider Permission END -->
+    <!-- Android Sync Provider Permission END -->
 
     <application
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:persistent="false" android:debuggable="true">
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme" android:persistent="false" android:debuggable="true">
         <activity
-            android:name=".MainActivity"
-            android:label="RetroShare Remote" >
+                android:name=".MainActivity"
+                android:label="RetroShare Remote" >
         </activity>
-	    <activity
-	        android:name=".PeersActivity"
-	        android:label="@string/peers" >
-	        <meta-data
-	            android:name="android.support.PARENT_ACTIVITY"
-	            android:value="org.retroshare.android.MainActivity" />
-	    </activity>ChatlobbyActivityChatlobbyActivity
-	    <service android:name=".RsService"></service>
-	    <activity android:name=".ChatlobbyActivity" android:label="@string/chat_lobbies"></activity>
-	    <activity android:name=".ChatActivity"></activity>
-	    <activity android:name=".AddFriendActivity">
-	         <intent-filter>
+        <activity
+                android:name=".PeersActivity"
+                android:label="@string/peers" >
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="org.retroshare.android.MainActivity" />
+        </activity>ChatlobbyActivityChatlobbyActivity
+        <service android:name=".RsService"></service>
+        <activity android:name=".ChatlobbyActivity" android:label="@string/chat_lobbies"></activity>
+        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".AddFriendActivity">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="retroshare" android:host="certificate"/>
             </intent-filter>
-	    </activity>
-	    <activity android:name=".PeerDetailsActivity"></activity>
+        </activity>
+        <activity android:name=".PeerDetailsActivity"></activity>
         <activity android:name=".ShowQrCodeActivity"></activity>
-	    <activity android:name=".FilesActivity" android:label="@string/files"></activity>
-	    <activity android:name=".AddDownloadActivity">
-	        <intent-filter>
+        <activity android:name=".FilesActivity" android:label="@string/files"></activity>
+        <activity android:name=".AddDownloadActivity">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="retroshare" android:host="file"/>
             </intent-filter>
-	    </activity>
-	    <activity android:name=".ShowSearchResultsActivity"></activity>
-	    <activity android:name=".ListSearchesActivity"></activity>
-	    <activity android:name=".LoginActivity">
-	        <intent-filter>
+        </activity>
+        <activity android:name=".ShowSearchResultsActivity"></activity>
+        <activity android:name=".ListSearchesActivity"></activity>
+        <activity android:name=".LoginActivity">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-	    <activity android:name=".AddServerActivity"></activity>
+        <activity android:name=".AddServerActivity"></activity>
 
 
-		<!-- Android Authenticator BEGIN -->
-	    <activity
-            android:name=".authenticator.AccountActivity"
-            android:label="@string/authenticator_preference_category_server">
+        <!-- Android Authenticator BEGIN -->
+        <activity
+                android:name=".authenticator.AccountActivity"
+                android:label="@string/authenticator_preference_category_server">
         </activity>
         <service
-            android:name=".authenticator.AuthenticationService"
-            android:exported="true"
-            android:permission="org.retroshare.android.auth">
+                android:name=".authenticator.AuthenticationService"
+                android:exported="true"
+                android:permission="org.retroshare.android.auth">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
             <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                    android:name="android.accounts.AccountAuthenticator"
+                    android:resource="@xml/authenticator" />
         </service>
         <activity
-            android:name=".authenticator.AccountPreferenceActivity">
+                android:name=".authenticator.AccountPreferenceActivity">
             <intent-filter>
                 <action android:name="org.retroshare.android.authenticator.AccountPreferencesActivity.ACCOUNT_SETUP" />
             </intent-filter>
         </activity>
-		<!-- Android Authenticator END -->
+        <!-- Android Authenticator END -->
 
-		<!-- Android Sync Provide BEGIN -->
-<<<<<<< HEAD
-<<<<<<< HEAD
-		<service android:name=".ContactsSyncAdapterService" android:exported="true">
-=======
-		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
->>>>>>> c961921... Now RetroShare peers are added to android contact list
-=======
-		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
->>>>>>> c961921... Now RetroShare peers are added to android contact list
-			<intent-filter>
-				<action android:name="android.content.SyncAdapter" />
-			</intent-filter>
-			<meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
-		</service>
+        <!-- Android Sync Provide BEGIN -->
+        <service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
+        </service>
 
 
-		<!-- <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" /> -->
-		<!-- Android Sync Provide END -->
+        <!-- <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" /> -->
+        <!-- Android Sync Provide END -->
 
-	    
+
     </application>
 
 </manifest>
