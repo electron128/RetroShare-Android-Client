@@ -99,12 +99,15 @@
 		<!-- Android Authenticator END -->
 
 		<!-- Android Sync Provide BEGIN -->
-		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true" android:process=":contacts">
+		<service android:name=".sync.ContactsSyncAdapterService" android:exported="true"><!-- android:process=":contacts" ( This cause Contact Sync Provider run in another process and make mandatory use of AIDL that at moment we want avoid due to lack of time ) -->
 			<intent-filter>
 				<action android:name="android.content.SyncAdapter" />
 			</intent-filter>
 			<meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
 		</service>
+
+
+		<!-- <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" /> -->
 		<!-- Android Sync Provide END -->
 
 	    
