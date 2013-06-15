@@ -1,41 +1,33 @@
 package org.retroshare.android;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import rsctrl.chat.Chat;
-import rsctrl.chat.Chat.ChatId;
-import rsctrl.chat.Chat.ChatLobbyInfo;
-import rsctrl.chat.Chat.ChatType;
-import rsctrl.core.Core;
-import rsctrl.core.Core.Location;
-import rsctrl.core.Core.Person;
-import rsctrl.peers.Peers;
-import rsctrl.peers.Peers.RequestPeers;
-import rsctrl.peers.Peers.ResponsePeerList;
-
-import org.retroshare.java.ChatService.ChatServiceListener;
-import org.retroshare.java.PeersService.PeersServiceListener;
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
+
+import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.java.PeersService.PeersServiceListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import rsctrl.chat.Chat.ChatId;
+import rsctrl.chat.Chat.ChatType;
+import rsctrl.core.Core.Location;
+import rsctrl.core.Core.Person;
 
 public class PeersActivity extends RsActivityBase
 {
@@ -142,12 +134,12 @@ public class PeersActivity extends RsActivityBase
 
 	        if( (l.getState()&Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
 			{
-	        	imageViewUserState.setImageResource(R.drawable.identity);
+	        	imageViewUserState.setImageResource(R.drawable.ic_contact_color);
 	        	textView1.setTextColor(Color.BLUE);
 	        }
 			else
 			{
-	        	imageViewUserState.setImageResource(R.drawable.identity_grey);
+	        	imageViewUserState.setImageResource(R.drawable.ic_contact_picture);
 	        	textView1.setTextColor(Color.GRAY);
 	        }
 	        

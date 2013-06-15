@@ -3,61 +3,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filename"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
     <TextView
         android:id="@+id/textViewName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="myfilename.ext"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/size"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
     <TextView
         android:id="@+id/textViewSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="100kB"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
+
+
+
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hash"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
+
     <TextView
         android:id="@+id/textViewHash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="asdfghjkl"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
+
+
     <TextView
         android:id="@+id/textViewResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ok or not ok"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/buttonDownload"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onButtonDownloadClick"
-        android:text="@string/download" />
+
+    <FrameLayout
+            android:layout_width="fill_parent" android:layout_height="fill_parent"
+            android:layout_weight="1">
+    </FrameLayout>
+
+    <!-- content fixated to the bottom of the screen -->
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button
+                android:id="@+id/buttonDownload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onButtonDownloadClick"
+                android:text="@string/download" />
+    </LinearLayout>
+
+
+
+
 
 </LinearLayout>
