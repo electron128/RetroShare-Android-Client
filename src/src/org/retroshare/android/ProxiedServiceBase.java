@@ -14,18 +14,18 @@ import android.util.Log;
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each service doesn't need to handle all this common stuff
  */
-public abstract class RsServiceBaseNG extends Service implements ServiceConnection
+public abstract class ProxiedServiceBase extends Service implements ServiceConnection
 {
-	private static final String TAG="RsServiceBaseNG";
+	private static final String TAG="ProxiedServiceBase";
 
-	protected RsService mRsService;
+	protected RetroShareAndroidProxy rsProxy;
 	protected boolean mBound = false;
 
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service)
 	{
-		RsService.RsBinder binder = (RsService.RsBinder) service;
-		mRsService = binder.getService();
+		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
+		rsProxy = binder.getService();
 		mBound = true;
 		Log.v(TAG, "onServiceConnected");
 	}
@@ -39,7 +39,7 @@ public abstract class RsServiceBaseNG extends Service implements ServiceConnecti
 
 	private void _bindRsService()
 	{
-		Intent intent = new Intent(this, RsService.class);
+		Intent intent = new Intent(this, RetroShareAndroidProxy.class);
 		bindService(intent, this, Context.BIND_AUTO_CREATE);
 	}
 	private void _unBindRsService() { unbindService(this); }

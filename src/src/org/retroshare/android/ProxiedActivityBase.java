@@ -1,6 +1,5 @@
 package org.retroshare.android;
 
-import org.retroshare.android.RsService.RsBinder;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,23 +16,23 @@ import android.util.Log;
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
-public abstract class RsActivityBaseNG extends Activity
+public abstract class ProxiedActivityBase extends Activity
 {
-    private static final String TAG="RsActivityBaseNG";
+    private static final String TAG="ProxiedActivityBase";
 
-    protected RsService mRsService;
+    protected RetroShareAndroidProxy rsProxy;
     protected boolean mBound = false;
 
-    private class RsServiceConnection implements ServiceConnection
+    private class RetroShareAndroidProxyConnection implements ServiceConnection
     {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
         {
-            RsBinder binder = (RsBinder) service;
-            mRsService = binder.getService();
+            RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
+			rsProxy = binder.getService();
             mBound = true;
             Log.v(TAG, "onServiceConnected");
-            RsActivityBaseNG.this.onServiceConnected();
+            ProxiedActivityBase.this.onServiceConnected();
         }
         @Override
         public void onServiceDisconnected(ComponentName arg0)
@@ -43,13 +42,13 @@ public abstract class RsActivityBaseNG extends Activity
         }
     };
 
-    private RsServiceConnection mConnection = null;
+    private RetroShareAndroidProxyConnection mConnection = null;
     private void _bindRsService()
     {
         if(mConnection == null)
         {
-            mConnection = new RsServiceConnection();
-            Intent intent = new Intent(this, RsService.class);
+            mConnection = new RetroShareAndroidProxyConnection();
+            Intent intent = new Intent(this, RetroShareAndroidProxy.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
     }

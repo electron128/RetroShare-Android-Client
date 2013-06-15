@@ -1,4 +1,10 @@
 update readme
+{
+	TODO Add instruction on how to contribute with the new restructured code
+	TODO Move todo relative to source in the code
+}
+
+TODO Port all useful activities to new RetroShareAndroidProxy backend
 
 change display of ssh public key
 solved:- users don't know what net.lag.jaramiko means
@@ -6,30 +12,23 @@ solved:- users don't know what net.lag.jaramiko means
 - display ipd:port instead?
 
 add disconnect
-- dont know if needed, disconnect now done by pressing back button
+- don't know if needed, disconnect now done by pressing back button
 
 documentation
 
 use fragments to make ui for tablets (bigger screen)
 
 add errorhandling:
+add check if port is a number
 mServerData.port=Integer.parseInt(editTextPort.getText().toString());
 
 use unregisterListener, to allow gc of old objects
 
 add auto-update to chatlobby activity
 
-
-add check if port is a number
-
-
 important:
 with different accounts we have to renew the chatservice when the account is changed
 - maybe just restart RsCtrlService?
-
-
-
-
 
 notes
 
@@ -43,10 +42,6 @@ std::cerr from c++ to logcat:
 create a local.prop on your workstation, then adb push local.prop /data
 local.prop:
 log.redirect-stdio = true
-
-
-
-
 
 
 ndk-stack:

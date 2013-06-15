@@ -3,8 +3,8 @@ package org.retroshare.android.authenticator;
 import java.util.ArrayList;
 
 import org.retroshare.android.AddServerActivity;
+import org.retroshare.android.ProxiedActivityBase;
 import org.retroshare.android.R;
-import org.retroshare.android.RsActivityBaseNG;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
@@ -19,7 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 
-public class AccountActivity extends RsActivityBaseNG
+public class AccountActivity extends ProxiedActivityBase
 {
 	private static final String TAG = "AccountActivity";
 	

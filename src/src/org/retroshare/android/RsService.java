@@ -105,7 +105,7 @@ public class RsService extends Service implements RsCtrlServiceListener
 	@Override
 	public void onConnectionStateChanged(ConnectionEvent ce)
 	{
-		if( ce == ConnectionEvent.SERVER_DATA_CHANGED ) saveData();
+		if( ce.kind == RsCtrlService.ConnectionEventKind.SERVER_DATA_CHANGED ) saveData();
 		updateNotification();
 	}
 	
@@ -151,5 +151,4 @@ public class RsService extends Service implements RsCtrlServiceListener
 		
 		startForeground(NotificationIds.RS_SERVICE, notification);
 	}
-
 }

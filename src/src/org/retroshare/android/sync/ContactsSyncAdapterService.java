@@ -24,7 +24,9 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 import org.retroshare.android.R;
-import org.retroshare.android.RsServiceBaseNG;
+import org.retroshare.android.ProxiedServiceBase;
+import org.retroshare.android.RetroShareAndroidProxy;
+import org.retroshare.java.RsCtrlService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import java.util.Map;
 
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
-public class ContactsSyncAdapterService extends RsServiceBaseNG
+public class ContactsSyncAdapterService extends ProxiedServiceBase
 {
 	private static final String TAG = "ContactsSyncAdapterService";
 	private static SyncAdapterImpl sSyncAdapter = null;
@@ -55,12 +57,6 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 
     // We should try to keep it updated every edit
     HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
-
-    public ContactsSyncAdapterService(){
-        super();
-    }
-
-
 
 	private class SyncAdapterImpl extends AbstractThreadedSyncAdapter
 	{
@@ -118,7 +114,7 @@ public class ContactsSyncAdapterService extends RsServiceBaseNG
 			mContentResolver = context.getContentResolver();
             updateContactList(account);
 
-			peers = mRsService.mRsCtrlService.peersService.getPeersList();
+			peers = rsProxy.getServer(account.name).peersService.getPeersList();
             locationList.clear();
             mapLocationToPerson.clear();
             String name;

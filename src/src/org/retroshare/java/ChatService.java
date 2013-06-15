@@ -28,7 +28,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener{
 	RsCtrlService mRsCtrlService;
-	ChatService(RsCtrlService s){
+	ChatService(RsCtrlService s)
+	{
 		mRsCtrlService=s;
 		mRsCtrlService.registerListener(this);
 	}
@@ -180,13 +181,14 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 	}
 	
 	// called once in onConnected()
-	public void registerForEventsAtServer(){
-		RequestRegisterEvents.Builder reqb= RequestRegisterEvents.newBuilder();
+	public void registerForEventsAtServer()
+	{
+		RequestRegisterEvents.Builder reqb = RequestRegisterEvents.newBuilder();
 		reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
 		
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
-    	msg.body=reqb.build().toByteArray();
+    	RsMessage msg = new RsMessage();
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
+    	msg.body = reqb.build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
 	}
 	
@@ -268,10 +270,9 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 	}
 	
 	@Override
-	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) {
-		if(ce==RsCtrlService.ConnectionEvent.CONNECTED){
-			registerForEventsAtServer();
-		}
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
+	{
+		if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED) registerForEventsAtServer();
 	}
 	
 	

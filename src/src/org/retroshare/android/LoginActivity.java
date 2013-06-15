@@ -215,13 +215,13 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
 	{
-		if(ce==RsCtrlService.ConnectionEvent.CONNECTED)
+		if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED)
 		{
 			dismissDialog(DIALOG_CONNECT);
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
 		}
-		if(ce==RsCtrlService.ConnectionEvent.ERROR_WHILE_CONNECTING)
+		if(ce.kind == RsCtrlService.ConnectionEventKind.ERROR_WHILE_CONNECTING)
 		{
 			dismissDialog(DIALOG_CONNECT);
 			showDialog(DIALOG_CONNECT_ERROR);
