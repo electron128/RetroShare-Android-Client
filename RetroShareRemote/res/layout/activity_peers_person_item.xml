@@ -3,19 +3,27 @@
     android:id="@+id/TableLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
+
+
+
     <LinearLayout
         android:id="@+id/LinearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
-
+
+
+
+
+
         <ImageView
             android:id="@+id/imageViewUserState"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="8dp"
-            android:src="@drawable/identity_grey" />
-
+            android:src="@drawable/ic_contact_picture" />
+
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
@@ -23,13 +31,14 @@
             android:layout_gravity="center_vertical"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
         <ImageView
             android:id="@+id/imageViewMessage"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="8dp"
-            android:src="@drawable/chat_bubble" />
+            android:src="@android:drawable/sym_action_chat" />
 
     </LinearLayout>
 
