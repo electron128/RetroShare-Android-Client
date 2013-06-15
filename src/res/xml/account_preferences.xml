@@ -1,17 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-            android:title="Sync Settings" />
- 
-    <PreferenceScreen
-        android:key="account_settings"
-        android:title="Account Settings"
-        android:summary="Sync frequency, notifications, etc.">
-        <intent
-            android:action="org.retroshare.android.authenticator.AccountPreferencesActivity.ACCOUNT_SETUP"
-            android:targetPackage="org.retroshare.android"
-            android:targetClass="org.retroshare.android.authenticator.AccountPreferencesActivity" />
-    </PreferenceScreen>
-</PreferenceScreen>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" />

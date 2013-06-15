@@ -1,19 +1,10 @@
+
 package org.retroshare.android.authenticator;
 
-import android.os.Bundle;
 import android.preference.PreferenceActivity;
-
-import org.retroshare.android.R;
 
 /**
  * @author G10h4ck
+ * This empty activity is needed by Android Account Manager tho show RetroShare accounts and to edit option such as to enable/disable sync
  */
-public class AccountPreferenceActivity extends PreferenceActivity
-{
-	@Override
-	protected void onCreate(Bundle icicle)
-	{
-		super.onCreate(icicle);
-		addPreferencesFromResource(R.xml.account_preferences);
-	}
-}
+public class AccountPreferenceActivity extends PreferenceActivity {}
