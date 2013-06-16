@@ -102,8 +102,6 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
 	}
 
-	public Map<String,RsServerData> getServers() { return mDatapack.serverDataMap; }
-
 	public class RsProxyBinder extends Binder { RetroShareAndroidProxy getService() { return RetroShareAndroidProxy.this; } }
 	private final IBinder mBinder = new RsProxyBinder();
 	@Override
@@ -171,12 +169,51 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	}
 
 	/**
+	 * This method add a server to the internal server pack
+	 * @param serverData the server data
+	 */
+	public void addServer(RsServerData serverData)
+	{
+		mDatapack.serverDataMap.put(serverData.name, serverData);
+		saveData();
+	}
+
+	/**
+	 * This method del a server to the internal server pack ( server is disconnected before deletion )
+	 * @param serverData the server data
+	 */
+	public void delServer(RsServerData serverData)
+	{
+		_deactivateServer(serverData.name);
+		mDatapack.serverDataMap.remove(serverData);
+		saveData();
+	}
+
+	/**
+	 * This method provide access to saved servers
+	 * @return Map containing the saved servers
+	 */
+	public Map<String,RsServerData> getSavedServers() { return mDatapack.serverDataMap; }
+
+	/**
+	 * This method provide access to active servers
+	 * @return Map containing the active servers
+	 */
+	public Map<String, RsCtrlService> getActiveServers()
+	{
+		Map<String, RsCtrlService> servers = new HashMap<String, RsCtrlService>();
+		for(RsBund bund : serverBunds.values()) servers.put(bund.server.getServerData().name, bund.server);
+		return servers;
+	};
+
+	/**
 	 * Return the requested server and start it if not running but exists in DataPack
 	 * @param serverName The server name you want to get
 	 * @return The requested server if exists, null otherwise
 	 */
-	public RsCtrlService getServer(String serverName)
+	public RsCtrlService activateServer(String serverName)
 	{
+		Log.wtf(TAG, "activateServer(" + serverName +")");
 		_activateServer(serverName);
 		return serverBunds.get(serverName).server;
 	}
@@ -187,15 +224,19 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	private void _activateServer(String serverName)
 	{
+		Log.d(TAG, "_activateServer(" + serverName + ")");
+
 		RsServerData serverData = mDatapack.serverDataMap.get(serverName);
 		if ( serverData != null && serverBunds.get(serverName) == null )
 		{
+			Log.d(TAG, "_activateServer(String serverName) activating server");
 			RsCtrlService server = new RsCtrlService(new UiThreadHandler()); // TODO check if we just one UiThreadHandler for all servers is enough or if we need one for each server
 			server.setServerData(serverData);
 			server.registerListener(this);
 			RsBund bund = new RsBund(server, new NotifyService(server.chatService, this));
 			serverBunds.put(serverName, bund);
 			server.connect();
+			Log.d(TAG, "_activateServer(String serverName) server activated");
 		}
 	}
 

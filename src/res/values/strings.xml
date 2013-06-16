@@ -75,6 +75,7 @@
 	<!-- Contact Sync Provider END  -->
 
 	<!-- RetroShare Android Proxy BEGIN-->
+	<string name="add_server">Add Server</string>
 	<!-- RetroShare Android Proxy END-->
     
 </resources>

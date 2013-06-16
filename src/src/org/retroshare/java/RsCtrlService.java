@@ -110,7 +110,7 @@ public class RsCtrlService implements Runnable
 		UnknownHostException,
 
 		/**
-		 * Signals that an error occurred while attempting to connect a socket
+		 * Signals that an error occurred while attempting to onConnectButtonPressed a socket
 		 * to a remote address and port. Typically, the remote host cannot be
 		 * reached because of an intervening firewall, or if an intermediate
 		 * router is down.
@@ -118,7 +118,7 @@ public class RsCtrlService implements Runnable
 		NoRouteToHostException,
 
 		/**
-		 * Signals that an error occurred while attempting to connect a socket
+		 * Signals that an error occurred while attempting to onConnectButtonPressed a socket
 		 * to a remote address and port. Typically, the connection was refused
 		 * remotely (e.g., no process is listening on the remote address/port).
 		 */
@@ -151,7 +151,7 @@ public class RsCtrlService implements Runnable
 	}
 
 	public ConnectionError getLastConnectionError(){ return mLastConnectionError; } /** @return Last connection error */
-	public String getLasConnectionErrorString(){ return mLastConnectionErrorString;	} /** @return Last connection error string */
+	public String getLastConnectionErrorString(){ return mLastConnectionErrorString; } /** @return Last connection error string */
 
 	/*************************************/
 	// dont know if i have to worry with enums and threads
@@ -218,8 +218,8 @@ public class RsCtrlService implements Runnable
 	
 
 	/**
-	 * Set data of the server we will connect to
-	 * @param d RsServerData containing the data relative to the server you want to connect to ( host, port, user... )
+	 * Set data of the server we will onConnectButtonPressed to
+	 * @param d RsServerData containing the data relative to the server you want to onConnectButtonPressed to ( host, port, user... )
 	 */
 	public void setServerData(RsServerData d)
 	{
@@ -242,7 +242,7 @@ public class RsCtrlService implements Runnable
 	 */
 	public void connect()
 	{
-		if(DEBUG){System.err.println("RsCtrlService: connect()");}
+		if(DEBUG){System.err.println("RsCtrlService: onConnectButtonPressed()");}
 		
 		synchronized(mConnectAction){ mConnectAction = ConnectAction.CONNECT; }
 	}

@@ -18,43 +18,10 @@
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_launcher" />
 
-
-        <EditText
-            android:id="@+id/editTextHostname"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/hostname"
-            android:inputType="text" >
-        </EditText>
-
-
-        <EditText
-            android:id="@+id/editTextPort"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/port"
-            android:inputType="number" >
-        </EditText>
-
-
-        <EditText
-            android:id="@+id/editTextUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/user"
-            android:inputType="text" />
-
-
-        <EditText
-            android:id="@+id/editTextPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
+		<Spinner
+				android:id="@+id/serverSpinner"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
 
 
         <LinearLayout

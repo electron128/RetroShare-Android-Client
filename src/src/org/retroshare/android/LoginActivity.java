@@ -32,7 +32,8 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.text.method.PasswordTransformationMethod;
 
-public class LoginActivity extends RsActivityBase implements RsCtrlServiceListener{
+public class LoginActivity extends ProxiedActivityBase implements RsCtrlServiceListener
+{
 
 	private static final String TAG="LoginActivity";
 	
@@ -47,58 +48,49 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-    	
-    	
-    	
     	// run test
     	// run in own thread to not get killed by activitymanager
-    	testThread=new Thread(new Runnable(){
+    	testThread=new Thread(new Runnable()
+		{
 			@Override
-			public void run() {
-			    try {
+			public void run()
+			{
+			    try
+				{
 			    	// copy bdboot.txt
 			    	InputStream in = getResources().openRawResource(R.raw.bdboot);
 					FileOutputStream out=openFileOutput("bdboot.txt", 0);
 					int read=0;
 					//int length=0;
 					byte[] buffer=new byte[1000];
-					while(read!=-1){
+					while(read!=-1)
+					{
 						read=in.read(buffer);
-						if(read!=-1){
+						if(read!=-1)
+						{
 							out.write(buffer, 0, read);
 							//length+=read;
 						}
 					}
 					in.close();
 					out.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				catch (FileNotFoundException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+				catch (IOException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+
+				String path = getFilesDir().getAbsolutePath() + "/bdboot.txt";
 			    Log.v(TAG, "java: calling native code");
-			    String path=getFilesDir().getAbsolutePath()+"/bdboot.txt";
-				Log.v(TAG, "native code:"+bitdht.getIp(path));
+				Log.v(TAG, "native code:" + bitdht.getIp(path));
 				Log.v(TAG, "java: native code returned");
 			}
 		});
     	//testThread.start();
     	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         
-        listView=(ListView) findViewById(R.id.listView1);
-        lal=new ListAdapterListener(this);
+        listView = (ListView) findViewById(R.id.listView1);
+        lal = new ListAdapterListener(this);
         listView.setAdapter(lal);
         listView.setOnItemClickListener(lal);
     }
@@ -107,7 +99,6 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     protected void onServiceConnected()
     {
     	lal.update();
-    	mRsService.mRsCtrlService.registerListener(LoginActivity.this);
     }
     
     @Override
@@ -117,14 +108,11 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     	if(mBound) lal.update();
     }
 
-    @Override
-    public void onPause(){ super.onPause(); } // TODO if we doesn't override this is not super called automatically ?
-    
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		if(mBound) mRsService.mRsCtrlService.unregisterListener(this);
+		if(mBound) for (RsCtrlService server : rsProxy.getActiveServers().values()) server.unregisterListener(this);
 	}
     
     public void onNewServerClick(View v)
@@ -191,14 +179,17 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     		AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 	    	builder2.setTitle(R.string.connection_error)
 	    		// TODO solve the connection error thing
-	    		.setMessage(mRsService.mRsCtrlService.getLasConnectionErrorString())
-	    		.setPositiveButton("ok", new DialogInterface.OnClickListener(){
+	    		.setMessage(rsProxy.getActiveServers().get(selectedServer.name).getLastConnectionErrorString())
+	    		.setPositiveButton(
+						"ok", new DialogInterface.OnClickListener()
+				{
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
 						//dismissDialog(DIALOG_CONNECT_ERROR);
 					}
-	    		});
+				}
+				);
 	    	return builder2.create();
     	}
     	return null;
@@ -206,15 +197,15 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     
     private void connect()
     {
-		mRsService.mRsCtrlService.setServerData(selectedServer);
-		mRsService.mRsCtrlService.connect();
-		
+		rsProxy.activateServer(selectedServer.name).registerListener(this);
 		showDialog(DIALOG_CONNECT);
     }
     
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
 	{
+		Log.d(TAG, "onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)");
+
 		if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED)
 		{
 			dismissDialog(DIALOG_CONNECT);
@@ -244,7 +235,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
     	public void update()
     	{
     		servers.clear();
-    		for(RsServerData sd:mRsService.getServers().values()) servers.add(sd);
+    		for(RsServerData sd : rsProxy.getSavedServers().values()) servers.add(sd);
     		for(DataSetObserver obs:ObserverList) obs.onChanged();
     	}
     	

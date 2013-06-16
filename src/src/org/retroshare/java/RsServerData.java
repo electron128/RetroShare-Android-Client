@@ -41,23 +41,23 @@ public class RsServerData implements Serializable, Cloneable
 		}*/
 	}
 	
-	public String getHostkeyFingerprint(){
-		String s=hostkey.getSSHName()+" "+Integer.toString(hostkey.getBits())+" ";
+	public String getHostkeyFingerprint()
+	{
+		if(hostkey == null) return null;
+
+		String s = hostkey.getSSHName()+" "+Integer.toString(hostkey.getBits())+" ";
 		
-		boolean firstbyte=true;
-		for(byte b:hostkey.getFingerprint()){
-			if(firstbyte==true){
-				firstbyte=false;
-			}else{
-				s+=":";
-			}
-			byte[] a=new byte[2];
-			int c=(b>>4) & 0x0f;
-			a[0]=(byte) ((c<10)?(c+'0'):(c-10+'a'));
-			c=b & 0x0f;
-			a[1]=(byte) ((c<10)?(c+'0'):(c-10+'a'));
-			
-			s+=new String(a);
+		boolean firstbyte = true;
+		for(byte b : hostkey.getFingerprint())
+		{
+			if( firstbyte == true ) firstbyte = false;
+			else s += ":";
+			byte[] a = new byte[2];
+			int c = (b>>4) & 0x0f;
+			a[0] = (byte) ((c<10)?(c+'0'):(c-10+'a'));
+			c = b & 0x0f;
+			a[1] = (byte) ((c<10)?(c+'0'):(c-10+'a'));
+			s += new String(a);
 		}
 		
 		return s;

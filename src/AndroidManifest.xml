@@ -30,9 +30,11 @@
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Holo" android:persistent="false" android:debuggable="true">
-        <activity
-                android:name=".MainActivity"
-                android:label="RetroShare Remote" >
+        <activity android:name=".MainActivity" android:label="RetroShare Remote" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
         </activity>
         <activity
                 android:name=".PeersActivity"
@@ -40,7 +42,7 @@
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="org.retroshare.android.MainActivity" />
-        </activity>ChatlobbyActivityChatlobbyActivity
+        </activity>
         <service android:name=".RsService"></service>
         <activity android:name=".ChatlobbyActivity" android:label="@string/chat_lobbies"></activity>
         <activity android:name=".ChatActivity"></activity>
@@ -65,12 +67,7 @@
         </activity>
         <activity android:name=".ShowSearchResultsActivity"></activity>
         <activity android:name=".ListSearchesActivity"></activity>
-        <activity android:name=".LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".LoginActivity"></activity>
         <activity android:name=".AddServerActivity"></activity>
 
 		<!-- Android RetroShare Proxy BEGIN -->

@@ -16,62 +16,52 @@ import android.util.Log;
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
-public abstract class ProxiedActivityBase extends Activity
+public abstract class ProxiedActivityBase extends Activity implements ServiceConnection
 {
     private static final String TAG="ProxiedActivityBase";
 
     protected RetroShareAndroidProxy rsProxy;
     protected boolean mBound = false;
 
-    private class RetroShareAndroidProxyConnection implements ServiceConnection
-    {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
-            RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
-			rsProxy = binder.getService();
-            mBound = true;
-            Log.v(TAG, "onServiceConnected");
-            ProxiedActivityBase.this.onServiceConnected();
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName arg0)
-        {
-            mBound = false;
-            Log.v(TAG, "onServiceDisconnected");
-        }
-    };
+	public static final String serverNameExtraName = "serverName";
+	protected String serverName;
 
-    private RetroShareAndroidProxyConnection mConnection = null;
-    private void _bindRsService()
-    {
-        if(mConnection == null)
-        {
-            mConnection = new RetroShareAndroidProxyConnection();
-            Intent intent = new Intent(this, RetroShareAndroidProxy.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
-    private void _unBindRsService() { if(mConnection != null && mBound) unbindService(mConnection); }
+	/**
+	 * This method should be overridden by child classes that want to do something between Activity.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected
+	 * It is suggested for inflating your activity layout, so you are sure that your widget are in the right place when onServiceConnected() is called
+	 */
+	protected void onCreateBeforeConnectionInit(Bundle savedInstanceState)
+	{}
 
+	/**
+	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
+	 */
+	protected void onServiceConnected()
+	{}
 
-    /**
-     * This method should be overridden by child classes that want to do something between Activity.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected
-     * It is suggested for inflating your activity layout, so you are sure that your widget are in the right place when onServiceConnected() is called
-     */
-    protected void onCreateBeforeConnectionInit(Bundle savedInstanceState)
-    {}
+	@Override
+	public void onServiceConnected(ComponentName className, IBinder service)
+	{
+		Log.d(TAG, "onServiceConnected(ComponentName className, IBinder service)");
 
-    /**
-     * This method should be overridden by child classes that want to do something when connection to RsService is available.
-     */
-    protected void onServiceConnected()
-    {}
+		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
+		rsProxy = binder.getService();
+		mBound = true;
+		onServiceConnected();
+	}
+
+	@Override
+	public void onServiceDisconnected(ComponentName arg0)
+	{
+		Log.d(TAG, "onServiceDisconnected(ComponentName arg0)");
+		mBound = false;
+	}
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+		serverName = getIntent().getStringExtra(serverNameExtraName);
         onCreateBeforeConnectionInit(savedInstanceState);
         _bindRsService();
     }
@@ -82,4 +72,14 @@ public abstract class ProxiedActivityBase extends Activity
         _unBindRsService();
         super.onDestroy();
     }
+
+	private void _bindRsService()
+	{
+		if(mBound) return;
+
+		Intent intent = new Intent(this, RetroShareAndroidProxy.class);
+		bindService(intent, this, Context.BIND_AUTO_CREATE);
+	}
+
+	private void _unBindRsService() { if(mBound) unbindService(this); }
 }

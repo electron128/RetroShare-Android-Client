@@ -1,16 +1,17 @@
 package org.retroshare.android;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import rsctrl.core.Core;
 import rsctrl.system.System.RequestSystemStatus;
 import rsctrl.system.System.ResponseSystemStatus;
 
 import org.retroshare.java.RsCtrlService;
-import org.retroshare.java.RsServerData;
 import org.retroshare.java.RsCtrlService.ConnectionError;
 import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
 import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.java.RsServerData;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -22,66 +23,50 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class MainActivity extends RsActivityBase implements RsCtrlServiceListener
+public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceListener, AdapterView.OnItemSelectedListener
 {
 	private static final String TAG="MainActivity";
 	
-	private static final int UPDATE_INTERVALL=1000;
-	
-   	EditText editTextHostname;
-   	EditText editTextPort;
-   	EditText editTextUser;
-   	EditText editTextPassword;
-	TextView textViewConnectionState;
-	Button buttonConnect;
-	
-	TextView textViewNetStatus;
-	TextView textViewNoPeers;
-	TextView textViewBandwidth;
-	
+	private static final int UPDATE_INTERVAL = 1000;
+
 	Handler mHandler;
 	
 	boolean isInForeground = false;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
     {
-    	
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_2);
-        
-        editTextHostname=(EditText) findViewById(R.id.editTextHostname);
-        editTextPort=(EditText) findViewById(R.id.editTextPort);
-    	editTextUser=(EditText) findViewById(R.id.editTextUser);
-    	editTextPassword=(EditText) findViewById(R.id.editTextPassword);
-        textViewConnectionState=(TextView) findViewById(R.id.textViewConnectionState);
-        buttonConnect=(Button) findViewById(R.id.buttonConnect);
-        
-    	textViewNetStatus=(TextView) findViewById(R.id.textViewNetStatus);
-    	textViewNoPeers=(TextView) findViewById(R.id.textViewNoPeers);
-    	textViewBandwidth=(TextView) findViewById(R.id.textViewBandwidth);
-        
-        textViewConnectionState.setVisibility(View.GONE);
-        
-    	textViewNetStatus.setVisibility(View.GONE);
-    	textViewNoPeers.setVisibility(View.GONE);
-    	textViewBandwidth.setVisibility(View.GONE);
-    	
-    	mHandler=new Handler();
-    	mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+        setContentView(R.layout.activity_main_ng);
+
+		((Spinner) findViewById(R.id.serverSpinner)).setOnItemSelectedListener(this);
+
+		findViewById(R.id.textViewNetStatus).setVisibility(View.GONE);
+		findViewById(R.id.textViewNoPeers).setVisibility(View.GONE);
+		findViewById(R.id.textViewBandwidth).setVisibility(View.GONE);
+
+    	mHandler = new Handler();
+    	mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
     }
-    
-    private RsServerData mServerData;
     
     @Override
     protected void onServiceConnected()
     {
-    	mServerData = mRsService.mRsCtrlService.getServerData();
-    	mRsService.mRsCtrlService.registerListener(this);
+		if (rsProxy.getSavedServers().size() < 1) showAddServerActivity();
+
+		ArrayList<String> rsAvailableServers = new ArrayList<String>();
+		rsAvailableServers.addAll(rsProxy.getSavedServers().keySet());
+		rsAvailableServers.add(getString(R.string.add_server));
+
+		ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.text_view, rsAvailableServers);
+		Spinner serverSpinner = (Spinner) findViewById(R.id.serverSpinner);
+		serverSpinner.setAdapter(spinnerAdapter);
+
     	updateViews();
     }
     
@@ -89,72 +74,60 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     public void onResume()
     {
     	super.onResume();
-    	if(mRsService != null)
-    	{
-        	mServerData = mRsService.mRsCtrlService.getServerData();
-        	updateViews();
-    	}
-    	isInForeground=true;
+    	updateViews();
+    	isInForeground = true;
     }
+
     @Override
     public void onPause()
     {
     	super.onPause();
-    	isInForeground=false;
+    	isInForeground = false;
     }
     
     private void updateViews()
     {
-    	editTextHostname.setText(mServerData.hostname);
-    	if( mServerData.port != 0) editTextPort.setText(Integer.toString(mServerData.port));
-    	else editTextPort.setText("");
-    	
-    	editTextUser.setText(mServerData.user);
-    	editTextPassword.setText(mServerData.password);
-    	
-    	TextView textViewServerKey=(TextView) findViewById(R.id.textViewServerKey);
-    	try { textViewServerKey.setText("Server Key: "+mServerData.getHostkeyFingerprint()); }
-    	catch(NullPointerException e)
-    	{
-    		textViewServerKey.setText("Server Key: Error in sd.hostkey.toString");
-    		e.printStackTrace();
-    	}
-
-    	
     	if(mBound)
     	{
-    		if(mRsService.mRsCtrlService.isOnline())
-    		{
-    			editTextHostname.setVisibility(View.GONE);
-    			editTextPort.setVisibility(View.GONE);
-    			editTextUser.setVisibility(View.GONE);
-    			editTextPassword.setVisibility(View.GONE);
-    			
-            	buttonConnect.setVisibility(View.GONE);
-            	
-            	textViewConnectionState.setTextColor(Color.GREEN);            	
-            	textViewConnectionState.setText("  connected");
-            	textViewConnectionState.setVisibility(View.VISIBLE);
-    		}
-    		else
-    		{
-    			requestSystemStatus();
-    			
-    			editTextHostname.setVisibility(View.VISIBLE);
-    			editTextPort.setVisibility(View.VISIBLE);
-    			editTextUser.setVisibility(View.VISIBLE);
-    			editTextPassword.setVisibility(View.VISIBLE);
-    			
-    	    	textViewNetStatus.setVisibility(View.GONE);
-    	    	textViewNoPeers.setVisibility(View.GONE);
-    	    	textViewBandwidth.setVisibility(View.GONE);
-    			
-    			buttonConnect.setVisibility(View.VISIBLE);
-    			
-    			ConnectionError conErr = mRsService.mRsCtrlService.getLastConnectionError();
-    			boolean showStatus = true;
+			boolean actualServerConnected = false;
+			RsCtrlService server = rsProxy.getActiveServers().get(serverName);
+			if (server != null && server.isOnline()) actualServerConnected = true;
 
-    			Log.v(TAG,"updateViews(): conErr: "+conErr);
+
+			View connectButton = findViewById(R.id.buttonConnect);
+			TextView textViewServerKey = (TextView) findViewById(R.id.textViewServerKey);
+			TextView textViewConnectionState = (TextView) findViewById(R.id.textViewConnectionState);
+
+
+			if (actualServerConnected)
+			{
+				connectButton.setVisibility(View.GONE);
+				textViewServerKey.setText("Server Key: " + server.getServerData().getHostkeyFingerprint()); // TODO HARDCODED string
+
+				textViewConnectionState.setTextColor(Color.GREEN);
+				textViewConnectionState.setText("  connected"); // TODO HARDCODED string
+				textViewConnectionState.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				connectButton.setVisibility(View.VISIBLE);
+				textViewServerKey.setVisibility(View.GONE);
+
+    			requestSystemStatus();
+
+				findViewById(R.id.textViewNetStatus).setVisibility(View.GONE);
+				findViewById(R.id.textViewNoPeers).setVisibility(View.GONE);
+				findViewById(R.id.textViewBandwidth).setVisibility(View.GONE);
+
+				ConnectionError conErr = ConnectionError.UNKNOWN;
+				boolean showStatus = false;
+				if(server != null)
+				{
+					conErr = server.getLastConnectionError();
+					showStatus = true;
+				}
+
+    			Log.v(TAG,"updateViews(): conErr: " + conErr);
     			
     			switch(conErr)
     			{
@@ -184,7 +157,7 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 					textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_unknown_host));
 					break;
 				case UNKNOWN:
-					textViewConnectionState.setText(mRsService.mRsCtrlService.getLasConnectionErrorString());
+					textViewConnectionState.setText(getResources().getText(R.string.error)+ "Unknown Error"); //TODO HARDCODED string
 					break;
 				default:
 					textViewConnectionState.setText("default reached, this should not happen");
@@ -207,30 +180,26 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
     
     public void deleteServerKey(View v)
     {
-    	mServerData.hostkey = null;
-    	mRsService.mRsCtrlService.setServerData(mServerData);
+		RsCtrlService server = rsProxy.getActiveServers().get(serverName);
+    	RsServerData sd = server.getServerData();
+		sd.hostkey = null;
+		server.setServerData(sd);
     }
     
-    public void connect(View v)
+    public void onConnectButtonPressed(View v)
     {
-    	Log.v(TAG, "connect");
+    	Log.d(TAG, "onConnectButtonPressed(View v)");
         if(mBound)
         {
-        	mServerData.hostname=editTextHostname.getText().toString();
-        	mServerData.port=Integer.parseInt(editTextPort.getText().toString());
-        	mServerData.user=editTextUser.getText().toString();
-        	mServerData.password=editTextPassword.getText().toString();
+        	Log.d(TAG,"onConnectButtonPressed(View v) connecting to Server: " + serverName );
         	
-        	Log.v(TAG,"connecting to Server: "+mServerData);
+        	rsProxy.activateServer(serverName).registerListener(this);
+			v.setVisibility(View.GONE);
         	
-        	mRsService.mRsCtrlService.setServerData(mServerData);
-        	mRsService.mRsCtrlService.connect();
-        	
-        	buttonConnect.setVisibility(View.GONE);
-        	
-        	textViewConnectionState.setTextColor(Color.BLACK);
-        	textViewConnectionState.setText("connecting...");
-        	textViewConnectionState.setVisibility(View.VISIBLE);
+        	TextView tv = (TextView) findViewById(R.id.textViewConnectionState);
+			tv.setTextColor(Color.BLACK);
+			tv.setText("connecting...");
+			tv.setVisibility(View.VISIBLE);
         }
         else
         {
@@ -238,38 +207,21 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
         	text.setText("Error: not bound");
         }
     }
-    
-    public void showPeers(View v)
-    {
-    	Intent intent = new Intent(this, PeersActivity.class);
-    	startActivity(intent);
-    }
-    
-    public void showChatLobbies(View v)
-    {
-    	Intent intent = new Intent(this, ChatlobbyActivity.class);
-    	startActivity(intent);
-    }
-    
-    public void onShowQrCode(View v)
-    {
-    	Intent intent = new Intent(this, ShowQrCodeActivity.class);
-    	intent.putExtra("Description", "just a test");
-    	intent.putExtra("Data", "just a test");
-    	startActivity(intent);
-    }
-    
-    public void showFilesActivity(View v)
-    {
-    	Intent intent = new Intent(this, FilesActivity.class);
-    	startActivity(intent);
-    }
-    
-    public void showSearchActivity(View v)
-    {
-    	Intent intent = new Intent(this, ListSearchesActivity.class);
-    	startActivity(intent);
-    }
+
+
+	private void showActivity(Class<?> cls) { showActivity(cls, new Intent()); };
+	private void showActivity(Class<?> cls, Intent i)
+	{
+		i.setClass(this, cls);
+		i.putExtra(ProxiedActivityBase.serverNameExtraName, serverName );
+		startActivity(i);
+	}
+    public void showPeers(View v) { showActivity(PeersActivity.class); };
+    public void showChatLobbies(View v) { showActivity(ChatlobbyActivity.class); }
+    public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); showActivity(ShowQrCodeActivity.class, intent); }
+    public void showFilesActivity(View v) { showActivity(FilesActivity.class); }
+    public void showSearchActivity(View v) { showActivity(ListSearchesActivity.class); }
+	private void showAddServerActivity() { showActivity(AddServerActivity.class); }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -283,22 +235,26 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 	
 	private void requestSystemStatus()
 	{
-    	if(mBound && mRsService.mRsCtrlService.isOnline())
+    	if(mBound)
     	{
-			RsMessage msg=new RsMessage();
-			msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SYSTEM_VALUE<<8)|rsctrl.system.System.RequestMsgIds.MsgId_RequestSystemStatus_VALUE;
-			msg.body=RequestSystemStatus.newBuilder().build().toByteArray();
-			mRsService.mRsCtrlService.sendMsg(msg, new SystemStatusHandler());
+			RsCtrlService server = rsProxy.getActiveServers().get(serverName);
+			if(server != null && server.isOnline())
+			{
+				RsMessage msg=new RsMessage();
+				msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SYSTEM_VALUE<<8)|rsctrl.system.System.RequestMsgIds.MsgId_RequestSystemStatus_VALUE;
+				msg.body=RequestSystemStatus.newBuilder().build().toByteArray();
+				server.sendMsg(msg, new SystemStatusHandler());
+			}
     	}
 	}
-	
+
 	private class requestSystemStatusRunnable implements Runnable
 	{
 		@Override
 		public void run()
 		{
 			if(isInForeground) { requestSystemStatus(); }
-			mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+			mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}
 	
@@ -311,6 +267,11 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 			try
 			{
 				resp = ResponseSystemStatus.parseFrom(msg.body);
+
+				TextView textViewNetStatus = (TextView) findViewById(R.id.textViewNetStatus);
+				TextView textViewNoPeers   = (TextView) findViewById(R.id.textViewNoPeers);
+				TextView textViewBandwidth = (TextView) findViewById(R.id.textViewBandwidth);
+
 		    	textViewNetStatus.setText(getResources().getText(R.string.network_status)+":\n"+resp.getNetStatus().toString());
 		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers()));
 		    	DecimalFormat df = new DecimalFormat("#.##");
@@ -322,4 +283,19 @@ public class MainActivity extends RsActivityBase implements RsCtrlServiceListene
 			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
 		}
 	}
+
+	// Those two handles the server spinner
+	@Override public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+	{
+		String si = ( (TextView) adapterView.getSelectedView() ).getText().toString();
+		Log.d(TAG, "onItemSelected(..., " + si + ", ...)");
+
+		if(si.equals(getString(R.string.add_server))) showAddServerActivity();
+		else
+		{
+			serverName = si;
+			updateViews();
+		}
+	}
+	@Override public void onNothingSelected(AdapterView<?> adapterView) {}
 }

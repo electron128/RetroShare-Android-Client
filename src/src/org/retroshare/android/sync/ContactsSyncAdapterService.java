@@ -25,8 +25,6 @@ import android.util.Log;
 
 import org.retroshare.android.R;
 import org.retroshare.android.ProxiedServiceBase;
-import org.retroshare.android.RetroShareAndroidProxy;
-import org.retroshare.java.RsCtrlService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -114,7 +112,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			mContentResolver = context.getContentResolver();
             updateContactList(account);
 
-			peers = rsProxy.getServer(account.name).peersService.getPeersList();
+			peers = rsProxy.activateServer(account.name).peersService.getPeersList();
             locationList.clear();
             mapLocationToPerson.clear();
             String name;

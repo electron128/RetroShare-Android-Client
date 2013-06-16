@@ -41,7 +41,7 @@ public class AccountActivity extends ProxiedActivityBase
 		Log.d(TAG, "onServiceConnected()");
         // Get RetroShare servers
         ArrayList<String> rsAvailableServers = new ArrayList<String>();
-        rsAvailableServers.addAll(rsProxy.getServers().keySet());
+        rsAvailableServers.addAll(rsProxy.getSavedServers().keySet());
         if(rsAvailableServers.size() < 1) return;
 
         // Remove servers already associated with an android account
