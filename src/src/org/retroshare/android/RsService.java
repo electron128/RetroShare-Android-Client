@@ -31,6 +31,8 @@ public class RsService extends Service implements RsCtrlServiceListener
 {
 	private static final String TAG="RsService";
 
+	private static final String DataPackBaseFileName = "RetroShareServers";
+
 	private static class Datapack implements Serializable
 	{
 		static final long serialVersionUID = 1L;
@@ -45,7 +47,7 @@ public class RsService extends Service implements RsCtrlServiceListener
 	{
 		try
 		{
-			ObjectInputStream i = new ObjectInputStream(openFileInput("RsService" + Long.toString(Datapack.serialVersionUID)));
+			ObjectInputStream i = new ObjectInputStream(openFileInput(DataPackBaseFileName + Long.toString(Datapack.serialVersionUID)));
 			mDatapack = (Datapack) i.readObject();
 			
 			Log.v(TAG, "read Datapack, Datapack.serverDataMap="+mDatapack.serverDataMap);
@@ -81,7 +83,7 @@ public class RsService extends Service implements RsCtrlServiceListener
 			RsServerData sd = mRsCtrlService.getServerData();
 			mDatapack.serverDataMap.put( sd.name, sd );
 			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
-			ObjectOutputStream o = new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
+			ObjectOutputStream o = new ObjectOutputStream(openFileOutput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
 		} catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
 	}

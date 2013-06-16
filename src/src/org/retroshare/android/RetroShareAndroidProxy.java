@@ -31,6 +31,8 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 {
 	private static final String TAG="RetroShareAndroidProxy";
 
+	private static final String DataPackBaseFileName = "RetroShareServers";
+
 	public static class RsBund
 	{
 		RsCtrlService server;
@@ -59,7 +61,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	{
 		try
 		{
-			ObjectInputStream i = new ObjectInputStream(openFileInput("RsService" + Long.toString(Datapack.serialVersionUID)));
+			ObjectInputStream i = new ObjectInputStream(openFileInput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID)));
 			mDatapack = (Datapack) i.readObject();
 			
 			Log.v(TAG, "read Datapack, Datapack.serverDataMap="+mDatapack.serverDataMap);
@@ -93,8 +95,8 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 
 		try
 		{
-			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt="+mDatapack.serverDataMap);
-			ObjectOutputStream o = new ObjectOutputStream(openFileOutput("RsService"+Long.toString(Datapack.serialVersionUID), 0));
+			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt=" + mDatapack.serverDataMap);
+			ObjectOutputStream o = new ObjectOutputStream(openFileOutput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID), 0));
 			o.writeObject(mDatapack);
 		}
 		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
