@@ -27,57 +27,47 @@ public class SearchService implements RsServiceInterface
 {
 	
 	RsCtrlService mRsCtrlService;
+	UiThreadHandlerInterface mUiThreadHandler;
 	
-	SearchService(RsCtrlService s)
+	SearchService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
-		mRsCtrlService=s;
+		mRsCtrlService = s;
+		mUiThreadHandler = u;
 	}
 	
-	public static interface SearchServiceListener{
-		public void update();
-	}
+	public static interface SearchServiceListener{ public void update(); }
 	
 	private Set<SearchServiceListener>mListeners=new HashSet<SearchServiceListener>();
-	public void registerListener(SearchServiceListener l){
-		mListeners.add(l);
-	}
-	public void unregisterListener(SearchServiceListener l){
-		mListeners.remove(l);
-	}
-	private void _notifyListeners(){
-		for(SearchServiceListener l:mListeners){
-			l.update();
-		}
-	}
+	public void registerListener(SearchServiceListener l) { mListeners.add(l); }
+	public void unregisterListener(SearchServiceListener l) { mListeners.remove(l); }
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(SearchServiceListener l:mListeners){ l.update(); }; }}); }
 
 	@Override
 	public void handleMessage(RsMessage m) {}
 	
 	
-	public interface SearchResponseHandler
-	{
-		public void onSearchResponseReceived(int id);
-	}
+	public interface SearchResponseHandler { public void onSearchResponseReceived(int id); }
 	
 	// stores search terms
 	@SuppressLint("UseSparseArrays")
 	Map<Integer,String> searchTermsList=new HashMap<Integer,String>();
 	
-	public Map<Integer,String> getSearches(){
-		return searchTermsList;
-	}
+	public Map<Integer,String> getSearches(){ return searchTermsList; }
 	
-	public void sendRequestBasicSearch(String term, SearchResponseHandler handler){
+	public void sendRequestBasicSearch(String term, SearchResponseHandler handler)
+	{
 		RsMessage msg=new RsMessage();
-		msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SEARCH_VALUE<<8)|Search.RequestMsgIds.MsgId_RequestBasicSearch_VALUE;
-		msg.body=RequestBasicSearch.newBuilder().addTerms(term).build().toByteArray();
+		msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SEARCH_VALUE<<8)|Search.RequestMsgIds.MsgId_RequestBasicSearch_VALUE;
+		msg.body = RequestBasicSearch.newBuilder().addTerms(term).build().toByteArray();
 		mRsCtrlService.sendMsg(msg, new RequestBasicSearchHandler(term,handler));
 	}
 	
-	private class RequestBasicSearchHandler extends RsMessageHandler{
+	private class RequestBasicSearchHandler extends RsMessageHandler
+	{
 		SearchResponseHandler handler;
 		String term;
-		RequestBasicSearchHandler(String t, SearchResponseHandler h){
+		RequestBasicSearchHandler(String t, SearchResponseHandler h)
+		{
 			super();
 			term=t;
 			handler=h;
@@ -116,7 +106,8 @@ public class SearchService implements RsServiceInterface
 	}
 	*/
 	
-	public void updateSearchResults(int id){
+	public void updateSearchResults(int id)
+	{
 		RsMessage msg=new RsMessage();
 		msg.msgId=msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SEARCH_VALUE<<8)|Search.RequestMsgIds.MsgId_RequestSearchResults_VALUE;
 		msg.body=RequestSearchResults.newBuilder()/*.addSearchIds(id)*/.build().toByteArray();
