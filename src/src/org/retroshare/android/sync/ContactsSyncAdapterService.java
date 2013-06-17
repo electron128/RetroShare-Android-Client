@@ -112,7 +112,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			mContentResolver = context.getContentResolver();
             updateContactList(account);
 
-			peers = rsProxy.activateServer(account.name).peersService.getPeersList();
+			peers = rsProxy.activateServer(account.name).mRsPeersService.getPeersList();
             locationList.clear();
             mapLocationToPerson.clear();
             String name;

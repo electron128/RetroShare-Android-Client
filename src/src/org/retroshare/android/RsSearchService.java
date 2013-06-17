@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,18 +18,17 @@ import rsctrl.search.Search.SearchSet;
 
 import android.annotation.SuppressLint;
 
-import org.retroshare.android.RsMessageHandler;
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class SearchService implements RsServiceInterface
+public class RsSearchService implements RsServiceInterface
 {
 	
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
 	
-	SearchService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsSearchService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;

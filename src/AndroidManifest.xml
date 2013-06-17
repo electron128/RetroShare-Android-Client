@@ -43,7 +43,6 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="org.retroshare.android.MainActivity" />
         </activity>
-        <service android:name=".RsService"></service>
         <activity android:name=".ChatlobbyActivity" android:label="@string/chat_lobbies"></activity>
         <activity android:name=".ChatActivity"></activity>
         <activity android:name=".AddFriendActivity">
@@ -67,7 +66,6 @@
         </activity>
         <activity android:name=".ShowSearchResultsActivity"></activity>
         <activity android:name=".ListSearchesActivity"></activity>
-        <activity android:name=".LoginActivity"></activity>
         <activity android:name=".AddServerActivity"></activity>
 
 		<!-- Android RetroShare Proxy BEGIN -->

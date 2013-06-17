@@ -4,7 +4,7 @@ package org.retroshare.android;
 
 import android.os.Handler;
 
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 /**
  *	This is an abstract class used as base for received messages handlers   

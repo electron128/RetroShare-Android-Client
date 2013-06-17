@@ -3,8 +3,7 @@ package org.retroshare.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.retroshare.java.RsCtrlService;
-import org.retroshare.java.SearchService.SearchServiceListener;
+import org.retroshare.android.RsSearchService.SearchServiceListener;
 
 import rsctrl.search.Search.SearchHit;
 
@@ -65,10 +64,10 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		RsCtrlService server = getConnectedServer();
-        server.searchService.registerListener(adapter);
+        server.mRsSearchService.registerListener(adapter);
         
         // TODO remove this
-		server.searchService.updateSearchResults(mId);
+		server.mRsSearchService.updateSearchResults(mId);
     }
     
     boolean isInForeground = false;
@@ -90,7 +89,7 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
     @Override
     public void onDestroy()
 	{
-		getConnectedServer().searchService.unregisterListener(adapter);
+		getConnectedServer().mRsSearchService.unregisterListener(adapter);
     	super.onDestroy();
     }
     
@@ -100,7 +99,7 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 		public void run()
 		{
 			RsCtrlService server = getConnectedServer();
-			if( isInForeground && mBound && server.isOnline()) server.searchService.updateSearchResults(mId);
+			if( isInForeground && mBound && server.isOnline()) server.mRsSearchService.updateSearchResults(mId);
 			mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}
@@ -205,8 +204,8 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 		public void update()
 		{
 			RsCtrlService server = getConnectedServer();
-			Log.v(TAG, "update: "+Integer.toString( server.searchService.getSearchResults(mId).size())+" items");
-			setData(server.searchService.getSearchResults(mId));
+			Log.v(TAG, "update: "+Integer.toString( server.mRsSearchService.getSearchResults(mId).size())+" items");
+			setData(server.mRsSearchService.getSearchResults(mId));
 		}
     	
     }

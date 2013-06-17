@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import android.os.Looper;
 
@@ -14,12 +14,11 @@ import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
 
-import org.retroshare.android.RsMessageHandler;
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class PeersService implements RsServiceInterface
+public class RsPeersService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
@@ -27,7 +26,7 @@ public class PeersService implements RsServiceInterface
     OwnIdReceivedHandler mOwnIdReceivedHandler;
     Thread mOwnIdReceivedHandlerThread;
 
-	PeersService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsPeersService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;

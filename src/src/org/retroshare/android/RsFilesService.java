@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,17 +14,16 @@ import rsctrl.files.Files.RequestControlDownload.Action;
 import rsctrl.files.Files.RequestTransferList;
 import rsctrl.files.Files.ResponseTransferList;
 
-import org.retroshare.android.RsMessageHandler;
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class FilesService implements RsServiceInterface
+public class RsFilesService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
 	
-	FilesService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsFilesService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;

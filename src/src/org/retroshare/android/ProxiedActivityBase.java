@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.retroshare.java.RsCtrlService;
-
 
 /**
  * @author G10h4ck

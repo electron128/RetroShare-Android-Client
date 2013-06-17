@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 
 public interface UiThreadHandlerInterface

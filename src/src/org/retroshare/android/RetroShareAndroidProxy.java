@@ -9,12 +9,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import org.retroshare.java.RsCtrlService;
-import org.retroshare.java.RsCtrlService.ConnectionError;
-import org.retroshare.java.RsCtrlService.ConnectionEvent;
-import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
-import org.retroshare.java.RsServerData;
-import org.retroshare.java.UiThreadHandlerInterface;
+import org.retroshare.android.RsCtrlService.ConnectionError;
+import org.retroshare.android.RsCtrlService.ConnectionEvent;
+import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -238,7 +235,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 			RsCtrlService server = new RsCtrlService(mUiThreadHandler); // TODO This crash when called by a service...
 			server.setServerData(serverData);
 			server.registerListener(this);
-			RsBund bund = new RsBund(server, new NotifyService(server.chatService, this));
+			RsBund bund = new RsBund(server, new NotifyService(server.mRsChatService, this, serverName));
 			serverBunds.put(serverName, bund);
 			server.connect();
 			Log.d(TAG, "_activateServer(String serverName) server activated");

@@ -1,12 +1,9 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import net.lag.jaramiko.AuthenticationFailedException;
 import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
-
-import org.retroshare.android.RsMessageHandler;
-import org.retroshare.android.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +58,7 @@ public class RsCtrlService implements Runnable
 
 	/**
 	 * Stuff that need to receive info about connection with RetroShare core
-	 * should implement this interface ( see LoginActivity for example ).
+	 * should implement this interface ( see MainActivity for example ).
 	 * The fact that we have a public inner interface make perfectly sense because
 	 * we want that only code that can access RSCtrlService can be a Listener
 	 * see http://stackoverflow.com/a/209158 for more details
@@ -167,10 +164,10 @@ public class RsCtrlService implements Runnable
 	/*************************************/
 
 	private Set<RsServiceInterface> Services = new HashSet<RsServiceInterface>();
-	public ChatService chatService;
-	public PeersService peersService;
-	public FilesService filesService;
-	public SearchService searchService;
+	public RsChatService mRsChatService;
+	public RsPeersService mRsPeersService;
+	public RsFilesService mRsFilesService;
+	public RsSearchService mRsSearchService;
 
 	/**
 	 * Initialize the RetroShare Control Service
@@ -183,24 +180,24 @@ public class RsCtrlService implements Runnable
 		runThread = true;
 		mThread.start();
 		
-		chatService = new ChatService(this, mUiThreadHandler);
-		Services.add(chatService);
+		mRsChatService = new RsChatService(this, mUiThreadHandler);
+		Services.add(mRsChatService);
 		
-		peersService = new PeersService(this, mUiThreadHandler);
-		Services.add(peersService);
+		mRsPeersService = new RsPeersService(this, mUiThreadHandler);
+		Services.add(mRsPeersService);
 		
-		filesService = new FilesService(this, mUiThreadHandler);
-		Services.add(filesService);
+		mRsFilesService = new RsFilesService(this, mUiThreadHandler);
+		Services.add(mRsFilesService);
 		
-		searchService = new SearchService(this, mUiThreadHandler);
-		Services.add(searchService);
+		mRsSearchService = new RsSearchService(this, mUiThreadHandler);
+		Services.add(mRsSearchService);
 		
 		// preload own Name, needed for Chat
-		peersService.getOwnPerson();
+		mRsPeersService.getOwnPerson();
 		// preload peers list, needed for chat notification
-		peersService.updatePeersList();
+		mRsPeersService.updatePeersList();
 		// preload chatobby list, because first request returns just an empty list
-		chatService.updateChatLobbies();
+		mRsChatService.updateChatLobbies();
 	}
 	
 	public void destroy(){ runThread=false;	}

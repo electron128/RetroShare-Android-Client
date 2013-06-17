@@ -3,8 +3,7 @@ package org.retroshare.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.retroshare.java.FilesService.FilesServiceListener;
-import org.retroshare.java.RsCtrlService;
+import org.retroshare.android.RsFilesService.FilesServiceListener;
 
 import rsctrl.core.Core;
 import rsctrl.files.Files;
@@ -71,8 +70,8 @@ public class FilesActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		RsCtrlService server = getConnectedServer();
-		server.filesService.registerListener(adapter);
-		server.filesService.updateTransfers(mDirection);
+		server.mRsFilesService.registerListener(adapter);
+		server.mRsFilesService.updateTransfers(mDirection);
     }
     
     boolean isInForeground = false;
@@ -157,7 +156,7 @@ public class FilesActivity extends ProxiedActivityBase
 							
 						default:
 						}
-						if( action != null ){ getConnectedServer().filesService.sendRequestControlDownload(clickedFile,action); }
+						if( action != null ){ getConnectedServer().mRsFilesService.sendRequestControlDownload(clickedFile,action); }
 					}
 				}
 			);
@@ -174,7 +173,7 @@ public class FilesActivity extends ProxiedActivityBase
 		public void run()
 		{
 			RsCtrlService server = getConnectedServer();
-			if( isInForeground && mBound && server.isOnline() ) { server.filesService.updateTransfers(mDirection); }
+			if( isInForeground && mBound && server.isOnline() ) { server.mRsFilesService.updateTransfers(mDirection); }
 			mHandler.postAtTime( new requestFilesRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVALL );
 		}
 	}
@@ -284,8 +283,8 @@ public class FilesActivity extends ProxiedActivityBase
 		public void update()
 		{
 			RsCtrlService server = getConnectedServer();
-	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)) transferList = server.filesService.getTransfersDown();
-	        else transferList = server.filesService.getTransfersUp();
+	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)) transferList = server.mRsFilesService.getTransfersDown();
+	        else transferList = server.mRsFilesService.getTransfersUp();
 	        
     		for(DataSetObserver obs:observerList) obs.onChanged();
 		}

@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import java.io.IOException;
 import java.io.NotActiveException;

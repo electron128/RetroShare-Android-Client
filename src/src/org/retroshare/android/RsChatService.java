@@ -1,4 +1,4 @@
-package org.retroshare.java;
+package org.retroshare.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,16 +22,16 @@ import rsctrl.chat.Chat.ResponseMsgIds;
 import rsctrl.core.Core;
 import rsctrl.core.Core.Person;
 
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener
+public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener
 {
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
 
-	ChatService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsChatService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
 		mRsCtrlService=s;
 		mRsCtrlService.registerListener(this);
@@ -130,7 +130,7 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 					ResponseChatLobbies resp=Chat.ResponseChatLobbies.parseFrom(msg.body);
 					ChatLobbies=resp.getLobbiesList();
 					
-					System.err.println("ChatService::handleMessage: ResponseChatLobbies\n"+ChatLobbies);
+					System.err.println("RsChatService::handleMessage: ResponseChatLobbies\n"+ChatLobbies);
 					
 					_notifyListeners();
 				} catch (InvalidProtocolBufferException e) {
@@ -155,7 +155,7 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 		    		lastChatlobbyMessage=m;
 		    	}else{
 		    		// private chat, we have to add names
-		    		Person p=mRsCtrlService.peersService.getPersonFromSslId(m.getId().getChatId());
+		    		Person p=mRsCtrlService.mRsPeersService.getPersonFromSslId(m.getId().getChatId());
 			    	if(p!=null){
 			    		m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(
 				    				p.getName()
@@ -216,7 +216,7 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 	}
 	
 	public void sendChatMessage(ChatMessage m){
-		System.err.println("ChatService: Sending Message:\n"+m);
+		System.err.println("RsChatService: Sending Message:\n"+m);
 		
     	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
@@ -225,14 +225,14 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
     	
 		// ad name information
     	if(m.getId().getChatType().equals(ChatType.TYPE_LOBBY)){
-    		System.err.println("ChatService::_sendChatMessage: ChatLobbies:\n"+ChatLobbies);
+    		System.err.println("RsChatService::_sendChatMessage: ChatLobbies:\n"+ChatLobbies);
     		// we have lobby
     		for(ChatLobbyInfo i:ChatLobbies){
     			if(i.getLobbyId().equals(m.getId().getChatId())){
-    				System.err.println("ChatService::_sendChatMessage: Lobby found");
+    				System.err.println("RsChatService::_sendChatMessage: Lobby found");
 	    			// no nick set
 	    			if(i.getLobbyNickname().equals("")){
-	    				m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.peersService.getOwnPerson().getName()).build();
+	    				m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
 	    			}
 	    			//nick set
 	    			else{
@@ -244,8 +244,8 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
     		
     	}else{
     		// private chat
-	    	if(mRsCtrlService.peersService.getOwnPerson()!=null){
-	    		m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.peersService.getOwnPerson().getName()).build();
+	    	if(mRsCtrlService.mRsPeersService.getOwnPerson()!=null){
+	    		m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
 	    	}else{
 	    		// no name available
 	    	}

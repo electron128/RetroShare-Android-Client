@@ -1,6 +1,6 @@
 package org.retroshare.android;
 
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -92,7 +92,7 @@ public class AddDownloadActivity extends ProxiedActivityBase
     	textViewResult.setVisibility(View.VISIBLE);
     	textViewResult.setText("processing...");
     	if(mFile!=null){
-        	getConnectedServer().filesService.sendRequestControlDownload(mFile, Action.ACTION_START,new RsMessageHandler(){
+        	getConnectedServer().mRsFilesService.sendRequestControlDownload(mFile, Action.ACTION_START,new RsMessageHandler(){
 
 				@Override
 				protected void rsHandleMsg(RsMessage msg) {

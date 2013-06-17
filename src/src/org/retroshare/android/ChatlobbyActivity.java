@@ -8,16 +8,12 @@ import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatLobbyInfo;
 import rsctrl.chat.Chat.ChatLobbyInfo.LobbyState;
 import rsctrl.chat.Chat.ChatType;
-import rsctrl.chat.Chat.RequestChatLobbies;
-import rsctrl.chat.Chat.ResponseChatLobbies;
-import rsctrl.core.Core;
-import rsctrl.core.Core.Location;
+
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +24,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.retroshare.java.ChatService.ChatServiceListener;
-import org.retroshare.java.RsCtrlService;
-import org.retroshare.java.RsCtrlService.RsMessage;
+import org.retroshare.android.RsChatService.ChatServiceListener;
 //import org.retroshare.android.RsService.RsMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
+
 
 public class ChatlobbyActivity extends ProxiedActivityBase
 {
@@ -76,15 +70,15 @@ public class ChatlobbyActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		RsCtrlService server = getConnectedServer();
-		server.chatService.registerListener(mclla);
-		server.chatService.updateChatLobbies();
+		server.mRsChatService.registerListener(mclla);
+		server.mRsChatService.updateChatLobbies();
     }
     
     @Override
     public void onResume()
 	{
     	super.onResume();
-    	if ( mBound) getConnectedServer().chatService.updateChatLobbies();
+    	if ( mBound) getConnectedServer().mRsChatService.updateChatLobbies();
     }
 
     private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener
@@ -148,7 +142,7 @@ public class ChatlobbyActivity extends ProxiedActivityBase
 	        ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
 	        
 	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(LobbyList.get(position).getLobbyId()).build();
-	        Boolean haveNewMesage = getConnectedServer().chatService.getChatChanged().get(chatId);
+	        Boolean haveNewMesage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);
 	        imageViewMessage.setVisibility(View.GONE);
 	        if(haveNewMesage!=null){
 	        	if(haveNewMesage.equals(Boolean.TRUE)){
@@ -198,11 +192,11 @@ public class ChatlobbyActivity extends ProxiedActivityBase
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
 		
-		// called by ChatService
+		// called by RsChatService
 		@Override
 		public void update()
 		{
-			setData(getConnectedServer().chatService.getChatLobbies());
+			setData(getConnectedServer().mRsChatService.getChatLobbies());
 		}
     	
     }

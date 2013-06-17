@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.retroshare.java.RsServerData;
-
 public class AddServerActivity extends ProxiedActivityBase
 {
 	private static final String TAG = "AddServerActivity";
@@ -52,6 +50,6 @@ public class AddServerActivity extends ProxiedActivityBase
 			Log.d(TAG, "addServer(View v) fields ok saving data");
             rsProxy.addServer(sd);
         }
-        finish();
+        startActivity(MainActivity.class);
 	}
 }

@@ -13,35 +13,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.retroshare.java.ChatService;
-import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.android.RsChatService.ChatServiceListener;
 
 /**
- * The only service class which relies on Android
  * @author till
- *
  */
 public class NotifyService implements ChatServiceListener
 {
+    //TODO Probably this server should inherith ProxiedServiceBase too
+
 	private final static String TAG="NotifyService";
+
+    private String serverName;
 	
-	
-	private ChatService mChatService;
+	private RsChatService mRsChatService;
 	
 	private Service mService;
 	private NotificationManager mNotificationManager;
 	private Context mContext;
-	
-	NotifyService(ChatService cs,Service s)
+
+	NotifyService(RsChatService cs, Service s, String sn)
     {
-		mChatService = cs;
-		mChatService.registerListener(this);
+		mRsChatService = cs;
+		mRsChatService.registerListener(this);
 		
-		mService=s;
+		mService = s;
 		mNotificationManager = (NotificationManager) s.getSystemService(Context.NOTIFICATION_SERVICE);
 		mContext = s.getApplicationContext();
-		
-		//createNewNotification(null,null,null);
+
+        serverName = sn;
 	}
 	Notification notification;
 	
@@ -57,7 +57,7 @@ public class NotifyService implements ChatServiceListener
 		boolean privateUnread=false;
 		boolean lobbyUnread=false;
 		
-		for(Map.Entry<ChatId,Boolean> entry:mChatService.getChatChanged().entrySet()){
+		for(Map.Entry<ChatId,Boolean> entry: mRsChatService.getChatChanged().entrySet()){
 			if(entry.getValue()){
 				if(entry.getKey().getChatType().equals(ChatType.TYPE_PRIVATE)){
 					privateUnread=true;
@@ -74,7 +74,7 @@ public class NotifyService implements ChatServiceListener
 			CharSequence contentTitle = mService.getResources().getText(R.string.app_name);
 			CharSequence contentText = mService.getResources().getText(R.string.new_private_chat_message);
 			
-			ChatMessage m=mChatService.getLastPrivateChatMessage();
+			ChatMessage m= mRsChatService.getLastPrivateChatMessage();
 			if(m!=null){
 				tickerText=m.getPeerNickname()+": "+android.text.Html.fromHtml(m.getMsg());
 			}
@@ -83,8 +83,9 @@ public class NotifyService implements ChatServiceListener
 			}
 			
 			notification = new Notification(icon, tickerText, System.currentTimeMillis());
-			
+
 			Intent notificationIntent = new Intent(mService, PeersActivity.class);
+            notificationIntent.putExtra(PeersActivity.serverNameExtraName, serverName);
 			PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 			
 			notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
@@ -94,36 +95,33 @@ public class NotifyService implements ChatServiceListener
 			mNotificationManager.cancel(NotificationIds.CHAT_PRIVATE);
 		}
 		
-		if(lobbyUnread){
+		if(lobbyUnread)
+        {
 			int icon=R.drawable.irc_protocol;
 			CharSequence tickerText;
 			CharSequence contentTitle = mService.getResources().getText(R.string.app_name);
 			CharSequence contentText = mService.getResources().getText(R.string.new_lobby_chat_message);
 			
-			ChatMessage m=mChatService.getLastChatlobbyMessage();
-			if(m!=null){
-				tickerText=m.getPeerNickname()+": "+android.text.Html.fromHtml(m.getMsg());
-			}
-			else{
-				tickerText=mService.getResources().getText(R.string.new_private_chat_message);
-			}
+			ChatMessage m= mRsChatService.getLastChatlobbyMessage();
+			if(m!=null) tickerText=m.getPeerNickname()+": "+android.text.Html.fromHtml(m.getMsg());
+			else tickerText=mService.getResources().getText(R.string.new_private_chat_message);
 			
 			notification = new Notification(icon, tickerText, System.currentTimeMillis());
-			
+
 			Intent notificationIntent = new Intent(mService, ChatlobbyActivity.class);
+            notificationIntent.putExtra(ChatlobbyActivity.serverNameExtraName, serverName);
 			PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 			
 			notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
 			
 			mNotificationManager.notify(NotificationIds.CHAT_LOBBY, notification);
-		}else{
-			mNotificationManager.cancel(NotificationIds.CHAT_LOBBY);
 		}
+        else mNotificationManager.cancel(NotificationIds.CHAT_LOBBY);
 	}
 	
 	private void createNewNotification(/*Intent intent, String title, String text*/){
 		
-		Log.v(TAG,"createNewNotification");
+		Log.d(TAG,"createNewNotification");
 		
 		int icon=R.drawable.chat;
 		CharSequence tickerText = mService.getResources().getText(R.string.new_message);
@@ -131,8 +129,9 @@ public class NotifyService implements ChatServiceListener
 		CharSequence contentText = mService.getResources().getText(R.string.new_message);
 		
 		notification = new Notification(icon, tickerText, System.currentTimeMillis());
-		
+
 		Intent notificationIntent = new Intent(mService, PeersActivity.class);
+        notificationIntent.putExtra(PeersActivity.serverNameExtraName, serverName);
 		PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 		
 		notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);

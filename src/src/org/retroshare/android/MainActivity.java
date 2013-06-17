@@ -7,24 +7,30 @@ import rsctrl.core.Core;
 import rsctrl.system.System.RequestSystemStatus;
 import rsctrl.system.System.ResponseSystemStatus;
 
-import org.retroshare.java.RsCtrlService;
-import org.retroshare.java.RsCtrlService.ConnectionError;
-import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
-import org.retroshare.java.RsCtrlService.RsMessage;
-import org.retroshare.java.RsServerData;
+import org.retroshare.android.RsCtrlService.ConnectionError;
+import org.retroshare.android.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.android.RsCtrlService.RsMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,6 +44,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	Handler mHandler;
 	
 	boolean isInForeground = false;
+
+    boolean connectButtonRecentlyPressed = false;
 	
     @Override
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
@@ -189,23 +197,27 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     
     public void onConnectButtonPressed(View v)
     {
+        connectButtonRecentlyPressed = true;
+
     	Log.d(TAG, "onConnectButtonPressed(View v)");
         if(mBound)
         {
         	Log.d(TAG,"onConnectButtonPressed(View v) connecting to Server: " + serverName );
-        	
-        	rsProxy.activateServer(serverName).registerListener(this);
+
+            if(rsProxy.getSavedServers().get(serverName).password == null) showDialog(DIALOG_PASSWORD);
+            else connect();
+
 			v.setVisibility(View.GONE);
         	
         	TextView tv = (TextView) findViewById(R.id.textViewConnectionState);
 			tv.setTextColor(Color.BLACK);
-			tv.setText("connecting...");
+			tv.setText("connecting..."); // TODO HARDCODED string
 			tv.setVisibility(View.VISIBLE);
         }
         else
         {
         	EditText text = (EditText) findViewById(R.id.editText1);
-        	text.setText("Error: not bound");
+        	text.setText("Error: not bound"); // TODO HARDCODED string
         }
     }
 
@@ -224,7 +236,25 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     }
 
 	@Override
-	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) { updateViews(); }
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
+    {
+        // TODO lock for a better place for this code if there is one... ////////
+        if(connectButtonRecentlyPressed)
+        {
+            if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED)
+            {
+                dismissDialog(DIALOG_CONNECT);
+            }
+            if(ce.kind == RsCtrlService.ConnectionEventKind.ERROR_WHILE_CONNECTING)
+            {
+                dismissDialog(DIALOG_CONNECT);
+                showDialog(DIALOG_CONNECT_ERROR);
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////
+
+        updateViews();
+    }
 	
 	private void requestSystemStatus()
 	{
@@ -291,4 +321,69 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		}
 	}
 	@Override public void onNothingSelected(AdapterView<?> adapterView) {}
+
+    private static final int DIALOG_PASSWORD=0;
+    private static final int DIALOG_CONNECT=1;
+    private static final int DIALOG_CONNECT_ERROR=2;
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+        switch(id)
+        {
+            case DIALOG_PASSWORD:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = inflater.inflate(R.layout.activity_login_dialog, null);
+
+
+                final EditText et = (EditText) view.findViewById(R.id.editTextPassword);
+                final CheckBox cbvp = (CheckBox) view.findViewById(R.id.checkBoxShowPassword);
+                cbvp.setOnClickListener(
+                        new View.OnClickListener()
+                        {
+                            @Override public void onClick(View v)
+                            {
+                                if(cbvp.isChecked()) et.setTransformationMethod(null);
+                                else et.setTransformationMethod(new PasswordTransformationMethod());
+                            }
+                        });
+                final CheckBox cbsp = (CheckBox) view.findViewById(R.id.checkBoxSavePassword);
+                builder.setView(view)
+                        .setTitle(R.string.enter_ssh_password)
+                        .setPositiveButton(
+                                "login",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        serverData.password = et.getText().toString();
+                                        serverData.savePassword = cbsp.isChecked();
+                                        connect();
+                                    }
+                                });
+                return builder.create();
+
+            case DIALOG_CONNECT:
+                ProgressDialog pd = new ProgressDialog(MainActivity.this);
+                pd.setMessage("connecting to "+serverData.hostname+":"+serverData.port); // TODO HARDCODED string
+                return pd;
+
+            case DIALOG_CONNECT_ERROR:
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setTitle(R.string.connection_error)
+                        // TODO solve the connection error thing
+                        .setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} }); // TODO HARDCODED string
+                return builder2.create();
+        }
+
+        return null;
+    }
+
+    private void connect()
+    {
+        rsProxy.activateServer(serverName).registerListener(this);
+        showDialog(DIALOG_CONNECT);
+    }
 }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.retroshare.java.SearchService.SearchResponseHandler;
+import org.retroshare.android.RsSearchService.SearchResponseHandler;
 
 import android.content.Context;
 import android.content.Intent;
@@ -60,7 +60,7 @@ public class ListSearchesActivity extends ProxiedActivityBase
 			if((event.getAction()==KeyEvent.ACTION_DOWN)&(event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
 			{
 				Log.v(TAG,"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
-				getConnectedServer().searchService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
+				getConnectedServer().mRsSearchService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
 				return true;
 			}
 			else return false;
@@ -83,13 +83,13 @@ public class ListSearchesActivity extends ProxiedActivityBase
 	}
     
     @Override
-    protected void onServiceConnected() { adapter.setData(getConnectedServer().searchService.getSearches()); }
+    protected void onServiceConnected() { adapter.setData(getConnectedServer().mRsSearchService.getSearches()); }
     
     @Override
     public void onResume()
 	{
 		super.onResume();
-    	if(mBound) adapter.setData(getConnectedServer().searchService.getSearches());
+    	if(mBound) adapter.setData(getConnectedServer().mRsSearchService.getSearches());
     }
 
     private class SearchListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener

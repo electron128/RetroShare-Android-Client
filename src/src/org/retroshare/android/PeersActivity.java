@@ -16,9 +16,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.retroshare.java.ChatService.ChatServiceListener;
-import org.retroshare.java.PeersService.PeersServiceListener;
-import org.retroshare.java.RsCtrlService;
+import org.retroshare.android.RsChatService.ChatServiceListener;
+import org.retroshare.android.RsPeersService.PeersServiceListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,9 +52,9 @@ public class PeersActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		RsCtrlService server = getConnectedServer();
-		server.peersService.registerListener(adapter);
-		server.chatService.registerListener(adapter);
-		server.peersService.updatePeersList();
+		server.mRsPeersService.registerListener(adapter);
+		server.mRsChatService.registerListener(adapter);
+		server.mRsPeersService.updatePeersList();
     }
     
     @Override
@@ -64,7 +63,7 @@ public class PeersActivity extends ProxiedActivityBase
     	super.onResume();
     	if(mBound)
 		{
-			getConnectedServer().peersService.updatePeersList();
+			getConnectedServer().mRsPeersService.updatePeersList();
     		adapter.update();
     	}
     }
@@ -132,7 +131,7 @@ public class PeersActivity extends ProxiedActivityBase
 	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
 	        
 	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-	        Boolean haveNewMessage = getConnectedServer().chatService.getChatChanged().get(chatId);
+	        Boolean haveNewMessage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);
 	        imageViewMessage.setVisibility(View.GONE);
 	        if( haveNewMessage != null && haveNewMessage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
 
@@ -163,6 +162,6 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() { setData(getConnectedServer().peersService.getPeersList()); } // called by ChatService
+		@Override public void update() { setData(getConnectedServer().mRsPeersService.getPeersList()); } // called by RsChatService
     }
 }
