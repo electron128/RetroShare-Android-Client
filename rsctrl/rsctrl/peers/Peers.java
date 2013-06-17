@@ -12,12 +12,14 @@ public final class Peers {
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_RequestPeers(0, 1),
     MsgId_RequestAddPeer(1, 2),
-    MsgId_RequestModifyPeer(2, 3),
+    MsgId_RequestExaminePeer(2, 3),
+    MsgId_RequestModifyPeer(3, 4),
     ;
     
     public static final int MsgId_RequestPeers_VALUE = 1;
     public static final int MsgId_RequestAddPeer_VALUE = 2;
-    public static final int MsgId_RequestModifyPeer_VALUE = 3;
+    public static final int MsgId_RequestExaminePeer_VALUE = 3;
+    public static final int MsgId_RequestModifyPeer_VALUE = 4;
     
     
     public final int getNumber() { return value; }
@@ -26,7 +28,8 @@ public final class Peers {
       switch (value) {
         case 1: return MsgId_RequestPeers;
         case 2: return MsgId_RequestAddPeer;
-        case 3: return MsgId_RequestModifyPeer;
+        case 3: return MsgId_RequestExaminePeer;
+        case 4: return MsgId_RequestModifyPeer;
         default: return null;
       }
     }
@@ -57,7 +60,7 @@ public final class Peers {
     }
     
     private static final RequestMsgIds[] VALUES = {
-      MsgId_RequestPeers, MsgId_RequestAddPeer, MsgId_RequestModifyPeer, 
+      MsgId_RequestPeers, MsgId_RequestAddPeer, MsgId_RequestExaminePeer, MsgId_RequestModifyPeer, 
     };
     
     public static RequestMsgIds valueOf(
@@ -83,13 +86,9 @@ public final class Peers {
   public enum ResponseMsgIds
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_ResponsePeerList(0, 1),
-    MsgId_ResponseAddPeer(1, 2),
-    MsgId_ResponseModifyPeer(2, 3),
     ;
     
     public static final int MsgId_ResponsePeerList_VALUE = 1;
-    public static final int MsgId_ResponseAddPeer_VALUE = 2;
-    public static final int MsgId_ResponseModifyPeer_VALUE = 3;
     
     
     public final int getNumber() { return value; }
@@ -97,8 +96,6 @@ public final class Peers {
     public static ResponseMsgIds valueOf(int value) {
       switch (value) {
         case 1: return MsgId_ResponsePeerList;
-        case 2: return MsgId_ResponseAddPeer;
-        case 3: return MsgId_ResponseModifyPeer;
         default: return null;
       }
     }
@@ -129,7 +126,7 @@ public final class Peers {
     }
     
     private static final ResponseMsgIds[] VALUES = {
-      MsgId_ResponsePeerList, MsgId_ResponseAddPeer, MsgId_ResponseModifyPeer, 
+      MsgId_ResponsePeerList, 
     };
     
     public static ResponseMsgIds valueOf(
@@ -163,10 +160,10 @@ public final class Peers {
     boolean hasInfo();
     rsctrl.peers.Peers.RequestPeers.InfoOption getInfo();
     
-    // repeated string gpg_ids = 3;
-    java.util.List<String> getGpgIdsList();
-    int getGpgIdsCount();
-    String getGpgIds(int index);
+    // repeated string pgp_ids = 3;
+    java.util.List<String> getPgpIdsList();
+    int getPgpIdsCount();
+    String getPgpIds(int index);
   }
   public static final class RequestPeers extends
       com.google.protobuf.GeneratedMessage
@@ -376,24 +373,24 @@ public final class Peers {
       return info_;
     }
     
-    // repeated string gpg_ids = 3;
-    public static final int GPG_IDS_FIELD_NUMBER = 3;
-    private com.google.protobuf.LazyStringList gpgIds_;
+    // repeated string pgp_ids = 3;
+    public static final int PGP_IDS_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList pgpIds_;
     public java.util.List<String>
-        getGpgIdsList() {
-      return gpgIds_;
+        getPgpIdsList() {
+      return pgpIds_;
     }
-    public int getGpgIdsCount() {
-      return gpgIds_.size();
+    public int getPgpIdsCount() {
+      return pgpIds_.size();
     }
-    public String getGpgIds(int index) {
-      return gpgIds_.get(index);
+    public String getPgpIds(int index) {
+      return pgpIds_.get(index);
     }
     
     private void initFields() {
       set_ = rsctrl.peers.Peers.RequestPeers.SetOption.OWNID;
       info_ = rsctrl.peers.Peers.RequestPeers.InfoOption.NAMEONLY;
-      gpgIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      pgpIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -421,8 +418,8 @@ public final class Peers {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeEnum(2, info_.getNumber());
       }
-      for (int i = 0; i < gpgIds_.size(); i++) {
-        output.writeBytes(3, gpgIds_.getByteString(i));
+      for (int i = 0; i < pgpIds_.size(); i++) {
+        output.writeBytes(3, pgpIds_.getByteString(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -443,12 +440,12 @@ public final class Peers {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < gpgIds_.size(); i++) {
+        for (int i = 0; i < pgpIds_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(gpgIds_.getByteString(i));
+            .computeBytesSizeNoTag(pgpIds_.getByteString(i));
         }
         size += dataSize;
-        size += 1 * getGpgIdsList().size();
+        size += 1 * getPgpIdsList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -578,7 +575,7 @@ public final class Peers {
         bitField0_ = (bitField0_ & ~0x00000001);
         info_ = rsctrl.peers.Peers.RequestPeers.InfoOption.NAMEONLY;
         bitField0_ = (bitField0_ & ~0x00000002);
-        gpgIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        pgpIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
@@ -627,11 +624,11 @@ public final class Peers {
         }
         result.info_ = info_;
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          gpgIds_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              gpgIds_);
+          pgpIds_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              pgpIds_);
           bitField0_ = (bitField0_ & ~0x00000004);
         }
-        result.gpgIds_ = gpgIds_;
+        result.pgpIds_ = pgpIds_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -654,13 +651,13 @@ public final class Peers {
         if (other.hasInfo()) {
           setInfo(other.getInfo());
         }
-        if (!other.gpgIds_.isEmpty()) {
-          if (gpgIds_.isEmpty()) {
-            gpgIds_ = other.gpgIds_;
+        if (!other.pgpIds_.isEmpty()) {
+          if (pgpIds_.isEmpty()) {
+            pgpIds_ = other.pgpIds_;
             bitField0_ = (bitField0_ & ~0x00000004);
           } else {
-            ensureGpgIdsIsMutable();
-            gpgIds_.addAll(other.gpgIds_);
+            ensurePgpIdsIsMutable();
+            pgpIds_.addAll(other.pgpIds_);
           }
           onChanged();
         }
@@ -726,8 +723,8 @@ public final class Peers {
               break;
             }
             case 26: {
-              ensureGpgIdsIsMutable();
-              gpgIds_.add(input.readBytes());
+              ensurePgpIdsIsMutable();
+              pgpIds_.add(input.readBytes());
               break;
             }
           }
@@ -784,59 +781,59 @@ public final class Peers {
         return this;
       }
       
-      // repeated string gpg_ids = 3;
-      private com.google.protobuf.LazyStringList gpgIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureGpgIdsIsMutable() {
+      // repeated string pgp_ids = 3;
+      private com.google.protobuf.LazyStringList pgpIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensurePgpIdsIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          gpgIds_ = new com.google.protobuf.LazyStringArrayList(gpgIds_);
+          pgpIds_ = new com.google.protobuf.LazyStringArrayList(pgpIds_);
           bitField0_ |= 0x00000004;
          }
       }
       public java.util.List<String>
-          getGpgIdsList() {
-        return java.util.Collections.unmodifiableList(gpgIds_);
+          getPgpIdsList() {
+        return java.util.Collections.unmodifiableList(pgpIds_);
       }
-      public int getGpgIdsCount() {
-        return gpgIds_.size();
+      public int getPgpIdsCount() {
+        return pgpIds_.size();
       }
-      public String getGpgIds(int index) {
-        return gpgIds_.get(index);
+      public String getPgpIds(int index) {
+        return pgpIds_.get(index);
       }
-      public Builder setGpgIds(
+      public Builder setPgpIds(
           int index, String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureGpgIdsIsMutable();
-        gpgIds_.set(index, value);
+  ensurePgpIdsIsMutable();
+        pgpIds_.set(index, value);
         onChanged();
         return this;
       }
-      public Builder addGpgIds(String value) {
+      public Builder addPgpIds(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureGpgIdsIsMutable();
-        gpgIds_.add(value);
+  ensurePgpIdsIsMutable();
+        pgpIds_.add(value);
         onChanged();
         return this;
       }
-      public Builder addAllGpgIds(
+      public Builder addAllPgpIds(
           java.lang.Iterable<String> values) {
-        ensureGpgIdsIsMutable();
-        super.addAll(values, gpgIds_);
+        ensurePgpIdsIsMutable();
+        super.addAll(values, pgpIds_);
         onChanged();
         return this;
       }
-      public Builder clearGpgIds() {
-        gpgIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder clearPgpIds() {
+        pgpIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
-      void addGpgIds(com.google.protobuf.ByteString value) {
-        ensureGpgIdsIsMutable();
-        gpgIds_.add(value);
+      void addPgpIds(com.google.protobuf.ByteString value) {
+        ensurePgpIdsIsMutable();
+        pgpIds_.add(value);
         onChanged();
       }
       
@@ -1579,17 +1576,17 @@ public final class Peers {
   public interface RequestAddPeerOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
-    // required string gpg_id = 1;
-    boolean hasGpgId();
-    String getGpgId();
-    
-    // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 2;
+    // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 1;
     boolean hasCmd();
     rsctrl.peers.Peers.RequestAddPeer.AddCmd getCmd();
     
-    // optional string cert = 3;
-    boolean hasCert();
-    String getCert();
+    // required string pgp_id = 2;
+    boolean hasPgpId();
+    String getPgpId();
+    
+    // optional string ssl_id = 3;
+    boolean hasSslId();
+    String getSslId();
   }
   public static final class RequestAddPeer extends
       com.google.protobuf.GeneratedMessage
@@ -1621,29 +1618,20 @@ public final class Peers {
     
     public enum AddCmd
         implements com.google.protobuf.ProtocolMessageEnum {
-      NOOP(0, 0),
-      ADD(1, 1),
-      REMOVE(2, 2),
-      IMPORT(3, 3),
-      EXAMINE(4, 4),
+      ADD(0, 1),
+      REMOVE(1, 2),
       ;
       
-      public static final int NOOP_VALUE = 0;
       public static final int ADD_VALUE = 1;
       public static final int REMOVE_VALUE = 2;
-      public static final int IMPORT_VALUE = 3;
-      public static final int EXAMINE_VALUE = 4;
       
       
       public final int getNumber() { return value; }
       
       public static AddCmd valueOf(int value) {
         switch (value) {
-          case 0: return NOOP;
           case 1: return ADD;
           case 2: return REMOVE;
-          case 3: return IMPORT;
-          case 4: return EXAMINE;
           default: return null;
         }
       }
@@ -1674,7 +1662,7 @@ public final class Peers {
       }
       
       private static final AddCmd[] VALUES = {
-        NOOP, ADD, REMOVE, IMPORT, EXAMINE, 
+        ADD, REMOVE, 
       };
       
       public static AddCmd valueOf(
@@ -1698,14 +1686,24 @@ public final class Peers {
     }
     
     private int bitField0_;
-    // required string gpg_id = 1;
-    public static final int GPG_ID_FIELD_NUMBER = 1;
-    private java.lang.Object gpgId_;
-    public boolean hasGpgId() {
+    // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 1;
+    public static final int CMD_FIELD_NUMBER = 1;
+    private rsctrl.peers.Peers.RequestAddPeer.AddCmd cmd_;
+    public boolean hasCmd() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public String getGpgId() {
-      java.lang.Object ref = gpgId_;
+    public rsctrl.peers.Peers.RequestAddPeer.AddCmd getCmd() {
+      return cmd_;
+    }
+    
+    // required string pgp_id = 2;
+    public static final int PGP_ID_FIELD_NUMBER = 2;
+    private java.lang.Object pgpId_;
+    public boolean hasPgpId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getPgpId() {
+      java.lang.Object ref = pgpId_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -1713,41 +1711,31 @@ public final class Peers {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          gpgId_ = s;
+          pgpId_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getGpgIdBytes() {
-      java.lang.Object ref = gpgId_;
+    private com.google.protobuf.ByteString getPgpIdBytes() {
+      java.lang.Object ref = pgpId_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        gpgId_ = b;
+        pgpId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 2;
-    public static final int CMD_FIELD_NUMBER = 2;
-    private rsctrl.peers.Peers.RequestAddPeer.AddCmd cmd_;
-    public boolean hasCmd() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public rsctrl.peers.Peers.RequestAddPeer.AddCmd getCmd() {
-      return cmd_;
-    }
-    
-    // optional string cert = 3;
-    public static final int CERT_FIELD_NUMBER = 3;
-    private java.lang.Object cert_;
-    public boolean hasCert() {
+    // optional string ssl_id = 3;
+    public static final int SSL_ID_FIELD_NUMBER = 3;
+    private java.lang.Object sslId_;
+    public boolean hasSslId() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public String getCert() {
-      java.lang.Object ref = cert_;
+    public String getSslId() {
+      java.lang.Object ref = sslId_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -1755,17 +1743,17 @@ public final class Peers {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          cert_ = s;
+          sslId_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getCertBytes() {
-      java.lang.Object ref = cert_;
+    private com.google.protobuf.ByteString getSslIdBytes() {
+      java.lang.Object ref = sslId_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        cert_ = b;
+        sslId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1773,20 +1761,20 @@ public final class Peers {
     }
     
     private void initFields() {
-      gpgId_ = "";
-      cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.NOOP;
-      cert_ = "";
+      cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.ADD;
+      pgpId_ = "";
+      sslId_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasGpgId()) {
+      if (!hasCmd()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasCmd()) {
+      if (!hasPgpId()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1798,13 +1786,13 @@ public final class Peers {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getGpgIdBytes());
+        output.writeEnum(1, cmd_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeEnum(2, cmd_.getNumber());
+        output.writeBytes(2, getPgpIdBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getCertBytes());
+        output.writeBytes(3, getSslIdBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1817,15 +1805,15 @@ public final class Peers {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getGpgIdBytes());
+          .computeEnumSize(1, cmd_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, cmd_.getNumber());
+          .computeBytesSize(2, getPgpIdBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getCertBytes());
+          .computeBytesSize(3, getSslIdBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1951,11 +1939,11 @@ public final class Peers {
       
       public Builder clear() {
         super.clear();
-        gpgId_ = "";
+        cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.ADD;
         bitField0_ = (bitField0_ & ~0x00000001);
-        cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.NOOP;
+        pgpId_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        cert_ = "";
+        sslId_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
@@ -1998,15 +1986,15 @@ public final class Peers {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.gpgId_ = gpgId_;
+        result.cmd_ = cmd_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.cmd_ = cmd_;
+        result.pgpId_ = pgpId_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.cert_ = cert_;
+        result.sslId_ = sslId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2023,8 +2011,632 @@ public final class Peers {
       
       public Builder mergeFrom(rsctrl.peers.Peers.RequestAddPeer other) {
         if (other == rsctrl.peers.Peers.RequestAddPeer.getDefaultInstance()) return this;
-        if (other.hasGpgId()) {
-          setGpgId(other.getGpgId());
+        if (other.hasCmd()) {
+          setCmd(other.getCmd());
+        }
+        if (other.hasPgpId()) {
+          setPgpId(other.getPgpId());
+        }
+        if (other.hasSslId()) {
+          setSslId(other.getSslId());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasCmd()) {
+          
+          return false;
+        }
+        if (!hasPgpId()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              int rawValue = input.readEnum();
+              rsctrl.peers.Peers.RequestAddPeer.AddCmd value = rsctrl.peers.Peers.RequestAddPeer.AddCmd.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000001;
+                cmd_ = value;
+              }
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              pgpId_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              sslId_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 1;
+      private rsctrl.peers.Peers.RequestAddPeer.AddCmd cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.ADD;
+      public boolean hasCmd() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.peers.Peers.RequestAddPeer.AddCmd getCmd() {
+        return cmd_;
+      }
+      public Builder setCmd(rsctrl.peers.Peers.RequestAddPeer.AddCmd value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        cmd_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearCmd() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.ADD;
+        onChanged();
+        return this;
+      }
+      
+      // required string pgp_id = 2;
+      private java.lang.Object pgpId_ = "";
+      public boolean hasPgpId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getPgpId() {
+        java.lang.Object ref = pgpId_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          pgpId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setPgpId(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        pgpId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPgpId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        pgpId_ = getDefaultInstance().getPgpId();
+        onChanged();
+        return this;
+      }
+      void setPgpId(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        pgpId_ = value;
+        onChanged();
+      }
+      
+      // optional string ssl_id = 3;
+      private java.lang.Object sslId_ = "";
+      public boolean hasSslId() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public String getSslId() {
+        java.lang.Object ref = sslId_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          sslId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setSslId(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        sslId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearSslId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        sslId_ = getDefaultInstance().getSslId();
+        onChanged();
+        return this;
+      }
+      void setSslId(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000004;
+        sslId_ = value;
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.peers.RequestAddPeer)
+    }
+    
+    static {
+      defaultInstance = new RequestAddPeer(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.peers.RequestAddPeer)
+  }
+  
+  public interface RequestExaminePeerOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required string pgp_id = 1;
+    boolean hasPgpId();
+    String getPgpId();
+    
+    // required .rsctrl.peers.RequestExaminePeer.ExamineCmd cmd = 2;
+    boolean hasCmd();
+    rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd getCmd();
+    
+    // required string cert = 3;
+    boolean hasCert();
+    String getCert();
+  }
+  public static final class RequestExaminePeer extends
+      com.google.protobuf.GeneratedMessage
+      implements RequestExaminePeerOrBuilder {
+    // Use RequestExaminePeer.newBuilder() to construct.
+    private RequestExaminePeer(Builder builder) {
+      super(builder);
+    }
+    private RequestExaminePeer(boolean noInit) {}
+    
+    private static final RequestExaminePeer defaultInstance;
+    public static RequestExaminePeer getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RequestExaminePeer getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.peers.Peers.internal_static_rsctrl_peers_RequestExaminePeer_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.peers.Peers.internal_static_rsctrl_peers_RequestExaminePeer_fieldAccessorTable;
+    }
+    
+    public enum ExamineCmd
+        implements com.google.protobuf.ProtocolMessageEnum {
+      IMPORT(0, 3),
+      EXAMINE(1, 4),
+      ;
+      
+      public static final int IMPORT_VALUE = 3;
+      public static final int EXAMINE_VALUE = 4;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static ExamineCmd valueOf(int value) {
+        switch (value) {
+          case 3: return IMPORT;
+          case 4: return EXAMINE;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<ExamineCmd>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<ExamineCmd>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<ExamineCmd>() {
+              public ExamineCmd findValueByNumber(int number) {
+                return ExamineCmd.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return rsctrl.peers.Peers.RequestExaminePeer.getDescriptor().getEnumTypes().get(0);
+      }
+      
+      private static final ExamineCmd[] VALUES = {
+        IMPORT, EXAMINE, 
+      };
+      
+      public static ExamineCmd valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private ExamineCmd(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:rsctrl.peers.RequestExaminePeer.ExamineCmd)
+    }
+    
+    private int bitField0_;
+    // required string pgp_id = 1;
+    public static final int PGP_ID_FIELD_NUMBER = 1;
+    private java.lang.Object pgpId_;
+    public boolean hasPgpId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public String getPgpId() {
+      java.lang.Object ref = pgpId_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          pgpId_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getPgpIdBytes() {
+      java.lang.Object ref = pgpId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        pgpId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required .rsctrl.peers.RequestExaminePeer.ExamineCmd cmd = 2;
+    public static final int CMD_FIELD_NUMBER = 2;
+    private rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd cmd_;
+    public boolean hasCmd() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd getCmd() {
+      return cmd_;
+    }
+    
+    // required string cert = 3;
+    public static final int CERT_FIELD_NUMBER = 3;
+    private java.lang.Object cert_;
+    public boolean hasCert() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public String getCert() {
+      java.lang.Object ref = cert_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          cert_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getCertBytes() {
+      java.lang.Object ref = cert_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        cert_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    private void initFields() {
+      pgpId_ = "";
+      cmd_ = rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd.IMPORT;
+      cert_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasPgpId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasCmd()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasCert()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getPgpIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeEnum(2, cmd_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getCertBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getPgpIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, cmd_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getCertBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.peers.Peers.RequestExaminePeer parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.peers.Peers.RequestExaminePeer prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.peers.Peers.RequestExaminePeerOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.peers.Peers.internal_static_rsctrl_peers_RequestExaminePeer_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.peers.Peers.internal_static_rsctrl_peers_RequestExaminePeer_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.peers.Peers.RequestExaminePeer.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        pgpId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        cmd_ = rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd.IMPORT;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        cert_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.peers.Peers.RequestExaminePeer.getDescriptor();
+      }
+      
+      public rsctrl.peers.Peers.RequestExaminePeer getDefaultInstanceForType() {
+        return rsctrl.peers.Peers.RequestExaminePeer.getDefaultInstance();
+      }
+      
+      public rsctrl.peers.Peers.RequestExaminePeer build() {
+        rsctrl.peers.Peers.RequestExaminePeer result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.peers.Peers.RequestExaminePeer buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.peers.Peers.RequestExaminePeer result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.peers.Peers.RequestExaminePeer buildPartial() {
+        rsctrl.peers.Peers.RequestExaminePeer result = new rsctrl.peers.Peers.RequestExaminePeer(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.pgpId_ = pgpId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.cmd_ = cmd_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.cert_ = cert_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.peers.Peers.RequestExaminePeer) {
+          return mergeFrom((rsctrl.peers.Peers.RequestExaminePeer)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.peers.Peers.RequestExaminePeer other) {
+        if (other == rsctrl.peers.Peers.RequestExaminePeer.getDefaultInstance()) return this;
+        if (other.hasPgpId()) {
+          setPgpId(other.getPgpId());
         }
         if (other.hasCmd()) {
           setCmd(other.getCmd());
@@ -2037,11 +2649,15 @@ public final class Peers {
       }
       
       public final boolean isInitialized() {
-        if (!hasGpgId()) {
+        if (!hasPgpId()) {
           
           return false;
         }
         if (!hasCmd()) {
+          
+          return false;
+        }
+        if (!hasCert()) {
           
           return false;
         }
@@ -2073,12 +2689,12 @@ public final class Peers {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              gpgId_ = input.readBytes();
+              pgpId_ = input.readBytes();
               break;
             }
             case 16: {
               int rawValue = input.readEnum();
-              rsctrl.peers.Peers.RequestAddPeer.AddCmd value = rsctrl.peers.Peers.RequestAddPeer.AddCmd.valueOf(rawValue);
+              rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd value = rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(2, rawValue);
               } else {
@@ -2098,51 +2714,51 @@ public final class Peers {
       
       private int bitField0_;
       
-      // required string gpg_id = 1;
-      private java.lang.Object gpgId_ = "";
-      public boolean hasGpgId() {
+      // required string pgp_id = 1;
+      private java.lang.Object pgpId_ = "";
+      public boolean hasPgpId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public String getGpgId() {
-        java.lang.Object ref = gpgId_;
+      public String getPgpId() {
+        java.lang.Object ref = pgpId_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          gpgId_ = s;
+          pgpId_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setGpgId(String value) {
+      public Builder setPgpId(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        gpgId_ = value;
+        pgpId_ = value;
         onChanged();
         return this;
       }
-      public Builder clearGpgId() {
+      public Builder clearPgpId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        gpgId_ = getDefaultInstance().getGpgId();
+        pgpId_ = getDefaultInstance().getPgpId();
         onChanged();
         return this;
       }
-      void setGpgId(com.google.protobuf.ByteString value) {
+      void setPgpId(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000001;
-        gpgId_ = value;
+        pgpId_ = value;
         onChanged();
       }
       
-      // required .rsctrl.peers.RequestAddPeer.AddCmd cmd = 2;
-      private rsctrl.peers.Peers.RequestAddPeer.AddCmd cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.NOOP;
+      // required .rsctrl.peers.RequestExaminePeer.ExamineCmd cmd = 2;
+      private rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd cmd_ = rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd.IMPORT;
       public boolean hasCmd() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public rsctrl.peers.Peers.RequestAddPeer.AddCmd getCmd() {
+      public rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd getCmd() {
         return cmd_;
       }
-      public Builder setCmd(rsctrl.peers.Peers.RequestAddPeer.AddCmd value) {
+      public Builder setCmd(rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2153,12 +2769,12 @@ public final class Peers {
       }
       public Builder clearCmd() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        cmd_ = rsctrl.peers.Peers.RequestAddPeer.AddCmd.NOOP;
+        cmd_ = rsctrl.peers.Peers.RequestExaminePeer.ExamineCmd.IMPORT;
         onChanged();
         return this;
       }
       
-      // optional string cert = 3;
+      // required string cert = 3;
       private java.lang.Object cert_ = "";
       public boolean hasCert() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -2194,740 +2810,15 @@ public final class Peers {
         onChanged();
       }
       
-      // @@protoc_insertion_point(builder_scope:rsctrl.peers.RequestAddPeer)
+      // @@protoc_insertion_point(builder_scope:rsctrl.peers.RequestExaminePeer)
     }
     
     static {
-      defaultInstance = new RequestAddPeer(true);
+      defaultInstance = new RequestExaminePeer(true);
       defaultInstance.initFields();
     }
     
-    // @@protoc_insertion_point(class_scope:rsctrl.peers.RequestAddPeer)
-  }
-  
-  public interface ResponseAddPeerOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // required .rsctrl.core.Status status = 1;
-    boolean hasStatus();
-    rsctrl.core.Core.Status getStatus();
-    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
-    
-    // repeated .rsctrl.core.Person peers = 2;
-    java.util.List<rsctrl.core.Core.Person> 
-        getPeersList();
-    rsctrl.core.Core.Person getPeers(int index);
-    int getPeersCount();
-    java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-        getPeersOrBuilderList();
-    rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-        int index);
-  }
-  public static final class ResponseAddPeer extends
-      com.google.protobuf.GeneratedMessage
-      implements ResponseAddPeerOrBuilder {
-    // Use ResponseAddPeer.newBuilder() to construct.
-    private ResponseAddPeer(Builder builder) {
-      super(builder);
-    }
-    private ResponseAddPeer(boolean noInit) {}
-    
-    private static final ResponseAddPeer defaultInstance;
-    public static ResponseAddPeer getDefaultInstance() {
-      return defaultInstance;
-    }
-    
-    public ResponseAddPeer getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseAddPeer_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseAddPeer_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // required .rsctrl.core.Status status = 1;
-    public static final int STATUS_FIELD_NUMBER = 1;
-    private rsctrl.core.Core.Status status_;
-    public boolean hasStatus() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public rsctrl.core.Core.Status getStatus() {
-      return status_;
-    }
-    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
-      return status_;
-    }
-    
-    // repeated .rsctrl.core.Person peers = 2;
-    public static final int PEERS_FIELD_NUMBER = 2;
-    private java.util.List<rsctrl.core.Core.Person> peers_;
-    public java.util.List<rsctrl.core.Core.Person> getPeersList() {
-      return peers_;
-    }
-    public java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-        getPeersOrBuilderList() {
-      return peers_;
-    }
-    public int getPeersCount() {
-      return peers_.size();
-    }
-    public rsctrl.core.Core.Person getPeers(int index) {
-      return peers_.get(index);
-    }
-    public rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-        int index) {
-      return peers_.get(index);
-    }
-    
-    private void initFields() {
-      status_ = rsctrl.core.Core.Status.getDefaultInstance();
-      peers_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasStatus()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getStatus().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getPeersCount(); i++) {
-        if (!getPeers(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, status_);
-      }
-      for (int i = 0; i < peers_.size(); i++) {
-        output.writeMessage(2, peers_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, status_);
-      }
-      for (int i = 0; i < peers_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, peers_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-    
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseAddPeer parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(rsctrl.peers.Peers.ResponseAddPeer prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements rsctrl.peers.Peers.ResponseAddPeerOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseAddPeer_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseAddPeer_fieldAccessorTable;
-      }
-      
-      // Construct using rsctrl.peers.Peers.ResponseAddPeer.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getStatusFieldBuilder();
-          getPeersFieldBuilder();
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        if (statusBuilder_ == null) {
-          status_ = rsctrl.core.Core.Status.getDefaultInstance();
-        } else {
-          statusBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000001);
-        if (peersBuilder_ == null) {
-          peers_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-        } else {
-          peersBuilder_.clear();
-        }
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return rsctrl.peers.Peers.ResponseAddPeer.getDescriptor();
-      }
-      
-      public rsctrl.peers.Peers.ResponseAddPeer getDefaultInstanceForType() {
-        return rsctrl.peers.Peers.ResponseAddPeer.getDefaultInstance();
-      }
-      
-      public rsctrl.peers.Peers.ResponseAddPeer build() {
-        rsctrl.peers.Peers.ResponseAddPeer result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private rsctrl.peers.Peers.ResponseAddPeer buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        rsctrl.peers.Peers.ResponseAddPeer result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public rsctrl.peers.Peers.ResponseAddPeer buildPartial() {
-        rsctrl.peers.Peers.ResponseAddPeer result = new rsctrl.peers.Peers.ResponseAddPeer(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        if (statusBuilder_ == null) {
-          result.status_ = status_;
-        } else {
-          result.status_ = statusBuilder_.build();
-        }
-        if (peersBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            peers_ = java.util.Collections.unmodifiableList(peers_);
-            bitField0_ = (bitField0_ & ~0x00000002);
-          }
-          result.peers_ = peers_;
-        } else {
-          result.peers_ = peersBuilder_.build();
-        }
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof rsctrl.peers.Peers.ResponseAddPeer) {
-          return mergeFrom((rsctrl.peers.Peers.ResponseAddPeer)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(rsctrl.peers.Peers.ResponseAddPeer other) {
-        if (other == rsctrl.peers.Peers.ResponseAddPeer.getDefaultInstance()) return this;
-        if (other.hasStatus()) {
-          mergeStatus(other.getStatus());
-        }
-        if (peersBuilder_ == null) {
-          if (!other.peers_.isEmpty()) {
-            if (peers_.isEmpty()) {
-              peers_ = other.peers_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-            } else {
-              ensurePeersIsMutable();
-              peers_.addAll(other.peers_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.peers_.isEmpty()) {
-            if (peersBuilder_.isEmpty()) {
-              peersBuilder_.dispose();
-              peersBuilder_ = null;
-              peers_ = other.peers_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-              peersBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getPeersFieldBuilder() : null;
-            } else {
-              peersBuilder_.addAllMessages(other.peers_);
-            }
-          }
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        if (!hasStatus()) {
-          
-          return false;
-        }
-        if (!getStatus().isInitialized()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getPeersCount(); i++) {
-          if (!getPeers(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
-              if (hasStatus()) {
-                subBuilder.mergeFrom(getStatus());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setStatus(subBuilder.buildPartial());
-              break;
-            }
-            case 18: {
-              rsctrl.core.Core.Person.Builder subBuilder = rsctrl.core.Core.Person.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addPeers(subBuilder.buildPartial());
-              break;
-            }
-          }
-        }
-      }
-      
-      private int bitField0_;
-      
-      // required .rsctrl.core.Status status = 1;
-      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
-      public boolean hasStatus() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      public rsctrl.core.Core.Status getStatus() {
-        if (statusBuilder_ == null) {
-          return status_;
-        } else {
-          return statusBuilder_.getMessage();
-        }
-      }
-      public Builder setStatus(rsctrl.core.Core.Status value) {
-        if (statusBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          status_ = value;
-          onChanged();
-        } else {
-          statusBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder setStatus(
-          rsctrl.core.Core.Status.Builder builderForValue) {
-        if (statusBuilder_ == null) {
-          status_ = builderForValue.build();
-          onChanged();
-        } else {
-          statusBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder mergeStatus(rsctrl.core.Core.Status value) {
-        if (statusBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
-            status_ =
-              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
-          } else {
-            status_ = value;
-          }
-          onChanged();
-        } else {
-          statusBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder clearStatus() {
-        if (statusBuilder_ == null) {
-          status_ = rsctrl.core.Core.Status.getDefaultInstance();
-          onChanged();
-        } else {
-          statusBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return getStatusFieldBuilder().getBuilder();
-      }
-      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
-        if (statusBuilder_ != null) {
-          return statusBuilder_.getMessageOrBuilder();
-        } else {
-          return status_;
-        }
-      }
-      private com.google.protobuf.SingleFieldBuilder<
-          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
-          getStatusFieldBuilder() {
-        if (statusBuilder_ == null) {
-          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
-                  status_,
-                  getParentForChildren(),
-                  isClean());
-          status_ = null;
-        }
-        return statusBuilder_;
-      }
-      
-      // repeated .rsctrl.core.Person peers = 2;
-      private java.util.List<rsctrl.core.Core.Person> peers_ =
-        java.util.Collections.emptyList();
-      private void ensurePeersIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          peers_ = new java.util.ArrayList<rsctrl.core.Core.Person>(peers_);
-          bitField0_ |= 0x00000002;
-         }
-      }
-      
-      private com.google.protobuf.RepeatedFieldBuilder<
-          rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder> peersBuilder_;
-      
-      public java.util.List<rsctrl.core.Core.Person> getPeersList() {
-        if (peersBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(peers_);
-        } else {
-          return peersBuilder_.getMessageList();
-        }
-      }
-      public int getPeersCount() {
-        if (peersBuilder_ == null) {
-          return peers_.size();
-        } else {
-          return peersBuilder_.getCount();
-        }
-      }
-      public rsctrl.core.Core.Person getPeers(int index) {
-        if (peersBuilder_ == null) {
-          return peers_.get(index);
-        } else {
-          return peersBuilder_.getMessage(index);
-        }
-      }
-      public Builder setPeers(
-          int index, rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.set(index, value);
-          onChanged();
-        } else {
-          peersBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      public Builder setPeers(
-          int index, rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addPeers(rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.add(value);
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      public Builder addPeers(
-          int index, rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.add(index, value);
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      public Builder addPeers(
-          rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.add(builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addPeers(
-          int index, rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addAllPeers(
-          java.lang.Iterable<? extends rsctrl.core.Core.Person> values) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          super.addAll(values, peers_);
-          onChanged();
-        } else {
-          peersBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      public Builder clearPeers() {
-        if (peersBuilder_ == null) {
-          peers_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-          onChanged();
-        } else {
-          peersBuilder_.clear();
-        }
-        return this;
-      }
-      public Builder removePeers(int index) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.remove(index);
-          onChanged();
-        } else {
-          peersBuilder_.remove(index);
-        }
-        return this;
-      }
-      public rsctrl.core.Core.Person.Builder getPeersBuilder(
-          int index) {
-        return getPeersFieldBuilder().getBuilder(index);
-      }
-      public rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-          int index) {
-        if (peersBuilder_ == null) {
-          return peers_.get(index);  } else {
-          return peersBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      public java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-           getPeersOrBuilderList() {
-        if (peersBuilder_ != null) {
-          return peersBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(peers_);
-        }
-      }
-      public rsctrl.core.Core.Person.Builder addPeersBuilder() {
-        return getPeersFieldBuilder().addBuilder(
-            rsctrl.core.Core.Person.getDefaultInstance());
-      }
-      public rsctrl.core.Core.Person.Builder addPeersBuilder(
-          int index) {
-        return getPeersFieldBuilder().addBuilder(
-            index, rsctrl.core.Core.Person.getDefaultInstance());
-      }
-      public java.util.List<rsctrl.core.Core.Person.Builder> 
-           getPeersBuilderList() {
-        return getPeersFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder> 
-          getPeersFieldBuilder() {
-        if (peersBuilder_ == null) {
-          peersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder>(
-                  peers_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
-                  getParentForChildren(),
-                  isClean());
-          peers_ = null;
-        }
-        return peersBuilder_;
-      }
-      
-      // @@protoc_insertion_point(builder_scope:rsctrl.peers.ResponseAddPeer)
-    }
-    
-    static {
-      defaultInstance = new ResponseAddPeer(true);
-      defaultInstance.initFields();
-    }
-    
-    // @@protoc_insertion_point(class_scope:rsctrl.peers.ResponseAddPeer)
+    // @@protoc_insertion_point(class_scope:rsctrl.peers.RequestExaminePeer)
   }
   
   public interface RequestModifyPeerOrBuilder
@@ -3642,731 +3533,6 @@ public final class Peers {
     // @@protoc_insertion_point(class_scope:rsctrl.peers.RequestModifyPeer)
   }
   
-  public interface ResponseModifyPeerOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-    
-    // required .rsctrl.core.Status status = 1;
-    boolean hasStatus();
-    rsctrl.core.Core.Status getStatus();
-    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
-    
-    // repeated .rsctrl.core.Person peers = 2;
-    java.util.List<rsctrl.core.Core.Person> 
-        getPeersList();
-    rsctrl.core.Core.Person getPeers(int index);
-    int getPeersCount();
-    java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-        getPeersOrBuilderList();
-    rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-        int index);
-  }
-  public static final class ResponseModifyPeer extends
-      com.google.protobuf.GeneratedMessage
-      implements ResponseModifyPeerOrBuilder {
-    // Use ResponseModifyPeer.newBuilder() to construct.
-    private ResponseModifyPeer(Builder builder) {
-      super(builder);
-    }
-    private ResponseModifyPeer(boolean noInit) {}
-    
-    private static final ResponseModifyPeer defaultInstance;
-    public static ResponseModifyPeer getDefaultInstance() {
-      return defaultInstance;
-    }
-    
-    public ResponseModifyPeer getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseModifyPeer_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseModifyPeer_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // required .rsctrl.core.Status status = 1;
-    public static final int STATUS_FIELD_NUMBER = 1;
-    private rsctrl.core.Core.Status status_;
-    public boolean hasStatus() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public rsctrl.core.Core.Status getStatus() {
-      return status_;
-    }
-    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
-      return status_;
-    }
-    
-    // repeated .rsctrl.core.Person peers = 2;
-    public static final int PEERS_FIELD_NUMBER = 2;
-    private java.util.List<rsctrl.core.Core.Person> peers_;
-    public java.util.List<rsctrl.core.Core.Person> getPeersList() {
-      return peers_;
-    }
-    public java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-        getPeersOrBuilderList() {
-      return peers_;
-    }
-    public int getPeersCount() {
-      return peers_.size();
-    }
-    public rsctrl.core.Core.Person getPeers(int index) {
-      return peers_.get(index);
-    }
-    public rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-        int index) {
-      return peers_.get(index);
-    }
-    
-    private void initFields() {
-      status_ = rsctrl.core.Core.Status.getDefaultInstance();
-      peers_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasStatus()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getStatus().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getPeersCount(); i++) {
-        if (!getPeers(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, status_);
-      }
-      for (int i = 0; i < peers_.size(); i++) {
-        output.writeMessage(2, peers_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, status_);
-      }
-      for (int i = 0; i < peers_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, peers_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-    
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static rsctrl.peers.Peers.ResponseModifyPeer parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(rsctrl.peers.Peers.ResponseModifyPeer prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements rsctrl.peers.Peers.ResponseModifyPeerOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseModifyPeer_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return rsctrl.peers.Peers.internal_static_rsctrl_peers_ResponseModifyPeer_fieldAccessorTable;
-      }
-      
-      // Construct using rsctrl.peers.Peers.ResponseModifyPeer.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getStatusFieldBuilder();
-          getPeersFieldBuilder();
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        if (statusBuilder_ == null) {
-          status_ = rsctrl.core.Core.Status.getDefaultInstance();
-        } else {
-          statusBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000001);
-        if (peersBuilder_ == null) {
-          peers_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-        } else {
-          peersBuilder_.clear();
-        }
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return rsctrl.peers.Peers.ResponseModifyPeer.getDescriptor();
-      }
-      
-      public rsctrl.peers.Peers.ResponseModifyPeer getDefaultInstanceForType() {
-        return rsctrl.peers.Peers.ResponseModifyPeer.getDefaultInstance();
-      }
-      
-      public rsctrl.peers.Peers.ResponseModifyPeer build() {
-        rsctrl.peers.Peers.ResponseModifyPeer result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private rsctrl.peers.Peers.ResponseModifyPeer buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        rsctrl.peers.Peers.ResponseModifyPeer result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public rsctrl.peers.Peers.ResponseModifyPeer buildPartial() {
-        rsctrl.peers.Peers.ResponseModifyPeer result = new rsctrl.peers.Peers.ResponseModifyPeer(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        if (statusBuilder_ == null) {
-          result.status_ = status_;
-        } else {
-          result.status_ = statusBuilder_.build();
-        }
-        if (peersBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            peers_ = java.util.Collections.unmodifiableList(peers_);
-            bitField0_ = (bitField0_ & ~0x00000002);
-          }
-          result.peers_ = peers_;
-        } else {
-          result.peers_ = peersBuilder_.build();
-        }
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof rsctrl.peers.Peers.ResponseModifyPeer) {
-          return mergeFrom((rsctrl.peers.Peers.ResponseModifyPeer)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(rsctrl.peers.Peers.ResponseModifyPeer other) {
-        if (other == rsctrl.peers.Peers.ResponseModifyPeer.getDefaultInstance()) return this;
-        if (other.hasStatus()) {
-          mergeStatus(other.getStatus());
-        }
-        if (peersBuilder_ == null) {
-          if (!other.peers_.isEmpty()) {
-            if (peers_.isEmpty()) {
-              peers_ = other.peers_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-            } else {
-              ensurePeersIsMutable();
-              peers_.addAll(other.peers_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.peers_.isEmpty()) {
-            if (peersBuilder_.isEmpty()) {
-              peersBuilder_.dispose();
-              peersBuilder_ = null;
-              peers_ = other.peers_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-              peersBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getPeersFieldBuilder() : null;
-            } else {
-              peersBuilder_.addAllMessages(other.peers_);
-            }
-          }
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        if (!hasStatus()) {
-          
-          return false;
-        }
-        if (!getStatus().isInitialized()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getPeersCount(); i++) {
-          if (!getPeers(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
-              if (hasStatus()) {
-                subBuilder.mergeFrom(getStatus());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setStatus(subBuilder.buildPartial());
-              break;
-            }
-            case 18: {
-              rsctrl.core.Core.Person.Builder subBuilder = rsctrl.core.Core.Person.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addPeers(subBuilder.buildPartial());
-              break;
-            }
-          }
-        }
-      }
-      
-      private int bitField0_;
-      
-      // required .rsctrl.core.Status status = 1;
-      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
-      public boolean hasStatus() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      public rsctrl.core.Core.Status getStatus() {
-        if (statusBuilder_ == null) {
-          return status_;
-        } else {
-          return statusBuilder_.getMessage();
-        }
-      }
-      public Builder setStatus(rsctrl.core.Core.Status value) {
-        if (statusBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          status_ = value;
-          onChanged();
-        } else {
-          statusBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder setStatus(
-          rsctrl.core.Core.Status.Builder builderForValue) {
-        if (statusBuilder_ == null) {
-          status_ = builderForValue.build();
-          onChanged();
-        } else {
-          statusBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder mergeStatus(rsctrl.core.Core.Status value) {
-        if (statusBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
-            status_ =
-              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
-          } else {
-            status_ = value;
-          }
-          onChanged();
-        } else {
-          statusBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000001;
-        return this;
-      }
-      public Builder clearStatus() {
-        if (statusBuilder_ == null) {
-          status_ = rsctrl.core.Core.Status.getDefaultInstance();
-          onChanged();
-        } else {
-          statusBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return getStatusFieldBuilder().getBuilder();
-      }
-      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
-        if (statusBuilder_ != null) {
-          return statusBuilder_.getMessageOrBuilder();
-        } else {
-          return status_;
-        }
-      }
-      private com.google.protobuf.SingleFieldBuilder<
-          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
-          getStatusFieldBuilder() {
-        if (statusBuilder_ == null) {
-          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
-                  status_,
-                  getParentForChildren(),
-                  isClean());
-          status_ = null;
-        }
-        return statusBuilder_;
-      }
-      
-      // repeated .rsctrl.core.Person peers = 2;
-      private java.util.List<rsctrl.core.Core.Person> peers_ =
-        java.util.Collections.emptyList();
-      private void ensurePeersIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          peers_ = new java.util.ArrayList<rsctrl.core.Core.Person>(peers_);
-          bitField0_ |= 0x00000002;
-         }
-      }
-      
-      private com.google.protobuf.RepeatedFieldBuilder<
-          rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder> peersBuilder_;
-      
-      public java.util.List<rsctrl.core.Core.Person> getPeersList() {
-        if (peersBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(peers_);
-        } else {
-          return peersBuilder_.getMessageList();
-        }
-      }
-      public int getPeersCount() {
-        if (peersBuilder_ == null) {
-          return peers_.size();
-        } else {
-          return peersBuilder_.getCount();
-        }
-      }
-      public rsctrl.core.Core.Person getPeers(int index) {
-        if (peersBuilder_ == null) {
-          return peers_.get(index);
-        } else {
-          return peersBuilder_.getMessage(index);
-        }
-      }
-      public Builder setPeers(
-          int index, rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.set(index, value);
-          onChanged();
-        } else {
-          peersBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      public Builder setPeers(
-          int index, rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addPeers(rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.add(value);
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      public Builder addPeers(
-          int index, rsctrl.core.Core.Person value) {
-        if (peersBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePeersIsMutable();
-          peers_.add(index, value);
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      public Builder addPeers(
-          rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.add(builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addPeers(
-          int index, rsctrl.core.Core.Person.Builder builderForValue) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          peersBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      public Builder addAllPeers(
-          java.lang.Iterable<? extends rsctrl.core.Core.Person> values) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          super.addAll(values, peers_);
-          onChanged();
-        } else {
-          peersBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      public Builder clearPeers() {
-        if (peersBuilder_ == null) {
-          peers_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-          onChanged();
-        } else {
-          peersBuilder_.clear();
-        }
-        return this;
-      }
-      public Builder removePeers(int index) {
-        if (peersBuilder_ == null) {
-          ensurePeersIsMutable();
-          peers_.remove(index);
-          onChanged();
-        } else {
-          peersBuilder_.remove(index);
-        }
-        return this;
-      }
-      public rsctrl.core.Core.Person.Builder getPeersBuilder(
-          int index) {
-        return getPeersFieldBuilder().getBuilder(index);
-      }
-      public rsctrl.core.Core.PersonOrBuilder getPeersOrBuilder(
-          int index) {
-        if (peersBuilder_ == null) {
-          return peers_.get(index);  } else {
-          return peersBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      public java.util.List<? extends rsctrl.core.Core.PersonOrBuilder> 
-           getPeersOrBuilderList() {
-        if (peersBuilder_ != null) {
-          return peersBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(peers_);
-        }
-      }
-      public rsctrl.core.Core.Person.Builder addPeersBuilder() {
-        return getPeersFieldBuilder().addBuilder(
-            rsctrl.core.Core.Person.getDefaultInstance());
-      }
-      public rsctrl.core.Core.Person.Builder addPeersBuilder(
-          int index) {
-        return getPeersFieldBuilder().addBuilder(
-            index, rsctrl.core.Core.Person.getDefaultInstance());
-      }
-      public java.util.List<rsctrl.core.Core.Person.Builder> 
-           getPeersBuilderList() {
-        return getPeersFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder> 
-          getPeersFieldBuilder() {
-        if (peersBuilder_ == null) {
-          peersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              rsctrl.core.Core.Person, rsctrl.core.Core.Person.Builder, rsctrl.core.Core.PersonOrBuilder>(
-                  peers_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
-                  getParentForChildren(),
-                  isClean());
-          peers_ = null;
-        }
-        return peersBuilder_;
-      }
-      
-      // @@protoc_insertion_point(builder_scope:rsctrl.peers.ResponseModifyPeer)
-    }
-    
-    static {
-      defaultInstance = new ResponseModifyPeer(true);
-      defaultInstance.initFields();
-    }
-    
-    // @@protoc_insertion_point(class_scope:rsctrl.peers.ResponseModifyPeer)
-  }
-  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_peers_RequestPeers_descriptor;
   private static
@@ -4383,20 +3549,15 @@ public final class Peers {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_peers_RequestAddPeer_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_rsctrl_peers_ResponseAddPeer_descriptor;
+    internal_static_rsctrl_peers_RequestExaminePeer_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_rsctrl_peers_ResponseAddPeer_fieldAccessorTable;
+      internal_static_rsctrl_peers_RequestExaminePeer_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_peers_RequestModifyPeer_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_peers_RequestModifyPeer_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_rsctrl_peers_ResponseModifyPeer_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_rsctrl_peers_ResponseModifyPeer_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4410,31 +3571,29 @@ public final class Peers {
       "\251\002\n\014RequestPeers\0221\n\003set\030\001 \002(\0162$.rsctrl.p" +
       "eers.RequestPeers.SetOption\0223\n\004info\030\002 \002(" +
       "\0162%.rsctrl.peers.RequestPeers.InfoOption" +
-      "\022\017\n\007gpg_ids\030\003 \003(\t\"^\n\tSetOption\022\t\n\005OWNID\020" +
+      "\022\017\n\007pgp_ids\030\003 \003(\t\"^\n\tSetOption\022\t\n\005OWNID\020" +
       "\001\022\n\n\006LISTED\020\002\022\r\n\tCONNECTED\020\003\022\013\n\007FRIENDS\020" +
       "\004\022\t\n\005VALID\020\005\022\n\n\006SIGNED\020\006\022\007\n\003ALL\020\007\"@\n\nInf" +
       "oOption\022\014\n\010NAMEONLY\020\001\022\t\n\005BASIC\020\002\022\014\n\010LOCA" +
       "TION\020\003\022\013\n\007ALLINFO\020\004\"[\n\020ResponsePeerList\022" +
       "#\n\006status\030\001 \002(\0132\023.rsctrl.core.Status\022\"\n\005",
-      "peers\030\002 \003(\0132\023.rsctrl.core.Person\"\242\001\n\016Req" +
-      "uestAddPeer\022\016\n\006gpg_id\030\001 \002(\t\0220\n\003cmd\030\002 \002(\016" +
-      "2#.rsctrl.peers.RequestAddPeer.AddCmd\022\014\n" +
-      "\004cert\030\003 \001(\t\"@\n\006AddCmd\022\010\n\004NOOP\020\000\022\007\n\003ADD\020\001" +
-      "\022\n\n\006REMOVE\020\002\022\n\n\006IMPORT\020\003\022\013\n\007EXAMINE\020\004\"Z\n" +
-      "\017ResponseAddPeer\022#\n\006status\030\001 \002(\0132\023.rsctr" +
-      "l.core.Status\022\"\n\005peers\030\002 \003(\0132\023.rsctrl.co" +
-      "re.Person\"\231\001\n\021RequestModifyPeer\0223\n\003cmd\030\001" +
-      " \002(\0162&.rsctrl.peers.RequestModifyPeer.Mo" +
-      "dCmd\022\"\n\005peers\030\002 \003(\0132\023.rsctrl.core.Person",
-      "\"+\n\006ModCmd\022\010\n\004NOOP\020\000\022\013\n\007ADDRESS\020\001\022\n\n\006DYN" +
-      "DNS\020\002\"]\n\022ResponseModifyPeer\022#\n\006status\030\001 " +
-      "\002(\0132\023.rsctrl.core.Status\022\"\n\005peers\030\002 \003(\0132" +
-      "\023.rsctrl.core.Person*^\n\rRequestMsgIds\022\026\n" +
-      "\022MsgId_RequestPeers\020\001\022\030\n\024MsgId_RequestAd" +
-      "dPeer\020\002\022\033\n\027MsgId_RequestModifyPeer\020\003*e\n\016" +
+      "peers\030\002 \003(\0132\023.rsctrl.core.Person\"\201\001\n\016Req" +
+      "uestAddPeer\0220\n\003cmd\030\001 \002(\0162#.rsctrl.peers." +
+      "RequestAddPeer.AddCmd\022\016\n\006pgp_id\030\002 \002(\t\022\016\n" +
+      "\006ssl_id\030\003 \001(\t\"\035\n\006AddCmd\022\007\n\003ADD\020\001\022\n\n\006REMO" +
+      "VE\020\002\"\223\001\n\022RequestExaminePeer\022\016\n\006pgp_id\030\001 " +
+      "\002(\t\0228\n\003cmd\030\002 \002(\0162+.rsctrl.peers.RequestE" +
+      "xaminePeer.ExamineCmd\022\014\n\004cert\030\003 \002(\t\"%\n\nE" +
+      "xamineCmd\022\n\n\006IMPORT\020\003\022\013\n\007EXAMINE\020\004\"\231\001\n\021R" +
+      "equestModifyPeer\0223\n\003cmd\030\001 \002(\0162&.rsctrl.p" +
+      "eers.RequestModifyPeer.ModCmd\022\"\n\005peers\030\002",
+      " \003(\0132\023.rsctrl.core.Person\"+\n\006ModCmd\022\010\n\004N" +
+      "OOP\020\000\022\013\n\007ADDRESS\020\001\022\n\n\006DYNDNS\020\002*|\n\rReques" +
+      "tMsgIds\022\026\n\022MsgId_RequestPeers\020\001\022\030\n\024MsgId" +
+      "_RequestAddPeer\020\002\022\034\n\030MsgId_RequestExamin" +
+      "ePeer\020\003\022\033\n\027MsgId_RequestModifyPeer\020\004*,\n\016" +
       "ResponseMsgIds\022\032\n\026MsgId_ResponsePeerList" +
-      "\020\001\022\031\n\025MsgId_ResponseAddPeer\020\002\022\034\n\030MsgId_R" +
-      "esponseModifyPeer\020\003"
+      "\020\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -4446,7 +3605,7 @@ public final class Peers {
           internal_static_rsctrl_peers_RequestPeers_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_peers_RequestPeers_descriptor,
-              new java.lang.String[] { "Set", "Info", "GpgIds", },
+              new java.lang.String[] { "Set", "Info", "PgpIds", },
               rsctrl.peers.Peers.RequestPeers.class,
               rsctrl.peers.Peers.RequestPeers.Builder.class);
           internal_static_rsctrl_peers_ResponsePeerList_descriptor =
@@ -4462,17 +3621,17 @@ public final class Peers {
           internal_static_rsctrl_peers_RequestAddPeer_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_peers_RequestAddPeer_descriptor,
-              new java.lang.String[] { "GpgId", "Cmd", "Cert", },
+              new java.lang.String[] { "Cmd", "PgpId", "SslId", },
               rsctrl.peers.Peers.RequestAddPeer.class,
               rsctrl.peers.Peers.RequestAddPeer.Builder.class);
-          internal_static_rsctrl_peers_ResponseAddPeer_descriptor =
+          internal_static_rsctrl_peers_RequestExaminePeer_descriptor =
             getDescriptor().getMessageTypes().get(3);
-          internal_static_rsctrl_peers_ResponseAddPeer_fieldAccessorTable = new
+          internal_static_rsctrl_peers_RequestExaminePeer_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_rsctrl_peers_ResponseAddPeer_descriptor,
-              new java.lang.String[] { "Status", "Peers", },
-              rsctrl.peers.Peers.ResponseAddPeer.class,
-              rsctrl.peers.Peers.ResponseAddPeer.Builder.class);
+              internal_static_rsctrl_peers_RequestExaminePeer_descriptor,
+              new java.lang.String[] { "PgpId", "Cmd", "Cert", },
+              rsctrl.peers.Peers.RequestExaminePeer.class,
+              rsctrl.peers.Peers.RequestExaminePeer.Builder.class);
           internal_static_rsctrl_peers_RequestModifyPeer_descriptor =
             getDescriptor().getMessageTypes().get(4);
           internal_static_rsctrl_peers_RequestModifyPeer_fieldAccessorTable = new
@@ -4481,14 +3640,6 @@ public final class Peers {
               new java.lang.String[] { "Cmd", "Peers", },
               rsctrl.peers.Peers.RequestModifyPeer.class,
               rsctrl.peers.Peers.RequestModifyPeer.Builder.class);
-          internal_static_rsctrl_peers_ResponseModifyPeer_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_rsctrl_peers_ResponseModifyPeer_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_rsctrl_peers_ResponseModifyPeer_descriptor,
-              new java.lang.String[] { "Status", "Peers", },
-              rsctrl.peers.Peers.ResponseModifyPeer.class,
-              rsctrl.peers.Peers.ResponseModifyPeer.Builder.class);
           return null;
         }
       };

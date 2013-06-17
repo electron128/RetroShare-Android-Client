@@ -12,10 +12,12 @@ public final class System {
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_RequestSystemStatus(0, 1),
     MsgId_RequestSystemQuit(1, 2),
+    MsgId_RequestSystemExternalAccess(2, 3),
     ;
     
     public static final int MsgId_RequestSystemStatus_VALUE = 1;
     public static final int MsgId_RequestSystemQuit_VALUE = 2;
+    public static final int MsgId_RequestSystemExternalAccess_VALUE = 3;
     
     
     public final int getNumber() { return value; }
@@ -24,6 +26,7 @@ public final class System {
       switch (value) {
         case 1: return MsgId_RequestSystemStatus;
         case 2: return MsgId_RequestSystemQuit;
+        case 3: return MsgId_RequestSystemExternalAccess;
         default: return null;
       }
     }
@@ -54,7 +57,7 @@ public final class System {
     }
     
     private static final RequestMsgIds[] VALUES = {
-      MsgId_RequestSystemStatus, MsgId_RequestSystemQuit, 
+      MsgId_RequestSystemStatus, MsgId_RequestSystemQuit, MsgId_RequestSystemExternalAccess, 
     };
     
     public static RequestMsgIds valueOf(
@@ -81,10 +84,12 @@ public final class System {
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_ResponseSystemStatus(0, 1),
     MsgId_ResponseSystemQuit(1, 2),
+    MsgId_ResponseSystemExternalAccess(2, 3),
     ;
     
     public static final int MsgId_ResponseSystemStatus_VALUE = 1;
     public static final int MsgId_ResponseSystemQuit_VALUE = 2;
+    public static final int MsgId_ResponseSystemExternalAccess_VALUE = 3;
     
     
     public final int getNumber() { return value; }
@@ -93,6 +98,7 @@ public final class System {
       switch (value) {
         case 1: return MsgId_ResponseSystemStatus;
         case 2: return MsgId_ResponseSystemQuit;
+        case 3: return MsgId_ResponseSystemExternalAccess;
         default: return null;
       }
     }
@@ -123,7 +129,7 @@ public final class System {
     }
     
     private static final ResponseMsgIds[] VALUES = {
-      MsgId_ResponseSystemStatus, MsgId_ResponseSystemQuit, 
+      MsgId_ResponseSystemStatus, MsgId_ResponseSystemQuit, MsgId_ResponseSystemExternalAccess, 
     };
     
     public static ResponseMsgIds valueOf(
@@ -2179,6 +2185,889 @@ public final class System {
     // @@protoc_insertion_point(class_scope:rsctrl.system.ResponseSystemQuit)
   }
   
+  public interface RequestSystemExternalAccessOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+  }
+  public static final class RequestSystemExternalAccess extends
+      com.google.protobuf.GeneratedMessage
+      implements RequestSystemExternalAccessOrBuilder {
+    // Use RequestSystemExternalAccess.newBuilder() to construct.
+    private RequestSystemExternalAccess(Builder builder) {
+      super(builder);
+    }
+    private RequestSystemExternalAccess(boolean noInit) {}
+    
+    private static final RequestSystemExternalAccess defaultInstance;
+    public static RequestSystemExternalAccess getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RequestSystemExternalAccess getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemExternalAccess_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemExternalAccess_fieldAccessorTable;
+    }
+    
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.RequestSystemExternalAccess parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.system.System.RequestSystemExternalAccess prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.system.System.RequestSystemExternalAccessOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemExternalAccess_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.system.System.internal_static_rsctrl_system_RequestSystemExternalAccess_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.system.System.RequestSystemExternalAccess.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.system.System.RequestSystemExternalAccess.getDescriptor();
+      }
+      
+      public rsctrl.system.System.RequestSystemExternalAccess getDefaultInstanceForType() {
+        return rsctrl.system.System.RequestSystemExternalAccess.getDefaultInstance();
+      }
+      
+      public rsctrl.system.System.RequestSystemExternalAccess build() {
+        rsctrl.system.System.RequestSystemExternalAccess result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.system.System.RequestSystemExternalAccess buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.system.System.RequestSystemExternalAccess result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.system.System.RequestSystemExternalAccess buildPartial() {
+        rsctrl.system.System.RequestSystemExternalAccess result = new rsctrl.system.System.RequestSystemExternalAccess(this);
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.system.System.RequestSystemExternalAccess) {
+          return mergeFrom((rsctrl.system.System.RequestSystemExternalAccess)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.system.System.RequestSystemExternalAccess other) {
+        if (other == rsctrl.system.System.RequestSystemExternalAccess.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+          }
+        }
+      }
+      
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.system.RequestSystemExternalAccess)
+    }
+    
+    static {
+      defaultInstance = new RequestSystemExternalAccess(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.system.RequestSystemExternalAccess)
+  }
+  
+  public interface ResponseSystemExternalAccessOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.core.Status status = 1;
+    boolean hasStatus();
+    rsctrl.core.Core.Status getStatus();
+    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
+    
+    // required uint32 ext_port = 2;
+    boolean hasExtPort();
+    int getExtPort();
+    
+    // required string dht_key = 3;
+    boolean hasDhtKey();
+    String getDhtKey();
+  }
+  public static final class ResponseSystemExternalAccess extends
+      com.google.protobuf.GeneratedMessage
+      implements ResponseSystemExternalAccessOrBuilder {
+    // Use ResponseSystemExternalAccess.newBuilder() to construct.
+    private ResponseSystemExternalAccess(Builder builder) {
+      super(builder);
+    }
+    private ResponseSystemExternalAccess(boolean noInit) {}
+    
+    private static final ResponseSystemExternalAccess defaultInstance;
+    public static ResponseSystemExternalAccess getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public ResponseSystemExternalAccess getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemExternalAccess_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemExternalAccess_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.core.Status status = 1;
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private rsctrl.core.Core.Status status_;
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.core.Core.Status getStatus() {
+      return status_;
+    }
+    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+      return status_;
+    }
+    
+    // required uint32 ext_port = 2;
+    public static final int EXT_PORT_FIELD_NUMBER = 2;
+    private int extPort_;
+    public boolean hasExtPort() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getExtPort() {
+      return extPort_;
+    }
+    
+    // required string dht_key = 3;
+    public static final int DHT_KEY_FIELD_NUMBER = 3;
+    private java.lang.Object dhtKey_;
+    public boolean hasDhtKey() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public String getDhtKey() {
+      java.lang.Object ref = dhtKey_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          dhtKey_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getDhtKeyBytes() {
+      java.lang.Object ref = dhtKey_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        dhtKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    private void initFields() {
+      status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      extPort_ = 0;
+      dhtKey_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasStatus()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasExtPort()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasDhtKey()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getStatus().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeUInt32(2, extPort_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getDhtKeyBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(2, extPort_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getDhtKeyBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.system.System.ResponseSystemExternalAccess parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.system.System.ResponseSystemExternalAccess prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.system.System.ResponseSystemExternalAccessOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemExternalAccess_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.system.System.internal_static_rsctrl_system_ResponseSystemExternalAccess_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.system.System.ResponseSystemExternalAccess.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getStatusFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        extPort_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        dhtKey_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.system.System.ResponseSystemExternalAccess.getDescriptor();
+      }
+      
+      public rsctrl.system.System.ResponseSystemExternalAccess getDefaultInstanceForType() {
+        return rsctrl.system.System.ResponseSystemExternalAccess.getDefaultInstance();
+      }
+      
+      public rsctrl.system.System.ResponseSystemExternalAccess build() {
+        rsctrl.system.System.ResponseSystemExternalAccess result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.system.System.ResponseSystemExternalAccess buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.system.System.ResponseSystemExternalAccess result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.system.System.ResponseSystemExternalAccess buildPartial() {
+        rsctrl.system.System.ResponseSystemExternalAccess result = new rsctrl.system.System.ResponseSystemExternalAccess(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (statusBuilder_ == null) {
+          result.status_ = status_;
+        } else {
+          result.status_ = statusBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.extPort_ = extPort_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.dhtKey_ = dhtKey_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.system.System.ResponseSystemExternalAccess) {
+          return mergeFrom((rsctrl.system.System.ResponseSystemExternalAccess)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.system.System.ResponseSystemExternalAccess other) {
+        if (other == rsctrl.system.System.ResponseSystemExternalAccess.getDefaultInstance()) return this;
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        if (other.hasExtPort()) {
+          setExtPort(other.getExtPort());
+        }
+        if (other.hasDhtKey()) {
+          setDhtKey(other.getDhtKey());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasStatus()) {
+          
+          return false;
+        }
+        if (!hasExtPort()) {
+          
+          return false;
+        }
+        if (!hasDhtKey()) {
+          
+          return false;
+        }
+        if (!getStatus().isInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
+              if (hasStatus()) {
+                subBuilder.mergeFrom(getStatus());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setStatus(subBuilder.buildPartial());
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              extPort_ = input.readUInt32();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              dhtKey_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.core.Status status = 1;
+      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.core.Core.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      public Builder setStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder setStatus(
+          rsctrl.core.Core.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder mergeStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
+            status_ =
+              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
+          } else {
+            status_ = value;
+          }
+          onChanged();
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder clearStatus() {
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+          onChanged();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getStatusFieldBuilder().getBuilder();
+      }
+      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
+          getStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
+                  status_,
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+      
+      // required uint32 ext_port = 2;
+      private int extPort_ ;
+      public boolean hasExtPort() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getExtPort() {
+        return extPort_;
+      }
+      public Builder setExtPort(int value) {
+        bitField0_ |= 0x00000002;
+        extPort_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearExtPort() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        extPort_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required string dht_key = 3;
+      private java.lang.Object dhtKey_ = "";
+      public boolean hasDhtKey() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public String getDhtKey() {
+        java.lang.Object ref = dhtKey_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          dhtKey_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setDhtKey(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        dhtKey_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearDhtKey() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        dhtKey_ = getDefaultInstance().getDhtKey();
+        onChanged();
+        return this;
+      }
+      void setDhtKey(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000004;
+        dhtKey_ = value;
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.system.ResponseSystemExternalAccess)
+    }
+    
+    static {
+      defaultInstance = new ResponseSystemExternalAccess(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.system.ResponseSystemExternalAccess)
+  }
+  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_system_RequestSystemStatus_descriptor;
   private static
@@ -2199,6 +3088,16 @@ public final class System {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_system_ResponseSystemQuit_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_system_RequestSystemExternalAccess_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_system_RequestSystemExternalAccess_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_system_ResponseSystemExternalAccess_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_system_ResponseSystemExternalAccess_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2223,11 +3122,17 @@ public final class System {
       "(\0162).rsctrl.system.RequestSystemQuit.Qui" +
       "tCode\".\n\010QuitCode\022\021\n\rCLOSE_CHANNEL\020\001\022\017\n\013" +
       "SHUTDOWN_RS\020\002\"9\n\022ResponseSystemQuit\022#\n\006s" +
-      "tatus\030\001 \002(\0132\023.rsctrl.core.Status*K\n\rRequ" +
-      "estMsgIds\022\035\n\031MsgId_RequestSystemStatus\020\001" +
-      "\022\033\n\027MsgId_RequestSystemQuit\020\002*N\n\016Respons" +
-      "eMsgIds\022\036\n\032MsgId_ResponseSystemStatus\020\001\022" +
-      "\034\n\030MsgId_ResponseSystemQuit\020\002"
+      "tatus\030\001 \002(\0132\023.rsctrl.core.Status\"\035\n\033Requ" +
+      "estSystemExternalAccess\"f\n\034ResponseSyste" +
+      "mExternalAccess\022#\n\006status\030\001 \002(\0132\023.rsctrl" +
+      ".core.Status\022\020\n\010ext_port\030\002 \002(\r\022\017\n\007dht_ke" +
+      "y\030\003 \002(\t*r\n\rRequestMsgIds\022\035\n\031MsgId_Reques",
+      "tSystemStatus\020\001\022\033\n\027MsgId_RequestSystemQu" +
+      "it\020\002\022%\n!MsgId_RequestSystemExternalAcces" +
+      "s\020\003*v\n\016ResponseMsgIds\022\036\n\032MsgId_ResponseS" +
+      "ystemStatus\020\001\022\034\n\030MsgId_ResponseSystemQui" +
+      "t\020\002\022&\n\"MsgId_ResponseSystemExternalAcces" +
+      "s\020\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2266,6 +3171,22 @@ public final class System {
               new java.lang.String[] { "Status", },
               rsctrl.system.System.ResponseSystemQuit.class,
               rsctrl.system.System.ResponseSystemQuit.Builder.class);
+          internal_static_rsctrl_system_RequestSystemExternalAccess_descriptor =
+            getDescriptor().getMessageTypes().get(4);
+          internal_static_rsctrl_system_RequestSystemExternalAccess_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_system_RequestSystemExternalAccess_descriptor,
+              new java.lang.String[] { },
+              rsctrl.system.System.RequestSystemExternalAccess.class,
+              rsctrl.system.System.RequestSystemExternalAccess.Builder.class);
+          internal_static_rsctrl_system_ResponseSystemExternalAccess_descriptor =
+            getDescriptor().getMessageTypes().get(5);
+          internal_static_rsctrl_system_ResponseSystemExternalAccess_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_system_ResponseSystemExternalAccess_descriptor,
+              new java.lang.String[] { "Status", "ExtPort", "DhtKey", },
+              rsctrl.system.System.ResponseSystemExternalAccess.class,
+              rsctrl.system.System.ResponseSystemExternalAccess.Builder.class);
           return null;
         }
       };

@@ -4,6 +4,7 @@ import rsctrl.core.Core;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestAddPeer;
 import rsctrl.peers.Peers.RequestAddPeer.AddCmd;
+import rsctrl.peers.Peers.RequestExaminePeer;
 import rsctrl.peers.Peers.ResponseAddPeer;
 
 import com.example.retroshare.remote.RsCtrlService.RsMessage;
@@ -26,7 +27,7 @@ public class AddFriendActivity extends RsActivityBase {
         setContentView(R.layout.activity_addfriend);
         tv=(TextView) findViewById(R.id.textView2);
         button=(Button) findViewById(R.id.buttonAddFriend);
-        tv.setText("waiting for ResponseAddPeer...\n");
+        tv.setText("waiting for Response...\n");
         button.setVisibility(View.GONE);
     }
     
@@ -35,7 +36,7 @@ public class AddFriendActivity extends RsActivityBase {
     	Uri uri = getIntent().getData();
         String cert=getCertFromUri(uri);
         
-    	RequestAddPeer.Builder reqb=RequestAddPeer.newBuilder();
+    	RequestExaminePeer.Builder reqb=RequestExaminePeer.newBuilder();
     	reqb.setGpgId("");
     	reqb.setCmd(AddCmd.EXAMINE);
     	reqb.setCert(cert);

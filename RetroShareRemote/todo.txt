@@ -1,3 +1,23 @@
+changes from 5527 to 6147
+core 	nothing to do
+search	add result_limit to request and maybe use alt_names in result
+system	add external_acces to get dht key
+chat	request chat history
+		lobbystate public changed to visible<-not used
+peers	examinepeer modifypeer
+stream	all new
+
+don't know if search by ids working now?
+
+		
+questions drbob:
+-why list search ids without terms?
+
+
+
+
+change gpg id to pgp id
+
 update readme
 
 change display of ssh public key

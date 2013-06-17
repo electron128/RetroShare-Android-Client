@@ -16,6 +16,7 @@ public final class Chat {
     MsgId_RequestSetLobbyNickname(3, 4),
     MsgId_RequestRegisterEvents(4, 5),
     MsgId_RequestSendMessage(5, 6),
+    MsgId_RequestChatHistory(6, 7),
     ;
     
     public static final int MsgId_RequestChatLobbies_VALUE = 1;
@@ -24,6 +25,7 @@ public final class Chat {
     public static final int MsgId_RequestSetLobbyNickname_VALUE = 4;
     public static final int MsgId_RequestRegisterEvents_VALUE = 5;
     public static final int MsgId_RequestSendMessage_VALUE = 6;
+    public static final int MsgId_RequestChatHistory_VALUE = 7;
     
     
     public final int getNumber() { return value; }
@@ -36,6 +38,7 @@ public final class Chat {
         case 4: return MsgId_RequestSetLobbyNickname;
         case 5: return MsgId_RequestRegisterEvents;
         case 6: return MsgId_RequestSendMessage;
+        case 7: return MsgId_RequestChatHistory;
         default: return null;
       }
     }
@@ -66,7 +69,7 @@ public final class Chat {
     }
     
     private static final RequestMsgIds[] VALUES = {
-      MsgId_RequestChatLobbies, MsgId_RequestCreateLobby, MsgId_RequestJoinOrLeaveLobby, MsgId_RequestSetLobbyNickname, MsgId_RequestRegisterEvents, MsgId_RequestSendMessage, 
+      MsgId_RequestChatLobbies, MsgId_RequestCreateLobby, MsgId_RequestJoinOrLeaveLobby, MsgId_RequestSetLobbyNickname, MsgId_RequestRegisterEvents, MsgId_RequestSendMessage, MsgId_RequestChatHistory, 
     };
     
     public static RequestMsgIds valueOf(
@@ -95,14 +98,16 @@ public final class Chat {
     MsgId_ResponseSetLobbyNickname(1, 4),
     MsgId_ResponseRegisterEvents(2, 5),
     MsgId_ResponseSendMessage(3, 6),
-    MsgId_EventLobbyInvite(4, 101),
-    MsgId_EventChatMessage(5, 102),
+    MsgId_ResponseChatHistory(4, 7),
+    MsgId_EventLobbyInvite(5, 101),
+    MsgId_EventChatMessage(6, 102),
     ;
     
     public static final int MsgId_ResponseChatLobbies_VALUE = 1;
     public static final int MsgId_ResponseSetLobbyNickname_VALUE = 4;
     public static final int MsgId_ResponseRegisterEvents_VALUE = 5;
     public static final int MsgId_ResponseSendMessage_VALUE = 6;
+    public static final int MsgId_ResponseChatHistory_VALUE = 7;
     public static final int MsgId_EventLobbyInvite_VALUE = 101;
     public static final int MsgId_EventChatMessage_VALUE = 102;
     
@@ -115,6 +120,7 @@ public final class Chat {
         case 4: return MsgId_ResponseSetLobbyNickname;
         case 5: return MsgId_ResponseRegisterEvents;
         case 6: return MsgId_ResponseSendMessage;
+        case 7: return MsgId_ResponseChatHistory;
         case 101: return MsgId_EventLobbyInvite;
         case 102: return MsgId_EventChatMessage;
         default: return null;
@@ -147,7 +153,7 @@ public final class Chat {
     }
     
     private static final ResponseMsgIds[] VALUES = {
-      MsgId_ResponseChatLobbies, MsgId_ResponseSetLobbyNickname, MsgId_ResponseRegisterEvents, MsgId_ResponseSendMessage, MsgId_EventLobbyInvite, MsgId_EventChatMessage, 
+      MsgId_ResponseChatLobbies, MsgId_ResponseSetLobbyNickname, MsgId_ResponseRegisterEvents, MsgId_ResponseSendMessage, MsgId_ResponseChatHistory, MsgId_EventLobbyInvite, MsgId_EventChatMessage, 
     };
     
     public static ResponseMsgIds valueOf(
@@ -392,12 +398,12 @@ public final class Chat {
         implements com.google.protobuf.ProtocolMessageEnum {
       LOBBYSTATE_JOINED(0, 1),
       LOBBYSTATE_INVITED(1, 2),
-      LOBBYSTATE_PUBLIC(2, 3),
+      LOBBYSTATE_VISIBLE(2, 3),
       ;
       
       public static final int LOBBYSTATE_JOINED_VALUE = 1;
       public static final int LOBBYSTATE_INVITED_VALUE = 2;
-      public static final int LOBBYSTATE_PUBLIC_VALUE = 3;
+      public static final int LOBBYSTATE_VISIBLE_VALUE = 3;
       
       
       public final int getNumber() { return value; }
@@ -406,7 +412,7 @@ public final class Chat {
         switch (value) {
           case 1: return LOBBYSTATE_JOINED;
           case 2: return LOBBYSTATE_INVITED;
-          case 3: return LOBBYSTATE_PUBLIC;
+          case 3: return LOBBYSTATE_VISIBLE;
           default: return null;
         }
       }
@@ -437,7 +443,7 @@ public final class Chat {
       }
       
       private static final LobbyState[] VALUES = {
-        LOBBYSTATE_JOINED, LOBBYSTATE_INVITED, LOBBYSTATE_PUBLIC, 
+        LOBBYSTATE_JOINED, LOBBYSTATE_INVITED, LOBBYSTATE_VISIBLE, 
       };
       
       public static LobbyState valueOf(
@@ -3666,13 +3672,13 @@ public final class Chat {
       LOBBYSET_ALL(0, 1),
       LOBBYSET_JOINED(1, 2),
       LOBBYSET_INVITED(2, 3),
-      LOBBYSET_PUBLIC(3, 4),
+      LOBBYSET_VISIBLE(3, 4),
       ;
       
       public static final int LOBBYSET_ALL_VALUE = 1;
       public static final int LOBBYSET_JOINED_VALUE = 2;
       public static final int LOBBYSET_INVITED_VALUE = 3;
-      public static final int LOBBYSET_PUBLIC_VALUE = 4;
+      public static final int LOBBYSET_VISIBLE_VALUE = 4;
       
       
       public final int getNumber() { return value; }
@@ -3682,7 +3688,7 @@ public final class Chat {
           case 1: return LOBBYSET_ALL;
           case 2: return LOBBYSET_JOINED;
           case 3: return LOBBYSET_INVITED;
-          case 4: return LOBBYSET_PUBLIC;
+          case 4: return LOBBYSET_VISIBLE;
           default: return null;
         }
       }
@@ -3713,7 +3719,7 @@ public final class Chat {
       }
       
       private static final LobbySet[] VALUES = {
-        LOBBYSET_ALL, LOBBYSET_JOINED, LOBBYSET_INVITED, LOBBYSET_PUBLIC, 
+        LOBBYSET_ALL, LOBBYSET_JOINED, LOBBYSET_INVITED, LOBBYSET_VISIBLE, 
       };
       
       public static LobbySet valueOf(
@@ -8810,6 +8816,1330 @@ public final class Chat {
     // @@protoc_insertion_point(class_scope:rsctrl.chat.ResponseSendMessage)
   }
   
+  public interface RequestChatHistoryOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.chat.ChatId id = 1;
+    boolean hasId();
+    rsctrl.chat.Chat.ChatId getId();
+    rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder();
+  }
+  public static final class RequestChatHistory extends
+      com.google.protobuf.GeneratedMessage
+      implements RequestChatHistoryOrBuilder {
+    // Use RequestChatHistory.newBuilder() to construct.
+    private RequestChatHistory(Builder builder) {
+      super(builder);
+    }
+    private RequestChatHistory(boolean noInit) {}
+    
+    private static final RequestChatHistory defaultInstance;
+    public static RequestChatHistory getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RequestChatHistory getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.chat.Chat.internal_static_rsctrl_chat_RequestChatHistory_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.chat.Chat.internal_static_rsctrl_chat_RequestChatHistory_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.chat.ChatId id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+    private rsctrl.chat.Chat.ChatId id_;
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.chat.Chat.ChatId getId() {
+      return id_;
+    }
+    public rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder() {
+      return id_;
+    }
+    
+    private void initFields() {
+      id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getId().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, id_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, id_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.chat.Chat.RequestChatHistory parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.chat.Chat.RequestChatHistory prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.chat.Chat.RequestChatHistoryOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.chat.Chat.internal_static_rsctrl_chat_RequestChatHistory_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.chat.Chat.internal_static_rsctrl_chat_RequestChatHistory_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.chat.Chat.RequestChatHistory.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getIdFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+        } else {
+          idBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.chat.Chat.RequestChatHistory.getDescriptor();
+      }
+      
+      public rsctrl.chat.Chat.RequestChatHistory getDefaultInstanceForType() {
+        return rsctrl.chat.Chat.RequestChatHistory.getDefaultInstance();
+      }
+      
+      public rsctrl.chat.Chat.RequestChatHistory build() {
+        rsctrl.chat.Chat.RequestChatHistory result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.chat.Chat.RequestChatHistory buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.chat.Chat.RequestChatHistory result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.chat.Chat.RequestChatHistory buildPartial() {
+        rsctrl.chat.Chat.RequestChatHistory result = new rsctrl.chat.Chat.RequestChatHistory(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.chat.Chat.RequestChatHistory) {
+          return mergeFrom((rsctrl.chat.Chat.RequestChatHistory)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.chat.Chat.RequestChatHistory other) {
+        if (other == rsctrl.chat.Chat.RequestChatHistory.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasId()) {
+          
+          return false;
+        }
+        if (!getId().isInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              rsctrl.chat.Chat.ChatId.Builder subBuilder = rsctrl.chat.Chat.ChatId.newBuilder();
+              if (hasId()) {
+                subBuilder.mergeFrom(getId());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setId(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.chat.ChatId id = 1;
+      private rsctrl.chat.Chat.ChatId id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder> idBuilder_;
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.chat.Chat.ChatId getId() {
+        if (idBuilder_ == null) {
+          return id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      public Builder setId(rsctrl.chat.Chat.ChatId value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder setId(
+          rsctrl.chat.Chat.ChatId.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder mergeId(rsctrl.chat.Chat.ChatId value) {
+        if (idBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              id_ != rsctrl.chat.Chat.ChatId.getDefaultInstance()) {
+            id_ =
+              rsctrl.chat.Chat.ChatId.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+          onChanged();
+        } else {
+          idBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      public rsctrl.chat.Chat.ChatId.Builder getIdBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      public rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder>(
+                  id_,
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.chat.RequestChatHistory)
+    }
+    
+    static {
+      defaultInstance = new RequestChatHistory(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.chat.RequestChatHistory)
+  }
+  
+  public interface ResponseChatHistoryOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.core.Status status = 1;
+    boolean hasStatus();
+    rsctrl.core.Core.Status getStatus();
+    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
+    
+    // required .rsctrl.chat.ChatId id = 2;
+    boolean hasId();
+    rsctrl.chat.Chat.ChatId getId();
+    rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder();
+    
+    // repeated .rsctrl.chat.ChatMessage msgs = 3;
+    java.util.List<rsctrl.chat.Chat.ChatMessage> 
+        getMsgsList();
+    rsctrl.chat.Chat.ChatMessage getMsgs(int index);
+    int getMsgsCount();
+    java.util.List<? extends rsctrl.chat.Chat.ChatMessageOrBuilder> 
+        getMsgsOrBuilderList();
+    rsctrl.chat.Chat.ChatMessageOrBuilder getMsgsOrBuilder(
+        int index);
+  }
+  public static final class ResponseChatHistory extends
+      com.google.protobuf.GeneratedMessage
+      implements ResponseChatHistoryOrBuilder {
+    // Use ResponseChatHistory.newBuilder() to construct.
+    private ResponseChatHistory(Builder builder) {
+      super(builder);
+    }
+    private ResponseChatHistory(boolean noInit) {}
+    
+    private static final ResponseChatHistory defaultInstance;
+    public static ResponseChatHistory getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public ResponseChatHistory getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.chat.Chat.internal_static_rsctrl_chat_ResponseChatHistory_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.chat.Chat.internal_static_rsctrl_chat_ResponseChatHistory_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.core.Status status = 1;
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private rsctrl.core.Core.Status status_;
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.core.Core.Status getStatus() {
+      return status_;
+    }
+    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+      return status_;
+    }
+    
+    // required .rsctrl.chat.ChatId id = 2;
+    public static final int ID_FIELD_NUMBER = 2;
+    private rsctrl.chat.Chat.ChatId id_;
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public rsctrl.chat.Chat.ChatId getId() {
+      return id_;
+    }
+    public rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder() {
+      return id_;
+    }
+    
+    // repeated .rsctrl.chat.ChatMessage msgs = 3;
+    public static final int MSGS_FIELD_NUMBER = 3;
+    private java.util.List<rsctrl.chat.Chat.ChatMessage> msgs_;
+    public java.util.List<rsctrl.chat.Chat.ChatMessage> getMsgsList() {
+      return msgs_;
+    }
+    public java.util.List<? extends rsctrl.chat.Chat.ChatMessageOrBuilder> 
+        getMsgsOrBuilderList() {
+      return msgs_;
+    }
+    public int getMsgsCount() {
+      return msgs_.size();
+    }
+    public rsctrl.chat.Chat.ChatMessage getMsgs(int index) {
+      return msgs_.get(index);
+    }
+    public rsctrl.chat.Chat.ChatMessageOrBuilder getMsgsOrBuilder(
+        int index) {
+      return msgs_.get(index);
+    }
+    
+    private void initFields() {
+      status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+      msgs_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasStatus()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getStatus().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getId().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      for (int i = 0; i < getMsgsCount(); i++) {
+        if (!getMsgs(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeMessage(2, id_);
+      }
+      for (int i = 0; i < msgs_.size(); i++) {
+        output.writeMessage(3, msgs_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, id_);
+      }
+      for (int i = 0; i < msgs_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, msgs_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.chat.Chat.ResponseChatHistory parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.chat.Chat.ResponseChatHistory prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.chat.Chat.ResponseChatHistoryOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.chat.Chat.internal_static_rsctrl_chat_ResponseChatHistory_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.chat.Chat.internal_static_rsctrl_chat_ResponseChatHistory_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.chat.Chat.ResponseChatHistory.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getStatusFieldBuilder();
+          getIdFieldBuilder();
+          getMsgsFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (idBuilder_ == null) {
+          id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+        } else {
+          idBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (msgsBuilder_ == null) {
+          msgs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        } else {
+          msgsBuilder_.clear();
+        }
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.chat.Chat.ResponseChatHistory.getDescriptor();
+      }
+      
+      public rsctrl.chat.Chat.ResponseChatHistory getDefaultInstanceForType() {
+        return rsctrl.chat.Chat.ResponseChatHistory.getDefaultInstance();
+      }
+      
+      public rsctrl.chat.Chat.ResponseChatHistory build() {
+        rsctrl.chat.Chat.ResponseChatHistory result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.chat.Chat.ResponseChatHistory buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.chat.Chat.ResponseChatHistory result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.chat.Chat.ResponseChatHistory buildPartial() {
+        rsctrl.chat.Chat.ResponseChatHistory result = new rsctrl.chat.Chat.ResponseChatHistory(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (statusBuilder_ == null) {
+          result.status_ = status_;
+        } else {
+          result.status_ = statusBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        if (msgsBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+            msgs_ = java.util.Collections.unmodifiableList(msgs_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.msgs_ = msgs_;
+        } else {
+          result.msgs_ = msgsBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.chat.Chat.ResponseChatHistory) {
+          return mergeFrom((rsctrl.chat.Chat.ResponseChatHistory)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.chat.Chat.ResponseChatHistory other) {
+        if (other == rsctrl.chat.Chat.ResponseChatHistory.getDefaultInstance()) return this;
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        if (msgsBuilder_ == null) {
+          if (!other.msgs_.isEmpty()) {
+            if (msgs_.isEmpty()) {
+              msgs_ = other.msgs_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureMsgsIsMutable();
+              msgs_.addAll(other.msgs_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.msgs_.isEmpty()) {
+            if (msgsBuilder_.isEmpty()) {
+              msgsBuilder_.dispose();
+              msgsBuilder_ = null;
+              msgs_ = other.msgs_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              msgsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getMsgsFieldBuilder() : null;
+            } else {
+              msgsBuilder_.addAllMessages(other.msgs_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasStatus()) {
+          
+          return false;
+        }
+        if (!hasId()) {
+          
+          return false;
+        }
+        if (!getStatus().isInitialized()) {
+          
+          return false;
+        }
+        if (!getId().isInitialized()) {
+          
+          return false;
+        }
+        for (int i = 0; i < getMsgsCount(); i++) {
+          if (!getMsgs(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
+              if (hasStatus()) {
+                subBuilder.mergeFrom(getStatus());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setStatus(subBuilder.buildPartial());
+              break;
+            }
+            case 18: {
+              rsctrl.chat.Chat.ChatId.Builder subBuilder = rsctrl.chat.Chat.ChatId.newBuilder();
+              if (hasId()) {
+                subBuilder.mergeFrom(getId());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setId(subBuilder.buildPartial());
+              break;
+            }
+            case 26: {
+              rsctrl.chat.Chat.ChatMessage.Builder subBuilder = rsctrl.chat.Chat.ChatMessage.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addMsgs(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.core.Status status = 1;
+      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.core.Core.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      public Builder setStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder setStatus(
+          rsctrl.core.Core.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder mergeStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
+            status_ =
+              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
+          } else {
+            status_ = value;
+          }
+          onChanged();
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder clearStatus() {
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+          onChanged();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getStatusFieldBuilder().getBuilder();
+      }
+      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
+          getStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
+                  status_,
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+      
+      // required .rsctrl.chat.ChatId id = 2;
+      private rsctrl.chat.Chat.ChatId id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder> idBuilder_;
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public rsctrl.chat.Chat.ChatId getId() {
+        if (idBuilder_ == null) {
+          return id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      public Builder setId(rsctrl.chat.Chat.ChatId value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder setId(
+          rsctrl.chat.Chat.ChatId.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder mergeId(rsctrl.chat.Chat.ChatId value) {
+        if (idBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              id_ != rsctrl.chat.Chat.ChatId.getDefaultInstance()) {
+            id_ =
+              rsctrl.chat.Chat.ChatId.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = rsctrl.chat.Chat.ChatId.getDefaultInstance();
+          onChanged();
+        } else {
+          idBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      public rsctrl.chat.Chat.ChatId.Builder getIdBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      public rsctrl.chat.Chat.ChatIdOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.chat.Chat.ChatId, rsctrl.chat.Chat.ChatId.Builder, rsctrl.chat.Chat.ChatIdOrBuilder>(
+                  id_,
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+      
+      // repeated .rsctrl.chat.ChatMessage msgs = 3;
+      private java.util.List<rsctrl.chat.Chat.ChatMessage> msgs_ =
+        java.util.Collections.emptyList();
+      private void ensureMsgsIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          msgs_ = new java.util.ArrayList<rsctrl.chat.Chat.ChatMessage>(msgs_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          rsctrl.chat.Chat.ChatMessage, rsctrl.chat.Chat.ChatMessage.Builder, rsctrl.chat.Chat.ChatMessageOrBuilder> msgsBuilder_;
+      
+      public java.util.List<rsctrl.chat.Chat.ChatMessage> getMsgsList() {
+        if (msgsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(msgs_);
+        } else {
+          return msgsBuilder_.getMessageList();
+        }
+      }
+      public int getMsgsCount() {
+        if (msgsBuilder_ == null) {
+          return msgs_.size();
+        } else {
+          return msgsBuilder_.getCount();
+        }
+      }
+      public rsctrl.chat.Chat.ChatMessage getMsgs(int index) {
+        if (msgsBuilder_ == null) {
+          return msgs_.get(index);
+        } else {
+          return msgsBuilder_.getMessage(index);
+        }
+      }
+      public Builder setMsgs(
+          int index, rsctrl.chat.Chat.ChatMessage value) {
+        if (msgsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMsgsIsMutable();
+          msgs_.set(index, value);
+          onChanged();
+        } else {
+          msgsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setMsgs(
+          int index, rsctrl.chat.Chat.ChatMessage.Builder builderForValue) {
+        if (msgsBuilder_ == null) {
+          ensureMsgsIsMutable();
+          msgs_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          msgsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addMsgs(rsctrl.chat.Chat.ChatMessage value) {
+        if (msgsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMsgsIsMutable();
+          msgs_.add(value);
+          onChanged();
+        } else {
+          msgsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addMsgs(
+          int index, rsctrl.chat.Chat.ChatMessage value) {
+        if (msgsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMsgsIsMutable();
+          msgs_.add(index, value);
+          onChanged();
+        } else {
+          msgsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addMsgs(
+          rsctrl.chat.Chat.ChatMessage.Builder builderForValue) {
+        if (msgsBuilder_ == null) {
+          ensureMsgsIsMutable();
+          msgs_.add(builderForValue.build());
+          onChanged();
+        } else {
+          msgsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addMsgs(
+          int index, rsctrl.chat.Chat.ChatMessage.Builder builderForValue) {
+        if (msgsBuilder_ == null) {
+          ensureMsgsIsMutable();
+          msgs_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          msgsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllMsgs(
+          java.lang.Iterable<? extends rsctrl.chat.Chat.ChatMessage> values) {
+        if (msgsBuilder_ == null) {
+          ensureMsgsIsMutable();
+          super.addAll(values, msgs_);
+          onChanged();
+        } else {
+          msgsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearMsgs() {
+        if (msgsBuilder_ == null) {
+          msgs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          msgsBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removeMsgs(int index) {
+        if (msgsBuilder_ == null) {
+          ensureMsgsIsMutable();
+          msgs_.remove(index);
+          onChanged();
+        } else {
+          msgsBuilder_.remove(index);
+        }
+        return this;
+      }
+      public rsctrl.chat.Chat.ChatMessage.Builder getMsgsBuilder(
+          int index) {
+        return getMsgsFieldBuilder().getBuilder(index);
+      }
+      public rsctrl.chat.Chat.ChatMessageOrBuilder getMsgsOrBuilder(
+          int index) {
+        if (msgsBuilder_ == null) {
+          return msgs_.get(index);  } else {
+          return msgsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends rsctrl.chat.Chat.ChatMessageOrBuilder> 
+           getMsgsOrBuilderList() {
+        if (msgsBuilder_ != null) {
+          return msgsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(msgs_);
+        }
+      }
+      public rsctrl.chat.Chat.ChatMessage.Builder addMsgsBuilder() {
+        return getMsgsFieldBuilder().addBuilder(
+            rsctrl.chat.Chat.ChatMessage.getDefaultInstance());
+      }
+      public rsctrl.chat.Chat.ChatMessage.Builder addMsgsBuilder(
+          int index) {
+        return getMsgsFieldBuilder().addBuilder(
+            index, rsctrl.chat.Chat.ChatMessage.getDefaultInstance());
+      }
+      public java.util.List<rsctrl.chat.Chat.ChatMessage.Builder> 
+           getMsgsBuilderList() {
+        return getMsgsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          rsctrl.chat.Chat.ChatMessage, rsctrl.chat.Chat.ChatMessage.Builder, rsctrl.chat.Chat.ChatMessageOrBuilder> 
+          getMsgsFieldBuilder() {
+        if (msgsBuilder_ == null) {
+          msgsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              rsctrl.chat.Chat.ChatMessage, rsctrl.chat.Chat.ChatMessage.Builder, rsctrl.chat.Chat.ChatMessageOrBuilder>(
+                  msgs_,
+                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  getParentForChildren(),
+                  isClean());
+          msgs_ = null;
+        }
+        return msgsBuilder_;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.chat.ResponseChatHistory)
+    }
+    
+    static {
+      defaultInstance = new ResponseChatHistory(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.chat.ResponseChatHistory)
+  }
+  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_chat_ChatLobbyInfo_descriptor;
   private static
@@ -8885,6 +10215,16 @@ public final class Chat {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_chat_ResponseSendMessage_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_chat_RequestChatHistory_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_chat_RequestChatHistory_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_chat_ResponseChatHistory_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_chat_ResponseChatHistory_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -8894,7 +10234,7 @@ public final class Chat {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\nchat.proto\022\013rsctrl.chat\032\ncore.proto\"\236\003" +
+      "\n\nchat.proto\022\013rsctrl.chat\032\ncore.proto\"\237\003" +
       "\n\rChatLobbyInfo\022\020\n\010lobby_id\030\001 \002(\t\022\023\n\013lob" +
       "by_topic\030\002 \002(\t\022\022\n\nlobby_name\030\003 \002(\t\022\026\n\016lo" +
       "bby_nickname\030\004 \002(\t\0225\n\rprivacy_level\030\005 \002(" +
@@ -8903,57 +10243,63 @@ public final class Chat {
       "fo.LobbyState\022\020\n\010no_peers\030\007 \002(\r\022\030\n\020last_" +
       "report_time\030\010 \002(\r\022\025\n\rlast_activity\030\t \002(\r" +
       "\022\035\n\025participating_friends\030\n \003(\t\022\021\n\tnickn" +
-      "ames\030\013 \003(\t\"R\n\nLobbyState\022\025\n\021LOBBYSTATE_J",
-      "OINED\020\001\022\026\n\022LOBBYSTATE_INVITED\020\002\022\025\n\021LOBBY" +
-      "STATE_PUBLIC\020\003\"C\n\006ChatId\022(\n\tchat_type\030\001 " +
-      "\002(\0162\025.rsctrl.chat.ChatType\022\017\n\007chat_id\030\002 " +
-      "\002(\t\"\214\001\n\013ChatMessage\022\037\n\002id\030\001 \002(\0132\023.rsctrl" +
-      ".chat.ChatId\022\013\n\003msg\030\002 \002(\t\022\025\n\rpeer_nickna" +
-      "me\030\003 \001(\t\022\022\n\nchat_flags\030\004 \001(\r\022\021\n\tsend_tim" +
-      "e\030\005 \001(\r\022\021\n\trecv_time\030\006 \001(\r\"g\n\023ResponseCh" +
-      "atLobbies\022#\n\006status\030\001 \002(\0132\023.rsctrl.core." +
-      "Status\022+\n\007lobbies\030\002 \003(\0132\032.rsctrl.chat.Ch" +
-      "atLobbyInfo\"\257\001\n\022RequestChatLobbies\022;\n\tlo",
-      "bby_set\030\001 \002(\0162(.rsctrl.chat.RequestChatL" +
-      "obbies.LobbySet\"\\\n\010LobbySet\022\020\n\014LOBBYSET_" +
-      "ALL\020\001\022\023\n\017LOBBYSET_JOINED\020\002\022\024\n\020LOBBYSET_I" +
-      "NVITED\020\003\022\023\n\017LOBBYSET_PUBLIC\020\004\"\215\001\n\022Reques" +
-      "tCreateLobby\022\022\n\nlobby_name\030\001 \002(\t\022\023\n\013lobb" +
-      "y_topic\030\002 \002(\t\0225\n\rprivacy_level\030\004 \002(\0162\036.r" +
-      "sctrl.chat.LobbyPrivacyLevel\022\027\n\017invited_" +
-      "friends\030\003 \003(\t\"\243\001\n\027RequestJoinOrLeaveLobb" +
-      "y\022\020\n\010lobby_id\030\001 \002(\t\022@\n\006action\030\002 \002(\01620.rs" +
-      "ctrl.chat.RequestJoinOrLeaveLobby.LobbyA",
-      "ction\"4\n\013LobbyAction\022\022\n\016JOIN_OR_ACCEPT\020\001" +
-      "\022\021\n\rLEAVE_OR_DENY\020\002\">\n\027RequestSetLobbyNi" +
-      "ckname\022\020\n\010nickname\030\001 \002(\t\022\021\n\tlobby_ids\030\002 " +
-      "\003(\t\"?\n\030ResponseSetLobbyNickname\022#\n\006statu" +
-      "s\030\001 \002(\0132\023.rsctrl.core.Status\"\212\001\n\025Request" +
-      "RegisterEvents\022A\n\006action\030\001 \002(\01621.rsctrl." +
-      "chat.RequestRegisterEvents.RegisterActio" +
-      "n\".\n\016RegisterAction\022\014\n\010REGISTER\020\001\022\016\n\nDER" +
-      "EGISTER\020\002\"=\n\026ResponseRegisterEvents\022#\n\006s" +
-      "tatus\030\001 \002(\0132\023.rsctrl.core.Status\"=\n\020Even",
-      "tLobbyInvite\022)\n\005lobby\030\001 \002(\0132\032.rsctrl.cha" +
-      "t.ChatLobbyInfo\"9\n\020EventChatMessage\022%\n\003m" +
-      "sg\030\001 \002(\0132\030.rsctrl.chat.ChatMessage\";\n\022Re" +
-      "questSendMessage\022%\n\003msg\030\001 \002(\0132\030.rsctrl.c" +
-      "hat.ChatMessage\":\n\023ResponseSendMessage\022#" +
-      "\n\006status\030\001 \002(\0132\023.rsctrl.core.Status*\320\001\n\r" +
-      "RequestMsgIds\022\034\n\030MsgId_RequestChatLobbie" +
-      "s\020\001\022\034\n\030MsgId_RequestCreateLobby\020\002\022!\n\035Msg" +
-      "Id_RequestJoinOrLeaveLobby\020\003\022!\n\035MsgId_Re" +
-      "questSetLobbyNickname\020\004\022\037\n\033MsgId_Request",
-      "RegisterEvents\020\005\022\034\n\030MsgId_RequestSendMes" +
-      "sage\020\006*\314\001\n\016ResponseMsgIds\022\035\n\031MsgId_Respo" +
-      "nseChatLobbies\020\001\022\"\n\036MsgId_ResponseSetLob" +
-      "byNickname\020\004\022 \n\034MsgId_ResponseRegisterEv" +
-      "ents\020\005\022\035\n\031MsgId_ResponseSendMessage\020\006\022\032\n" +
-      "\026MsgId_EventLobbyInvite\020e\022\032\n\026MsgId_Event" +
-      "ChatMessage\020f*<\n\021LobbyPrivacyLevel\022\023\n\017PR" +
-      "IVACY_PRIVATE\020\001\022\022\n\016PRIVACY_PUBLIC\020\002*<\n\010C" +
-      "hatType\022\020\n\014TYPE_PRIVATE\020\001\022\016\n\nTYPE_LOBBY\020" +
-      "\002\022\016\n\nTYPE_GROUP\020\003"
+      "ames\030\013 \003(\t\"S\n\nLobbyState\022\025\n\021LOBBYSTATE_J",
+      "OINED\020\001\022\026\n\022LOBBYSTATE_INVITED\020\002\022\026\n\022LOBBY" +
+      "STATE_VISIBLE\020\003\"C\n\006ChatId\022(\n\tchat_type\030\001" +
+      " \002(\0162\025.rsctrl.chat.ChatType\022\017\n\007chat_id\030\002" +
+      " \002(\t\"\214\001\n\013ChatMessage\022\037\n\002id\030\001 \002(\0132\023.rsctr" +
+      "l.chat.ChatId\022\013\n\003msg\030\002 \002(\t\022\025\n\rpeer_nickn" +
+      "ame\030\003 \001(\t\022\022\n\nchat_flags\030\004 \001(\r\022\021\n\tsend_ti" +
+      "me\030\005 \001(\r\022\021\n\trecv_time\030\006 \001(\r\"g\n\023ResponseC" +
+      "hatLobbies\022#\n\006status\030\001 \002(\0132\023.rsctrl.core" +
+      ".Status\022+\n\007lobbies\030\002 \003(\0132\032.rsctrl.chat.C" +
+      "hatLobbyInfo\"\260\001\n\022RequestChatLobbies\022;\n\tl",
+      "obby_set\030\001 \002(\0162(.rsctrl.chat.RequestChat" +
+      "Lobbies.LobbySet\"]\n\010LobbySet\022\020\n\014LOBBYSET" +
+      "_ALL\020\001\022\023\n\017LOBBYSET_JOINED\020\002\022\024\n\020LOBBYSET_" +
+      "INVITED\020\003\022\024\n\020LOBBYSET_VISIBLE\020\004\"\215\001\n\022Requ" +
+      "estCreateLobby\022\022\n\nlobby_name\030\001 \002(\t\022\023\n\013lo" +
+      "bby_topic\030\002 \002(\t\0225\n\rprivacy_level\030\004 \002(\0162\036" +
+      ".rsctrl.chat.LobbyPrivacyLevel\022\027\n\017invite" +
+      "d_friends\030\003 \003(\t\"\243\001\n\027RequestJoinOrLeaveLo" +
+      "bby\022\020\n\010lobby_id\030\001 \002(\t\022@\n\006action\030\002 \002(\01620." +
+      "rsctrl.chat.RequestJoinOrLeaveLobby.Lobb",
+      "yAction\"4\n\013LobbyAction\022\022\n\016JOIN_OR_ACCEPT" +
+      "\020\001\022\021\n\rLEAVE_OR_DENY\020\002\">\n\027RequestSetLobby" +
+      "Nickname\022\020\n\010nickname\030\001 \002(\t\022\021\n\tlobby_ids\030" +
+      "\002 \003(\t\"?\n\030ResponseSetLobbyNickname\022#\n\006sta" +
+      "tus\030\001 \002(\0132\023.rsctrl.core.Status\"\212\001\n\025Reque" +
+      "stRegisterEvents\022A\n\006action\030\001 \002(\01621.rsctr" +
+      "l.chat.RequestRegisterEvents.RegisterAct" +
+      "ion\".\n\016RegisterAction\022\014\n\010REGISTER\020\001\022\016\n\nD" +
+      "EREGISTER\020\002\"=\n\026ResponseRegisterEvents\022#\n" +
+      "\006status\030\001 \002(\0132\023.rsctrl.core.Status\"=\n\020Ev",
+      "entLobbyInvite\022)\n\005lobby\030\001 \002(\0132\032.rsctrl.c" +
+      "hat.ChatLobbyInfo\"9\n\020EventChatMessage\022%\n" +
+      "\003msg\030\001 \002(\0132\030.rsctrl.chat.ChatMessage\";\n\022" +
+      "RequestSendMessage\022%\n\003msg\030\001 \002(\0132\030.rsctrl" +
+      ".chat.ChatMessage\":\n\023ResponseSendMessage" +
+      "\022#\n\006status\030\001 \002(\0132\023.rsctrl.core.Status\"5\n" +
+      "\022RequestChatHistory\022\037\n\002id\030\001 \002(\0132\023.rsctrl" +
+      ".chat.ChatId\"\203\001\n\023ResponseChatHistory\022#\n\006" +
+      "status\030\001 \002(\0132\023.rsctrl.core.Status\022\037\n\002id\030" +
+      "\002 \002(\0132\023.rsctrl.chat.ChatId\022&\n\004msgs\030\003 \003(\013",
+      "2\030.rsctrl.chat.ChatMessage*\356\001\n\rRequestMs" +
+      "gIds\022\034\n\030MsgId_RequestChatLobbies\020\001\022\034\n\030Ms" +
+      "gId_RequestCreateLobby\020\002\022!\n\035MsgId_Reques" +
+      "tJoinOrLeaveLobby\020\003\022!\n\035MsgId_RequestSetL" +
+      "obbyNickname\020\004\022\037\n\033MsgId_RequestRegisterE" +
+      "vents\020\005\022\034\n\030MsgId_RequestSendMessage\020\006\022\034\n" +
+      "\030MsgId_RequestChatHistory\020\007*\353\001\n\016Response" +
+      "MsgIds\022\035\n\031MsgId_ResponseChatLobbies\020\001\022\"\n" +
+      "\036MsgId_ResponseSetLobbyNickname\020\004\022 \n\034Msg" +
+      "Id_ResponseRegisterEvents\020\005\022\035\n\031MsgId_Res",
+      "ponseSendMessage\020\006\022\035\n\031MsgId_ResponseChat" +
+      "History\020\007\022\032\n\026MsgId_EventLobbyInvite\020e\022\032\n" +
+      "\026MsgId_EventChatMessage\020f*<\n\021LobbyPrivac" +
+      "yLevel\022\023\n\017PRIVACY_PRIVATE\020\001\022\022\n\016PRIVACY_P" +
+      "UBLIC\020\002*<\n\010ChatType\022\020\n\014TYPE_PRIVATE\020\001\022\016\n" +
+      "\nTYPE_LOBBY\020\002\022\016\n\nTYPE_GROUP\020\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -9080,6 +10426,22 @@ public final class Chat {
               new java.lang.String[] { "Status", },
               rsctrl.chat.Chat.ResponseSendMessage.class,
               rsctrl.chat.Chat.ResponseSendMessage.Builder.class);
+          internal_static_rsctrl_chat_RequestChatHistory_descriptor =
+            getDescriptor().getMessageTypes().get(15);
+          internal_static_rsctrl_chat_RequestChatHistory_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_chat_RequestChatHistory_descriptor,
+              new java.lang.String[] { "Id", },
+              rsctrl.chat.Chat.RequestChatHistory.class,
+              rsctrl.chat.Chat.RequestChatHistory.Builder.class);
+          internal_static_rsctrl_chat_ResponseChatHistory_descriptor =
+            getDescriptor().getMessageTypes().get(16);
+          internal_static_rsctrl_chat_ResponseChatHistory_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_chat_ResponseChatHistory_descriptor,
+              new java.lang.String[] { "Status", "Id", "Msgs", },
+              rsctrl.chat.Chat.ResponseChatHistory.class,
+              rsctrl.chat.Chat.ResponseChatHistory.Builder.class);
           return null;
         }
       };

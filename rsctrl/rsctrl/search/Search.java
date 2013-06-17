@@ -167,6 +167,11 @@ public final class Search {
     // required uint32 no_hits = 3;
     boolean hasNoHits();
     int getNoHits();
+    
+    // repeated string alt_names = 4;
+    java.util.List<String> getAltNamesList();
+    int getAltNamesCount();
+    String getAltNames(int index);
   }
   public static final class SearchHit extends
       com.google.protobuf.GeneratedMessage
@@ -302,10 +307,25 @@ public final class Search {
       return noHits_;
     }
     
+    // repeated string alt_names = 4;
+    public static final int ALT_NAMES_FIELD_NUMBER = 4;
+    private com.google.protobuf.LazyStringList altNames_;
+    public java.util.List<String>
+        getAltNamesList() {
+      return altNames_;
+    }
+    public int getAltNamesCount() {
+      return altNames_.size();
+    }
+    public String getAltNames(int index) {
+      return altNames_.get(index);
+    }
+    
     private void initFields() {
       file_ = rsctrl.core.Core.File.getDefaultInstance();
       loc_ = 0;
       noHits_ = 0;
+      altNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -344,6 +364,9 @@ public final class Search {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeUInt32(3, noHits_);
       }
+      for (int i = 0; i < altNames_.size(); i++) {
+        output.writeBytes(4, altNames_.getByteString(i));
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -364,6 +387,15 @@ public final class Search {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(3, noHits_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < altNames_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(altNames_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getAltNamesList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -500,6 +532,8 @@ public final class Search {
         bitField0_ = (bitField0_ & ~0x00000002);
         noHits_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        altNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -554,6 +588,12 @@ public final class Search {
           to_bitField0_ |= 0x00000004;
         }
         result.noHits_ = noHits_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          altNames_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              altNames_);
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.altNames_ = altNames_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -578,6 +618,16 @@ public final class Search {
         }
         if (other.hasNoHits()) {
           setNoHits(other.getNoHits());
+        }
+        if (!other.altNames_.isEmpty()) {
+          if (altNames_.isEmpty()) {
+            altNames_ = other.altNames_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureAltNamesIsMutable();
+            altNames_.addAll(other.altNames_);
+          }
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -643,6 +693,11 @@ public final class Search {
             case 24: {
               bitField0_ |= 0x00000004;
               noHits_ = input.readUInt32();
+              break;
+            }
+            case 34: {
+              ensureAltNamesIsMutable();
+              altNames_.add(input.readBytes());
               break;
             }
           }
@@ -781,6 +836,62 @@ public final class Search {
         noHits_ = 0;
         onChanged();
         return this;
+      }
+      
+      // repeated string alt_names = 4;
+      private com.google.protobuf.LazyStringList altNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureAltNamesIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          altNames_ = new com.google.protobuf.LazyStringArrayList(altNames_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      public java.util.List<String>
+          getAltNamesList() {
+        return java.util.Collections.unmodifiableList(altNames_);
+      }
+      public int getAltNamesCount() {
+        return altNames_.size();
+      }
+      public String getAltNames(int index) {
+        return altNames_.get(index);
+      }
+      public Builder setAltNames(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAltNamesIsMutable();
+        altNames_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addAltNames(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAltNamesIsMutable();
+        altNames_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllAltNames(
+          java.lang.Iterable<String> values) {
+        ensureAltNamesIsMutable();
+        super.addAll(values, altNames_);
+        onChanged();
+        return this;
+      }
+      public Builder clearAltNames() {
+        altNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      void addAltNames(com.google.protobuf.ByteString value) {
+        ensureAltNamesIsMutable();
+        altNames_.add(value);
+        onChanged();
       }
       
       // @@protoc_insertion_point(builder_scope:rsctrl.search.SearchHit)
@@ -3376,6 +3487,10 @@ public final class Search {
   public interface RequestSearchResultsOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
+    // optional uint32 result_limit = 1;
+    boolean hasResultLimit();
+    int getResultLimit();
+    
     // repeated uint32 search_ids = 2;
     java.util.List<java.lang.Integer> getSearchIdsList();
     int getSearchIdsCount();
@@ -3409,6 +3524,17 @@ public final class Search {
       return rsctrl.search.Search.internal_static_rsctrl_search_RequestSearchResults_fieldAccessorTable;
     }
     
+    private int bitField0_;
+    // optional uint32 result_limit = 1;
+    public static final int RESULT_LIMIT_FIELD_NUMBER = 1;
+    private int resultLimit_;
+    public boolean hasResultLimit() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public int getResultLimit() {
+      return resultLimit_;
+    }
+    
     // repeated uint32 search_ids = 2;
     public static final int SEARCH_IDS_FIELD_NUMBER = 2;
     private java.util.List<java.lang.Integer> searchIds_;
@@ -3424,6 +3550,7 @@ public final class Search {
     }
     
     private void initFields() {
+      resultLimit_ = 0;
       searchIds_ = java.util.Collections.emptyList();;
     }
     private byte memoizedIsInitialized = -1;
@@ -3438,6 +3565,9 @@ public final class Search {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt32(1, resultLimit_);
+      }
       for (int i = 0; i < searchIds_.size(); i++) {
         output.writeUInt32(2, searchIds_.get(i));
       }
@@ -3450,6 +3580,10 @@ public final class Search {
       if (size != -1) return size;
     
       size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, resultLimit_);
+      }
       {
         int dataSize = 0;
         for (int i = 0; i < searchIds_.size(); i++) {
@@ -3583,8 +3717,10 @@ public final class Search {
       
       public Builder clear() {
         super.clear();
-        searchIds_ = java.util.Collections.emptyList();;
+        resultLimit_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
+        searchIds_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
       
@@ -3622,11 +3758,17 @@ public final class Search {
       public rsctrl.search.Search.RequestSearchResults buildPartial() {
         rsctrl.search.Search.RequestSearchResults result = new rsctrl.search.Search.RequestSearchResults(this);
         int from_bitField0_ = bitField0_;
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.resultLimit_ = resultLimit_;
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
           searchIds_ = java.util.Collections.unmodifiableList(searchIds_);
-          bitField0_ = (bitField0_ & ~0x00000001);
+          bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.searchIds_ = searchIds_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -3642,10 +3784,13 @@ public final class Search {
       
       public Builder mergeFrom(rsctrl.search.Search.RequestSearchResults other) {
         if (other == rsctrl.search.Search.RequestSearchResults.getDefaultInstance()) return this;
+        if (other.hasResultLimit()) {
+          setResultLimit(other.getResultLimit());
+        }
         if (!other.searchIds_.isEmpty()) {
           if (searchIds_.isEmpty()) {
             searchIds_ = other.searchIds_;
-            bitField0_ = (bitField0_ & ~0x00000001);
+            bitField0_ = (bitField0_ & ~0x00000002);
           } else {
             ensureSearchIdsIsMutable();
             searchIds_.addAll(other.searchIds_);
@@ -3683,6 +3828,11 @@ public final class Search {
               }
               break;
             }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              resultLimit_ = input.readUInt32();
+              break;
+            }
             case 16: {
               ensureSearchIdsIsMutable();
               searchIds_.add(input.readUInt32());
@@ -3703,12 +3853,33 @@ public final class Search {
       
       private int bitField0_;
       
+      // optional uint32 result_limit = 1;
+      private int resultLimit_ ;
+      public boolean hasResultLimit() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public int getResultLimit() {
+        return resultLimit_;
+      }
+      public Builder setResultLimit(int value) {
+        bitField0_ |= 0x00000001;
+        resultLimit_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearResultLimit() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        resultLimit_ = 0;
+        onChanged();
+        return this;
+      }
+      
       // repeated uint32 search_ids = 2;
       private java.util.List<java.lang.Integer> searchIds_ = java.util.Collections.emptyList();;
       private void ensureSearchIdsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
           searchIds_ = new java.util.ArrayList<java.lang.Integer>(searchIds_);
-          bitField0_ |= 0x00000001;
+          bitField0_ |= 0x00000002;
          }
       }
       public java.util.List<java.lang.Integer>
@@ -3743,7 +3914,7 @@ public final class Search {
       }
       public Builder clearSearchIds() {
         searchIds_ = java.util.Collections.emptyList();;
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
         return this;
       }
@@ -4539,26 +4710,27 @@ public final class Search {
   static {
     java.lang.String[] descriptorData = {
       "\n\014search.proto\022\rrsctrl.search\032\ncore.prot" +
-      "o\"y\n\tSearchHit\022\037\n\004file\030\001 \002(\0132\021.rsctrl.co" +
-      "re.File\022\013\n\003loc\030\002 \002(\r\022\017\n\007no_hits\030\003 \002(\r\"-\n" +
-      "\007LocFlag\022\t\n\005LOCAL\020\001\022\n\n\006FRIEND\020\002\022\013\n\007NETWO" +
-      "RK\020\004\"F\n\tSearchSet\022\021\n\tsearch_id\030\001 \002(\r\022&\n\004" +
-      "hits\030\002 \003(\0132\030.rsctrl.search.SearchHit\"#\n\022" +
-      "RequestBasicSearch\022\r\n\005terms\030\001 \003(\t\"!\n\020Req" +
-      "uestAdvSearch\022\r\n\005terms\030\001 \003(\t\"K\n\021Response" +
-      "SearchIds\022#\n\006status\030\001 \002(\0132\023.rsctrl.core." +
-      "Status\022\021\n\tsearch_id\030\002 \003(\r\"\'\n\022RequestClos",
-      "eSearch\022\021\n\tsearch_id\030\001 \002(\r\"\025\n\023RequestLis" +
-      "tSearches\"*\n\024RequestSearchResults\022\022\n\nsea" +
-      "rch_ids\030\002 \003(\r\"h\n\025ResponseSearchResults\022#" +
-      "\n\006status\030\001 \002(\0132\023.rsctrl.core.Status\022*\n\010s" +
-      "earches\030\002 \003(\0132\030.rsctrl.search.SearchSet*" +
-      "\212\001\n\rRequestMsgIds\022\034\n\030MsgId_RequestBasicS" +
-      "earch\020\001\022\034\n\030MsgId_RequestCloseSearch\020\003\022\035\n" +
-      "\031MsgId_RequestListSearches\020\004\022\036\n\032MsgId_Re" +
-      "questSearchResults\020\005*N\n\016ResponseMsgIds\022\033" +
-      "\n\027MsgId_ResponseSearchIds\020\001\022\037\n\033MsgId_Res",
-      "ponseSearchResults\020\005"
+      "o\"\214\001\n\tSearchHit\022\037\n\004file\030\001 \002(\0132\021.rsctrl.c" +
+      "ore.File\022\013\n\003loc\030\002 \002(\r\022\017\n\007no_hits\030\003 \002(\r\022\021" +
+      "\n\talt_names\030\004 \003(\t\"-\n\007LocFlag\022\t\n\005LOCAL\020\001\022" +
+      "\n\n\006FRIEND\020\002\022\013\n\007NETWORK\020\004\"F\n\tSearchSet\022\021\n" +
+      "\tsearch_id\030\001 \002(\r\022&\n\004hits\030\002 \003(\0132\030.rsctrl." +
+      "search.SearchHit\"#\n\022RequestBasicSearch\022\r" +
+      "\n\005terms\030\001 \003(\t\"!\n\020RequestAdvSearch\022\r\n\005ter" +
+      "ms\030\001 \003(\t\"K\n\021ResponseSearchIds\022#\n\006status\030" +
+      "\001 \002(\0132\023.rsctrl.core.Status\022\021\n\tsearch_id\030",
+      "\002 \003(\r\"\'\n\022RequestCloseSearch\022\021\n\tsearch_id" +
+      "\030\001 \002(\r\"\025\n\023RequestListSearches\"@\n\024Request" +
+      "SearchResults\022\024\n\014result_limit\030\001 \001(\r\022\022\n\ns" +
+      "earch_ids\030\002 \003(\r\"h\n\025ResponseSearchResults" +
+      "\022#\n\006status\030\001 \002(\0132\023.rsctrl.core.Status\022*\n" +
+      "\010searches\030\002 \003(\0132\030.rsctrl.search.SearchSe" +
+      "t*\212\001\n\rRequestMsgIds\022\034\n\030MsgId_RequestBasi" +
+      "cSearch\020\001\022\034\n\030MsgId_RequestCloseSearch\020\003\022" +
+      "\035\n\031MsgId_RequestListSearches\020\004\022\036\n\032MsgId_" +
+      "RequestSearchResults\020\005*N\n\016ResponseMsgIds",
+      "\022\033\n\027MsgId_ResponseSearchIds\020\001\022\037\n\033MsgId_R" +
+      "esponseSearchResults\020\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -4570,7 +4742,7 @@ public final class Search {
           internal_static_rsctrl_search_SearchHit_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_search_SearchHit_descriptor,
-              new java.lang.String[] { "File", "Loc", "NoHits", },
+              new java.lang.String[] { "File", "Loc", "NoHits", "AltNames", },
               rsctrl.search.Search.SearchHit.class,
               rsctrl.search.Search.SearchHit.Builder.class);
           internal_static_rsctrl_search_SearchSet_descriptor =
@@ -4626,7 +4798,7 @@ public final class Search {
           internal_static_rsctrl_search_RequestSearchResults_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_search_RequestSearchResults_descriptor,
-              new java.lang.String[] { "SearchIds", },
+              new java.lang.String[] { "ResultLimit", "SearchIds", },
               rsctrl.search.Search.RequestSearchResults.class,
               rsctrl.search.Search.RequestSearchResults.Builder.class);
           internal_static_rsctrl_search_ResponseSearchResults_descriptor =

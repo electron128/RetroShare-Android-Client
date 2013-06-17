@@ -133,7 +133,7 @@ public class LoginActivity extends RsActivityBase implements RsCtrlServiceListen
 				Log.v(TAG, "java: native code returned");
 			}
 		});
-    	testThread.start();
+    	//testThread.start();
     	
     	
     	

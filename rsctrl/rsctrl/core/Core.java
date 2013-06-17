@@ -81,7 +81,8 @@ public final class Core {
     CHAT(2, 3),
     SEARCH(3, 4),
     FILES(4, 5),
-    GXS(5, 1000),
+    STREAM(5, 6),
+    GXS(6, 1000),
     ;
     
     public static final int PEERS_VALUE = 1;
@@ -89,6 +90,7 @@ public final class Core {
     public static final int CHAT_VALUE = 3;
     public static final int SEARCH_VALUE = 4;
     public static final int FILES_VALUE = 5;
+    public static final int STREAM_VALUE = 6;
     public static final int GXS_VALUE = 1000;
     
     
@@ -101,6 +103,7 @@ public final class Core {
         case 3: return CHAT;
         case 4: return SEARCH;
         case 5: return FILES;
+        case 6: return STREAM;
         case 1000: return GXS;
         default: return null;
       }
@@ -132,7 +135,7 @@ public final class Core {
     }
     
     private static final PackageId[] VALUES = {
-      PEERS, SYSTEM, CHAT, SEARCH, FILES, GXS, 
+      PEERS, SYSTEM, CHAT, SEARCH, FILES, STREAM, GXS, 
     };
     
     public static PackageId valueOf(
@@ -2128,26 +2131,29 @@ public final class Core {
     
     public enum Relationship
         implements com.google.protobuf.ProtocolMessageEnum {
-      FRIEND(0, 1),
-      FRIEND_OF_MANY_FRIENDS(1, 2),
-      FRIEND_OF_FRIENDS(2, 3),
-      UNKNOWN(3, 4),
+      YOURSELF(0, 1),
+      FRIEND(1, 2),
+      FRIEND_OF_MANY_FRIENDS(2, 3),
+      FRIEND_OF_FRIENDS(3, 4),
+      UNKNOWN(4, 5),
       ;
       
-      public static final int FRIEND_VALUE = 1;
-      public static final int FRIEND_OF_MANY_FRIENDS_VALUE = 2;
-      public static final int FRIEND_OF_FRIENDS_VALUE = 3;
-      public static final int UNKNOWN_VALUE = 4;
+      public static final int YOURSELF_VALUE = 1;
+      public static final int FRIEND_VALUE = 2;
+      public static final int FRIEND_OF_MANY_FRIENDS_VALUE = 3;
+      public static final int FRIEND_OF_FRIENDS_VALUE = 4;
+      public static final int UNKNOWN_VALUE = 5;
       
       
       public final int getNumber() { return value; }
       
       public static Relationship valueOf(int value) {
         switch (value) {
-          case 1: return FRIEND;
-          case 2: return FRIEND_OF_MANY_FRIENDS;
-          case 3: return FRIEND_OF_FRIENDS;
-          case 4: return UNKNOWN;
+          case 1: return YOURSELF;
+          case 2: return FRIEND;
+          case 3: return FRIEND_OF_MANY_FRIENDS;
+          case 4: return FRIEND_OF_FRIENDS;
+          case 5: return UNKNOWN;
           default: return null;
         }
       }
@@ -2178,7 +2184,7 @@ public final class Core {
       }
       
       private static final Relationship[] VALUES = {
-        FRIEND, FRIEND_OF_MANY_FRIENDS, FRIEND_OF_FRIENDS, UNKNOWN, 
+        YOURSELF, FRIEND, FRIEND_OF_MANY_FRIENDS, FRIEND_OF_FRIENDS, UNKNOWN, 
       };
       
       public static Relationship valueOf(
@@ -2300,7 +2306,7 @@ public final class Core {
     private void initFields() {
       gpgId_ = "";
       name_ = "";
-      relation_ = rsctrl.core.Core.Person.Relationship.FRIEND;
+      relation_ = rsctrl.core.Core.Person.Relationship.YOURSELF;
       locations_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
@@ -2499,7 +2505,7 @@ public final class Core {
         bitField0_ = (bitField0_ & ~0x00000001);
         name_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        relation_ = rsctrl.core.Core.Person.Relationship.FRIEND;
+        relation_ = rsctrl.core.Core.Person.Relationship.YOURSELF;
         bitField0_ = (bitField0_ & ~0x00000004);
         if (locationsBuilder_ == null) {
           locations_ = java.util.Collections.emptyList();
@@ -2772,7 +2778,7 @@ public final class Core {
       }
       
       // required .rsctrl.core.Person.Relationship relation = 3;
-      private rsctrl.core.Core.Person.Relationship relation_ = rsctrl.core.Core.Person.Relationship.FRIEND;
+      private rsctrl.core.Core.Person.Relationship relation_ = rsctrl.core.Core.Person.Relationship.YOURSELF;
       public boolean hasRelation() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
@@ -2790,7 +2796,7 @@ public final class Core {
       }
       public Builder clearRelation() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        relation_ = rsctrl.core.Core.Person.Relationship.FRIEND;
+        relation_ = rsctrl.core.Core.Person.Relationship.YOURSELF;
         onChanged();
         return this;
       }
@@ -4597,6 +4603,417 @@ public final class Core {
     // @@protoc_insertion_point(class_scope:rsctrl.core.Dir)
   }
   
+  public interface TimestampOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required uint64 secs = 1;
+    boolean hasSecs();
+    long getSecs();
+    
+    // required uint32 microsecs = 2;
+    boolean hasMicrosecs();
+    int getMicrosecs();
+  }
+  public static final class Timestamp extends
+      com.google.protobuf.GeneratedMessage
+      implements TimestampOrBuilder {
+    // Use Timestamp.newBuilder() to construct.
+    private Timestamp(Builder builder) {
+      super(builder);
+    }
+    private Timestamp(boolean noInit) {}
+    
+    private static final Timestamp defaultInstance;
+    public static Timestamp getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public Timestamp getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.core.Core.internal_static_rsctrl_core_Timestamp_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.core.Core.internal_static_rsctrl_core_Timestamp_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required uint64 secs = 1;
+    public static final int SECS_FIELD_NUMBER = 1;
+    private long secs_;
+    public boolean hasSecs() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public long getSecs() {
+      return secs_;
+    }
+    
+    // required uint32 microsecs = 2;
+    public static final int MICROSECS_FIELD_NUMBER = 2;
+    private int microsecs_;
+    public boolean hasMicrosecs() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getMicrosecs() {
+      return microsecs_;
+    }
+    
+    private void initFields() {
+      secs_ = 0L;
+      microsecs_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasSecs()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasMicrosecs()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt64(1, secs_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeUInt32(2, microsecs_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(1, secs_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(2, microsecs_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.core.Core.Timestamp parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.core.Core.Timestamp parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.core.Core.Timestamp prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.core.Core.TimestampOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.core.Core.internal_static_rsctrl_core_Timestamp_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.core.Core.internal_static_rsctrl_core_Timestamp_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.core.Core.Timestamp.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        secs_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        microsecs_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.core.Core.Timestamp.getDescriptor();
+      }
+      
+      public rsctrl.core.Core.Timestamp getDefaultInstanceForType() {
+        return rsctrl.core.Core.Timestamp.getDefaultInstance();
+      }
+      
+      public rsctrl.core.Core.Timestamp build() {
+        rsctrl.core.Core.Timestamp result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.core.Core.Timestamp buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.core.Core.Timestamp result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.core.Core.Timestamp buildPartial() {
+        rsctrl.core.Core.Timestamp result = new rsctrl.core.Core.Timestamp(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.secs_ = secs_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.microsecs_ = microsecs_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.core.Core.Timestamp) {
+          return mergeFrom((rsctrl.core.Core.Timestamp)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.core.Core.Timestamp other) {
+        if (other == rsctrl.core.Core.Timestamp.getDefaultInstance()) return this;
+        if (other.hasSecs()) {
+          setSecs(other.getSecs());
+        }
+        if (other.hasMicrosecs()) {
+          setMicrosecs(other.getMicrosecs());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasSecs()) {
+          
+          return false;
+        }
+        if (!hasMicrosecs()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              secs_ = input.readUInt64();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              microsecs_ = input.readUInt32();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required uint64 secs = 1;
+      private long secs_ ;
+      public boolean hasSecs() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public long getSecs() {
+        return secs_;
+      }
+      public Builder setSecs(long value) {
+        bitField0_ |= 0x00000001;
+        secs_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearSecs() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        secs_ = 0L;
+        onChanged();
+        return this;
+      }
+      
+      // required uint32 microsecs = 2;
+      private int microsecs_ ;
+      public boolean hasMicrosecs() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getMicrosecs() {
+        return microsecs_;
+      }
+      public Builder setMicrosecs(int value) {
+        bitField0_ |= 0x00000002;
+        microsecs_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearMicrosecs() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        microsecs_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.core.Timestamp)
+    }
+    
+    static {
+      defaultInstance = new Timestamp(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.core.Timestamp)
+  }
+  
   public interface SystemStatusOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
@@ -6235,6 +6652,11 @@ public final class Core {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_core_Dir_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_core_Timestamp_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_core_Timestamp_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_core_SystemStatus_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -6269,28 +6691,30 @@ public final class Core {
       "rl.core.IpAddr\022$\n\007extaddr\030\004 \002(\0132\023.rsctrl" +
       ".core.IpAddr\022\r\n\005state\030\005 \002(\r\"8\n\nStateFlag",
       "s\022\n\n\006ONLINE\020\001\022\r\n\tCONNECTED\020\002\022\017\n\013UNREACHA" +
-      "BLE\020\004\"\340\001\n\006Person\022\016\n\006gpg_id\030\001 \002(\t\022\014\n\004name" +
+      "BLE\020\004\"\356\001\n\006Person\022\016\n\006gpg_id\030\001 \002(\t\022\014\n\004name" +
       "\030\002 \002(\t\0222\n\010relation\030\003 \002(\0162 .rsctrl.core.P" +
       "erson.Relationship\022(\n\tlocations\030\004 \003(\0132\025." +
-      "rsctrl.core.Location\"Z\n\014Relationship\022\n\n\006" +
-      "FRIEND\020\001\022\032\n\026FRIEND_OF_MANY_FRIENDS\020\002\022\025\n\021" +
-      "FRIEND_OF_FRIENDS\020\003\022\013\n\007UNKNOWN\020\004\"0\n\004File" +
-      "\022\014\n\004name\030\001 \002(\t\022\014\n\004hash\030\002 \002(\t\022\014\n\004size\030\003 \002" +
-      "(\004\"f\n\003Dir\022\014\n\004name\030\001 \002(\t\022\014\n\004path\030\002 \002(\t\022!\n" +
-      "\007subdirs\030\003 \003(\0132\020.rsctrl.core.Dir\022 \n\005file",
-      "s\030\004 \003(\0132\021.rsctrl.core.File\"\372\001\n\014SystemSta" +
-      "tus\0225\n\nnet_status\030\001 \002(\0162!.rsctrl.core.Sy" +
-      "stemStatus.NetCode\022\013\n\003msg\030\002 \001(\t\"\245\001\n\007NetC" +
-      "ode\022\017\n\013BAD_UNKNOWN\020\000\022\017\n\013BAD_OFFLINE\020\001\022\016\n" +
-      "\nBAD_NATSYM\020\002\022\021\n\rBAD_NODHT_NAT\020\003\022\023\n\017WARN" +
-      "ING_RESTART\020\004\022\022\n\016WARNING_NATTED\020\005\022\021\n\rWAR" +
-      "NING_NODHT\020\006\022\010\n\004GOOD\020\007\022\017\n\013ADV_FORWARD\020\010\"" +
-      "3\n\tBandwidth\022\n\n\002up\030\001 \002(\002\022\014\n\004down\030\002 \002(\002\022\014" +
-      "\n\004name\030\003 \001(\t\":\n\014BandwidthSet\022*\n\nbandwidt" +
-      "hs\030\001 \003(\0132\026.rsctrl.core.Bandwidth*\027\n\013Exte",
-      "nsionId\022\010\n\004CORE\020\000*M\n\tPackageId\022\t\n\005PEERS\020" +
-      "\001\022\n\n\006SYSTEM\020\002\022\010\n\004CHAT\020\003\022\n\n\006SEARCH\020\004\022\t\n\005F" +
-      "ILES\020\005\022\010\n\003GXS\020\350\007"
+      "rsctrl.core.Location\"h\n\014Relationship\022\014\n\010" +
+      "YOURSELF\020\001\022\n\n\006FRIEND\020\002\022\032\n\026FRIEND_OF_MANY" +
+      "_FRIENDS\020\003\022\025\n\021FRIEND_OF_FRIENDS\020\004\022\013\n\007UNK" +
+      "NOWN\020\005\"0\n\004File\022\014\n\004name\030\001 \002(\t\022\014\n\004hash\030\002 \002" +
+      "(\t\022\014\n\004size\030\003 \002(\004\"f\n\003Dir\022\014\n\004name\030\001 \002(\t\022\014\n" +
+      "\004path\030\002 \002(\t\022!\n\007subdirs\030\003 \003(\0132\020.rsctrl.co",
+      "re.Dir\022 \n\005files\030\004 \003(\0132\021.rsctrl.core.File" +
+      "\",\n\tTimestamp\022\014\n\004secs\030\001 \002(\004\022\021\n\tmicrosecs" +
+      "\030\002 \002(\r\"\372\001\n\014SystemStatus\0225\n\nnet_status\030\001 " +
+      "\002(\0162!.rsctrl.core.SystemStatus.NetCode\022\013" +
+      "\n\003msg\030\002 \001(\t\"\245\001\n\007NetCode\022\017\n\013BAD_UNKNOWN\020\000" +
+      "\022\017\n\013BAD_OFFLINE\020\001\022\016\n\nBAD_NATSYM\020\002\022\021\n\rBAD" +
+      "_NODHT_NAT\020\003\022\023\n\017WARNING_RESTART\020\004\022\022\n\016WAR" +
+      "NING_NATTED\020\005\022\021\n\rWARNING_NODHT\020\006\022\010\n\004GOOD" +
+      "\020\007\022\017\n\013ADV_FORWARD\020\010\"3\n\tBandwidth\022\n\n\002up\030\001" +
+      " \002(\002\022\014\n\004down\030\002 \002(\002\022\014\n\004name\030\003 \001(\t\":\n\014Band",
+      "widthSet\022*\n\nbandwidths\030\001 \003(\0132\026.rsctrl.co" +
+      "re.Bandwidth*\027\n\013ExtensionId\022\010\n\004CORE\020\000*Y\n" +
+      "\tPackageId\022\t\n\005PEERS\020\001\022\n\n\006SYSTEM\020\002\022\010\n\004CHA" +
+      "T\020\003\022\n\n\006SEARCH\020\004\022\t\n\005FILES\020\005\022\n\n\006STREAM\020\006\022\010" +
+      "\n\003GXS\020\350\007"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6345,8 +6769,16 @@ public final class Core {
               new java.lang.String[] { "Name", "Path", "Subdirs", "Files", },
               rsctrl.core.Core.Dir.class,
               rsctrl.core.Core.Dir.Builder.class);
-          internal_static_rsctrl_core_SystemStatus_descriptor =
+          internal_static_rsctrl_core_Timestamp_descriptor =
             getDescriptor().getMessageTypes().get(6);
+          internal_static_rsctrl_core_Timestamp_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_core_Timestamp_descriptor,
+              new java.lang.String[] { "Secs", "Microsecs", },
+              rsctrl.core.Core.Timestamp.class,
+              rsctrl.core.Core.Timestamp.Builder.class);
+          internal_static_rsctrl_core_SystemStatus_descriptor =
+            getDescriptor().getMessageTypes().get(7);
           internal_static_rsctrl_core_SystemStatus_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_core_SystemStatus_descriptor,
@@ -6354,7 +6786,7 @@ public final class Core {
               rsctrl.core.Core.SystemStatus.class,
               rsctrl.core.Core.SystemStatus.Builder.class);
           internal_static_rsctrl_core_Bandwidth_descriptor =
-            getDescriptor().getMessageTypes().get(7);
+            getDescriptor().getMessageTypes().get(8);
           internal_static_rsctrl_core_Bandwidth_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_core_Bandwidth_descriptor,
@@ -6362,7 +6794,7 @@ public final class Core {
               rsctrl.core.Core.Bandwidth.class,
               rsctrl.core.Core.Bandwidth.Builder.class);
           internal_static_rsctrl_core_BandwidthSet_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_rsctrl_core_BandwidthSet_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_core_BandwidthSet_descriptor,
