@@ -11,6 +11,7 @@ import org.retroshare.java.RsServerData;
 import org.retroshare.java.RsCtrlService.ConnectionError;
 import org.retroshare.java.RsCtrlService.ConnectionEvent;
 import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
+import org.retroshare.java.UiThreadHandlerInterface;
 
 import android.app.Notification;
 import android.app.PendingIntent;

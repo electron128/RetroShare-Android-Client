@@ -14,6 +14,7 @@ import org.retroshare.java.RsCtrlService.ConnectionError;
 import org.retroshare.java.RsCtrlService.ConnectionEvent;
 import org.retroshare.java.RsCtrlService.RsCtrlServiceListener;
 import org.retroshare.java.RsServerData;
+import org.retroshare.java.UiThreadHandlerInterface;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -213,7 +214,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	public RsCtrlService activateServer(String serverName)
 	{
-		Log.d(TAG, "activateServer(" + serverName +")");
+		Log.d(TAG, "activateServer(" + serverName + ")");
 		_activateServer(serverName);
 		RsBund bund = serverBunds.get(serverName);
 		if(bund != null) return bund.server;

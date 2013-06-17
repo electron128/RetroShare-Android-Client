@@ -20,9 +20,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class PeersService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
-	
-	PeersService(RsCtrlService s) { mRsCtrlService = s; }
-	
+	UiThreadHandlerInterface mUiThreadHandler;
+
+
+	PeersService(RsCtrlService s, UiThreadHandlerInterface u)
+	{
+		mRsCtrlService = s;
+		mUiThreadHandler = u;
+	}
+
 	public static interface PeersServiceListener
 	{
 		public void update();
@@ -31,8 +37,8 @@ public class PeersService implements RsServiceInterface
 	private Set<PeersServiceListener>mListeners=new HashSet<PeersServiceListener>();
 	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners() { for(PeersServiceListener l:mListeners){ l.update(); } }
-	
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(PeersServiceListener l:mListeners){ l.update(); }; }}); }
+
 	private List<Person> Persons=new ArrayList<Person>();
 	public List<Person> getPeersList(){ return Persons; }
 	public Person getPersonFromSslId(String sslId)
@@ -84,8 +90,7 @@ public class PeersService implements RsServiceInterface
     	msg.body=b;
     	mRsCtrlService.sendMsg(msg);
 	}
-	
-	
+
 	@Override
 	public void handleMessage(RsMessage msg)
 	{

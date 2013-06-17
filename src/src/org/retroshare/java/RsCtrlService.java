@@ -6,7 +6,6 @@ import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
 
 import org.retroshare.android.RsMessageHandler;
-import org.retroshare.android.UiThreadHandlerInterface;
 import org.retroshare.android.util;
 
 import java.io.IOException;
@@ -58,6 +57,8 @@ public class RsCtrlService implements Runnable
 		ConnectionEvent(ConnectionEventKind k) { kind = k; }
 	}
 
+	/* Non MultiThread UI communication handling BEGIN */
+
 	/**
 	 * Stuff that need to receive info about connection with RetroShare core
 	 * should implement this interface ( see LoginActivity for example ).
@@ -77,21 +78,8 @@ public class RsCtrlService implements Runnable
 	private Set<RsCtrlServiceListener> mListeners = new HashSet<RsCtrlServiceListener>();
 	public void registerListener(RsCtrlServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(RsCtrlServiceListener l){ mListeners.remove(l); }
-	private void notifyListenersOnConnectionStateChanged(ConnectionEvent ce)
-	{
-		// TODO commented because seems this doesn't interect the correct way with ui thread and make app crash
-		/*
-		for(RsCtrlServiceListener l:mListeners)
-		{
-			l.onConnectionStateChanged(ce);
-		}
-		*/
-	}
-
-	private void postNotifyListenersToUiThreadOnConnectionStateChanged(final ConnectionEvent ce)
-	{
-		mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ notifyListenersOnConnectionStateChanged(ce); }});
-	}
+	private UiThreadHandlerInterface mUiThreadHandler;
+	private void _notifyListeners(final ConnectionEvent ce) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(RsCtrlServiceListener l:mListeners) l.onConnectionStateChanged(ce); } } ); }
 
 	public enum ConnectState{ ONLINE, OFFLINE }
 
@@ -158,14 +146,13 @@ public class RsCtrlService implements Runnable
 
 	/*************************************/
 	// dont know if i have to worry with enums and threads
-	private volatile ConnectState mConnectState= ConnectState.OFFLINE;
-	private volatile ConnectAction mConnectAction= ConnectAction.NONE;
-	private volatile ConnectionError mLastConnectionError= ConnectionError.NONE;
-	private volatile String mLastConnectionErrorString="";
+	private volatile ConnectState mConnectState = ConnectState.OFFLINE;
+	private volatile ConnectAction mConnectAction = ConnectAction.NONE;
+	private volatile ConnectionError mLastConnectionError = ConnectionError.NONE;
+	private volatile String mLastConnectionErrorString = "";
 
 	// accessed from worker and ui thread, so we have to use synchronized()
 
-	private UiThreadHandlerInterface mUiThreadHandler;
 	private Thread mThread;
 	volatile static boolean runThread = false;
 
@@ -197,10 +184,10 @@ public class RsCtrlService implements Runnable
 		runThread = true;
 		mThread.start();
 		
-		chatService = new ChatService(this);
+		chatService = new ChatService(this, mUiThreadHandler);
 		Services.add(chatService);
 		
-		peersService = new PeersService(this);
+		peersService = new PeersService(this, mUiThreadHandler);
 		Services.add(peersService);
 		
 		filesService = new FilesService(this);
@@ -228,7 +215,7 @@ public class RsCtrlService implements Runnable
 	{
 		// The passed RsServerData d is cloned, so the caller ( outside thread ) can't change our serverdata which is used in our workerthread
 		synchronized(mServerData){ mServerData=d.clone(); }
-		notifyListenersOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.SERVER_DATA_CHANGED));
+		_notifyListeners(new ConnectionEvent(ConnectionEventKind.SERVER_DATA_CHANGED));
 	}
 
 	/**
@@ -397,7 +384,7 @@ public class RsCtrlService implements Runnable
 				if(newHostKey)
 				{
 					mServerData.hostkey = mTransport.getRemoteServerKey();
-					notifyListenersOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.SERVER_DATA_CHANGED));
+					_notifyListeners(new ConnectionEvent(ConnectionEventKind.SERVER_DATA_CHANGED));
 				}
 				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
 				mChannel = mTransport.openSession(2000);
@@ -408,7 +395,7 @@ public class RsCtrlService implements Runnable
 				synchronized(mConnectState)  { mConnectState  = ConnectState.ONLINE; }
 				synchronized(mConnectAction) { mConnectAction = ConnectAction.NONE;  }
 
-				postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.CONNECTED));
+				_notifyListeners(new ConnectionEvent(ConnectionEventKind.CONNECTED));
 
 				if(DEBUG){System.err.println("RsCtrlService: _connect(): success");}
 			}
@@ -425,28 +412,28 @@ public class RsCtrlService implements Runnable
 			mLastConnectionError= ConnectionError.UnknownHostException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 		}
 		catch (NoRouteToHostException e)
 		{
 			mLastConnectionError= ConnectionError.NoRouteToHostException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 		}
 		catch (ConnectException e)
 		{
 			mLastConnectionError= ConnectionError.ConnectException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 		}
 		catch (BadSignatureException e)
 		{
 			mLastConnectionError= ConnectionError.BadSignatureException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 		
 		}
 		catch (AuthenticationFailedException e)
@@ -455,7 +442,7 @@ public class RsCtrlService implements Runnable
 			mLastConnectionError= ConnectionError.AuthenticationFailedException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 			
 		}
 		catch (IOException e)
@@ -467,7 +454,7 @@ public class RsCtrlService implements Runnable
 			
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_WHILE_CONNECTING));
 		}
 	}
 	
@@ -526,7 +513,7 @@ public class RsCtrlService implements Runnable
 			mLastConnectionError= ConnectionError.SEND_ERROR;
 			synchronized(mConnectState){mConnectState = ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction = ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged( new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
 		}
 	}
 	
@@ -550,7 +537,8 @@ public class RsCtrlService implements Runnable
 	// http://lag.net/jaramiko/docs/net/lag/jaramiko/Channel.html # setTimeout (int)
 	//
 	// Update:is blocking, because now I have switched to bulk read
-	private int _recvMsg(){
+	private int _recvMsg()
+	{
 		try {
 			switch(inputState){
 				case BEGIN:
@@ -670,7 +658,7 @@ public class RsCtrlService implements Runnable
 			mLastConnectionError= ConnectionError.RECEIVE_ERROR;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
-			postNotifyListenersToUiThreadOnConnectionStateChanged(new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
+			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
 		}
 		return -1;
 	}
