@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.retroshare.java.FilesService.FilesServiceListener;
+import org.retroshare.java.RsCtrlService;
 
 import rsctrl.core.Core;
 import rsctrl.files.Files;
@@ -31,7 +32,8 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class FilesActivity extends RsActivityBase {
+public class FilesActivity extends ProxiedActivityBase
+{
 	//private static final String TAG="FilesActivity";
 	
 	private static final int UPDATE_INTERVALL=1000;
@@ -43,7 +45,8 @@ public class FilesActivity extends RsActivityBase {
 	Handler mHandler;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_peers);
         
@@ -65,23 +68,25 @@ public class FilesActivity extends RsActivityBase {
     }
     
     @Override
-    protected void onServiceConnected(){
-        mRsService.mRsCtrlService.filesService.registerListener(adapter);
-        mRsService.mRsCtrlService.filesService.updateTransfers(mDirection);
+    protected void onServiceConnected()
+	{
+		RsCtrlService server = getConnectedServer();
+		server.filesService.registerListener(adapter);
+		server.filesService.updateTransfers(mDirection);
     }
     
-    boolean isInForeground=false;
+    boolean isInForeground = false;
     
     @Override
-    public void onResume(){
+    public void onResume()
+	{
     	super.onResume();
-    	if(mRsService!=null){
-    		
-    	}
-    	isInForeground=true;
+    	isInForeground = true;
     }
+
     @Override
-    public void onPause(){
+    public void onPause()
+	{
     	super.onPause();
     	isInForeground=false;
     }
@@ -152,7 +157,7 @@ public class FilesActivity extends RsActivityBase {
 							
 						default:
 						}
-						if( action != null ){ mRsService.mRsCtrlService.filesService.sendRequestControlDownload(clickedFile,action); }
+						if( action != null ){ getConnectedServer().filesService.sendRequestControlDownload(clickedFile,action); }
 					}
 				}
 			);
@@ -168,7 +173,8 @@ public class FilesActivity extends RsActivityBase {
 		@Override
 		public void run()
 		{
-			if(isInForeground && mBound && mRsService.mRsCtrlService.isOnline()) { mRsService.mRsCtrlService.filesService.updateTransfers(mDirection); }
+			RsCtrlService server = getConnectedServer();
+			if( isInForeground && mBound && server.isOnline() ) { server.filesService.updateTransfers(mDirection); }
 			mHandler.postAtTime( new requestFilesRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVALL );
 		}
 	}
@@ -277,12 +283,11 @@ public class FilesActivity extends RsActivityBase {
 		@Override
 		public void update()
 		{
-	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD))
-	        { transferList = mRsService.mRsCtrlService.filesService.getTransfersDown(); }
-	        else
-	        { transferList = mRsService.mRsCtrlService.filesService.getTransfersUp(); }
+			RsCtrlService server = getConnectedServer();
+	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)) transferList = server.filesService.getTransfersDown();
+	        else transferList = server.filesService.getTransfersUp();
 	        
-    		for(DataSetObserver obs:observerList) { obs.onChanged(); }
+    		for(DataSetObserver obs:observerList) obs.onChanged();
 		}
     }
 }
