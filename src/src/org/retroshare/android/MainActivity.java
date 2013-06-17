@@ -208,14 +208,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
         }
     }
 
-
-	private void showActivity(Class<?> cls) { showActivity(cls, new Intent()); };
-	private void showActivity(Class<?> cls, Intent i)
-	{
-		i.setClass(this, cls);
-		i.putExtra(ProxiedActivityBase.serverNameExtraName, serverName );
-		startActivity(i);
-	}
     public void showPeers(View v) { showActivity(PeersActivity.class); };
     public void showChatLobbies(View v) { showActivity(ChatlobbyActivity.class); }
     public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); showActivity(ShowQrCodeActivity.class, intent); }
@@ -272,8 +264,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 				TextView textViewNoPeers   = (TextView) findViewById(R.id.textViewNoPeers);
 				TextView textViewBandwidth = (TextView) findViewById(R.id.textViewBandwidth);
 
-		    	textViewNetStatus.setText(getResources().getText(R.string.network_status)+":\n"+resp.getNetStatus().toString());
-		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers()));
+		    	textViewNetStatus.setText(getResources().getText(R.string.network_status)+":\n"+resp.getNetStatus().toString()); //TODO HARDCODED string
+		    	textViewNoPeers.setText(getResources().getText(R.string.peers)+": "+Integer.toString(resp.getNoConnected())+"/"+Integer.toString(resp.getNoPeers())); //TODO HARDCODED string
 		    	DecimalFormat df = new DecimalFormat("#.##");
 		    	textViewBandwidth.setText(getResources().getText(R.string.bandwidth_up_down)+":\n"+df.format(resp.getBwTotal().getUp())+"/"+df.format(resp.getBwTotal().getDown())+" (kB/s)");
 		    	

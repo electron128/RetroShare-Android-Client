@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import org.retroshare.java.ChatService.ChatServiceListener;
 import org.retroshare.java.PeersService.PeersServiceListener;
+import org.retroshare.java.RsCtrlService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ import rsctrl.chat.Chat.ChatType;
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
 
-public class PeersActivity extends RsActivityBase
+public class PeersActivity extends ProxiedActivityBase
 {
 	private static final String TAG="PeersActivity";
 	
@@ -51,26 +52,29 @@ public class PeersActivity extends RsActivityBase
     @Override
     protected void onServiceConnected()
 	{
-        mRsService.mRsCtrlService.peersService.registerListener(adapter);
-        mRsService.mRsCtrlService.chatService.registerListener(adapter);
-        mRsService.mRsCtrlService.peersService.updatePeersList();
+		RsCtrlService server = getConnectedServer();
+		server.peersService.registerListener(adapter);
+		server.chatService.registerListener(adapter);
+		server.peersService.updatePeersList();
     }
     
     @Override
-    public void onResume(){
+    public void onResume()
+	{
     	super.onResume();
-    	if(mBound){
-    		mRsService.mRsCtrlService.peersService.updatePeersList();
+    	if(mBound)
+		{
+			getConnectedServer().peersService.updatePeersList();
     		adapter.update();
     	}
     }
     
-    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener,PeersServiceListener,ChatServiceListener
+    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener, PeersServiceListener, ChatServiceListener
 	{
-    	private List<Person> personList=new ArrayList<Person>();
-    	private List<Location> locationList=new ArrayList<Location>();
-    	private Map<Location,Person> mapLocationToPerson=new HashMap<Location,Person>();
-    	private List<DataSetObserver> observerList=new ArrayList<DataSetObserver>();
+    	private List<Person> personList = new ArrayList<Person>();
+    	private List<Location> locationList = new ArrayList<Location>();
+    	private Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
+    	private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
     	
@@ -96,11 +100,11 @@ public class PeersActivity extends RsActivityBase
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
-    		Location loc=locationList.get(position);
+    		Location loc = locationList.get(position);
     		
-    		Intent i=new Intent(PeersActivity.this,ChatActivity.class);
+    		Intent i = new Intent(PeersActivity.this,ChatActivity.class);
     		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
-    		startActivity(i);
+			showActivity(ChatActivity.class, i);
     	}
     	
 		@Override
@@ -128,9 +132,9 @@ public class PeersActivity extends RsActivityBase
 	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
 	        
 	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-	        Boolean haveNewMesage = mRsService.mRsCtrlService.chatService.getChatChanged().get(chatId);
+	        Boolean haveNewMessage = getConnectedServer().chatService.getChatChanged().get(chatId);
 	        imageViewMessage.setVisibility(View.GONE);
-	        if( haveNewMesage != null && haveNewMesage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
+	        if( haveNewMessage != null && haveNewMessage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
 
 	        if( (l.getState()&Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
 			{
@@ -159,6 +163,6 @@ public class PeersActivity extends RsActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() { setData(mRsService.mRsCtrlService.peersService.getPeersList()); } // called by ChatService
+		@Override public void update() { setData(getConnectedServer().peersService.getPeersList()); } // called by ChatService
     }
 }

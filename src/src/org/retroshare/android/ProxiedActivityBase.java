@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.retroshare.java.RsCtrlService;
+
 
 /**
  * @author G10h4ck
@@ -38,6 +40,33 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	 */
 	protected void onServiceConnected()
 	{}
+
+	/**
+	 * This method launch an activity putting the server name as intent extra data transparently
+	 * @param cls The activity to launch like MainActivity.class
+	 */
+	protected void showActivity(Class<?> cls) { showActivity(cls, new Intent()); };
+
+	/**
+	 * This method launch an activity adding the server name in the already forged intent extra data transparently
+	 * @param cls The activity to launch like MainActivity.class
+	 */
+	protected void showActivity(Class<?> cls, Intent i)
+	{
+		i.setClass(this, cls);
+		i.putExtra(serverNameExtraName, serverName);
+		startActivity(i);
+	}
+
+	/**
+	 * Get Actual server
+	 * @return The actual server if bound, null otherwise
+	 */
+	protected RsCtrlService getConnectedServer()
+	{
+		if(mBound) return rsProxy.activateServer(serverName);
+		return null;
+	}
 
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service)

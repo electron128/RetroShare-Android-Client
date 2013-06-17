@@ -79,10 +79,13 @@ public class RsCtrlService implements Runnable
 	public void unregisterListener(RsCtrlServiceListener l){ mListeners.remove(l); }
 	private void notifyListenersOnConnectionStateChanged(ConnectionEvent ce)
 	{
+		// TODO commented because seems this doesn't interect the correct way with ui thread and make app crash
+		/*
 		for(RsCtrlServiceListener l:mListeners)
 		{
 			l.onConnectionStateChanged(ce);
 		}
+		*/
 	}
 
 	private void postNotifyListenersToUiThreadOnConnectionStateChanged(final ConnectionEvent ce)
