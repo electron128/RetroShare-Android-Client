@@ -61,6 +61,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
 		ArrayList<String> rsAvailableServers = new ArrayList<String>();
 		rsAvailableServers.addAll(rsProxy.getSavedServers().keySet());
+		try { serverName = rsAvailableServers.get(0); } catch (IndexOutOfBoundsException e) {}
 		rsAvailableServers.add(getString(R.string.add_server));
 
 		ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.text_view, rsAvailableServers);
@@ -208,12 +209,12 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
         }
     }
 
-    public void showPeers(View v) { showActivity(PeersActivity.class); };
-    public void showChatLobbies(View v) { showActivity(ChatlobbyActivity.class); }
-    public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); showActivity(ShowQrCodeActivity.class, intent); }
-    public void showFilesActivity(View v) { showActivity(FilesActivity.class); }
-    public void showSearchActivity(View v) { showActivity(ListSearchesActivity.class); }
-	private void showAddServerActivity() { showActivity(AddServerActivity.class); }
+    public void showPeers(View v) { startActivity(PeersActivity.class); };
+    public void showChatLobbies(View v) { startActivity(ChatlobbyActivity.class); }
+    public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); startActivity(ShowQrCodeActivity.class, intent ); }
+    public void showFilesActivity(View v) { startActivity(FilesActivity.class); }
+    public void showSearchActivity(View v) { startActivity(ListSearchesActivity.class); }
+	private void showAddServerActivity() { startActivity(AddServerActivity.class); }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -280,7 +281,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	@Override public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
 	{
 		String si = ((Spinner) adapterView).getSelectedItem().toString();
-		//String si = ( (TextView) adapterView.getSelectedView() ).getText().toString();
 		Log.d(TAG, "onItemSelected(..., " + si + ", ...)");
 
 		if(si.equals(getString(R.string.add_server))) showAddServerActivity();

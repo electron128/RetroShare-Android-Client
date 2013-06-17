@@ -42,29 +42,16 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	{}
 
 	/**
-	 * This method launch an activity putting the server name as intent extra data transparently
-	 * @param cls The activity to launch like MainActivity.class
-	 */
-	protected void showActivity(Class<?> cls) { showActivity(cls, new Intent()); };
-
-	/**
-	 * This method launch an activity adding the server name in the already forged intent extra data transparently
-	 * @param cls The activity to launch like MainActivity.class
-	 */
-	protected void showActivity(Class<?> cls, Intent i)
-	{
-		i.setClass(this, cls);
-		i.putExtra(serverNameExtraName, serverName);
-		startActivity(i);
-	}
-
-	/**
 	 * Get Actual server
 	 * @return The actual server if bound, null otherwise
 	 */
 	protected RsCtrlService getConnectedServer()
 	{
+		Log.d(TAG, "getConnectedServer() -> " + serverName );
+
 		if(mBound) return rsProxy.activateServer(serverName);
+
+		Log.wtf(TAG, "getConnectedServer() shouldn't be called before binding");
 		return null;
 	}
 
@@ -111,4 +98,30 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	}
 
 	private void _unBindRsService() { if(mBound) unbindService(this); }
+
+	/**
+	 * This method launch an activity putting the server name as intent extra data transparently
+	 * @param cls The activity to launch like MainActivity.class
+	 */
+	public void startActivity(Class<?> cls) { startActivity(cls, new Intent()); };
+
+	/**
+	 * This method launch an activity adding the server name in the already forged intent extra data transparently
+	 * @param cls The activity to launch like MainActivity.class
+	 */
+	public void startActivity(Class<?> cls, Intent i)
+	{
+		i.setClass(this, cls);
+		startActivity(i);
+	}
+
+	/**
+	 * @{inheritDoc}
+	 */
+	@Override
+	public void startActivity(Intent i)
+	{
+		i.putExtra(serverNameExtraName, serverName);
+		super.startActivity(i);
+	}
 }

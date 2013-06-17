@@ -104,7 +104,7 @@ public class PeersActivity extends ProxiedActivityBase
     		
     		Intent i = new Intent(PeersActivity.this,ChatActivity.class);
     		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
-			showActivity(ChatActivity.class, i);
+			startActivity(ChatActivity.class, i);
     	}
     	
 		@Override
