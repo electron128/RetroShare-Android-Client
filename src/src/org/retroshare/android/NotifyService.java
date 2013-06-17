@@ -32,13 +32,14 @@ public class NotifyService implements ChatServiceListener
 	private NotificationManager mNotificationManager;
 	private Context mContext;
 	
-	NotifyService(ChatService cs,Service s){
-		mChatService=cs;
+	NotifyService(ChatService cs,Service s)
+    {
+		mChatService = cs;
 		mChatService.registerListener(this);
 		
 		mService=s;
 		mNotificationManager = (NotificationManager) s.getSystemService(Context.NOTIFICATION_SERVICE);
-		mContext=s.getApplicationContext();
+		mContext = s.getApplicationContext();
 		
 		//createNewNotification(null,null,null);
 	}

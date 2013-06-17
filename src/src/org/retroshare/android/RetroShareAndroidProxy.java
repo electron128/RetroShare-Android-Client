@@ -34,6 +34,8 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 
 	private static final String DataPackBaseFileName = "RetroShareServers";
 
+    public UiThreadHandler mUiThreadHandler;
+
 	public static class RsBund
 	{
 		RsCtrlService server;
@@ -109,7 +111,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	public IBinder onBind(Intent arg0) { return mBinder; }
 	
 	// new new don't delete
-	private static class UiThreadHandler extends Handler implements UiThreadHandlerInterface
+	public static class UiThreadHandler extends Handler implements UiThreadHandlerInterface
 	{
 		@Override
 		public void postToUiThread(Runnable r) { post(r); }
@@ -233,7 +235,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		if ( serverData != null && serverBunds.get(serverName) == null )
 		{
 			Log.d(TAG, "_activateServer(String serverName) activating server");
-			RsCtrlService server = new RsCtrlService(new UiThreadHandler()); // TODO check if we just one UiThreadHandler for all servers is enough or if we need one for each server
+			RsCtrlService server = new RsCtrlService(mUiThreadHandler); // TODO This crash when called by a service...
 			server.setServerData(serverData);
 			server.registerListener(this);
 			RsBund bund = new RsBund(server, new NotifyService(server.chatService, this));

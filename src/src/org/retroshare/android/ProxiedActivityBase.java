@@ -63,6 +63,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		mBound = true;
+        if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.UiThreadHandler();
 		onServiceConnected();
 	}
 

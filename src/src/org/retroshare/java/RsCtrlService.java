@@ -79,10 +79,9 @@ public class RsCtrlService implements Runnable
 	public void registerListener(RsCtrlServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(RsCtrlServiceListener l){ mListeners.remove(l); }
 	private UiThreadHandlerInterface mUiThreadHandler;
-	private void _notifyListeners(final ConnectionEvent ce) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(RsCtrlServiceListener l:mListeners) l.onConnectionStateChanged(ce); } } ); }
+	private void _notifyListeners(final ConnectionEvent ce) { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(RsCtrlServiceListener l:mListeners) l.onConnectionStateChanged(ce); } } ); }
 
 	public enum ConnectState{ ONLINE, OFFLINE }
-
 	public enum ConnectAction{ CONNECT, DISCONNECT, NONE }
 
 	/**
@@ -260,7 +259,7 @@ public class RsCtrlService implements Runnable
 	private int msgCounter=0;
 	
 	//holds pairs of <reqId,Handler>
-	private HashMap<Integer,RsMessageHandler> msgHandlers= new HashMap<Integer,RsMessageHandler>();
+	private HashMap<Integer,RsMessageHandler> msgHandlers = new HashMap<Integer,RsMessageHandler>();
 	//holds pairs of <msgId,handler>
 	private HashMap<Integer,RsMessageHandler> msgHandlersById= new HashMap<Integer,RsMessageHandler>();
 	

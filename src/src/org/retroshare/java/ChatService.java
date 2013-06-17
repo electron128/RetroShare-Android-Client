@@ -46,7 +46,7 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 	private Set<ChatServiceListener>mListeners = new HashSet<ChatServiceListener>();
 	public void registerListener(ChatServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(ChatServiceListener l){ mListeners.remove(l); }
-	private void _notifyListeners() { mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }
 	
 	private List<Chat.ChatLobbyInfo> ChatLobbies=new ArrayList<Chat.ChatLobbyInfo>();
 	private Map<ChatId,List<ChatMessage>> ChatHistory=new HashMap<ChatId,List<ChatMessage>>();
@@ -64,7 +64,8 @@ public class ChatService implements RsServiceInterface, RsCtrlService.RsCtrlServ
 	}
 	
 	
-	public void setNotifyBlockedChat(ChatId id){
+	public void setNotifyBlockedChat(ChatId id)
+    {
 		NotifyBlockedChat=id;
 		if(id!=null){
 			if(lastPrivateChatMessage!=null){
