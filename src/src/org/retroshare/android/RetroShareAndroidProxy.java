@@ -213,9 +213,11 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	public RsCtrlService activateServer(String serverName)
 	{
-		Log.wtf(TAG, "activateServer(" + serverName +")");
+		Log.d(TAG, "activateServer(" + serverName +")");
 		_activateServer(serverName);
-		return serverBunds.get(serverName).server;
+		RsBund bund = serverBunds.get(serverName);
+		if(bund != null) return bund.server;
+		return null;
 	}
 
 	/**

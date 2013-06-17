@@ -287,7 +287,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	// Those two handles the server spinner
 	@Override public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
 	{
-		String si = ( (TextView) adapterView.getSelectedView() ).getText().toString();
+		String si = ((Spinner) adapterView).getSelectedItem().toString();
+		//String si = ( (TextView) adapterView.getSelectedView() ).getText().toString();
 		Log.d(TAG, "onItemSelected(..., " + si + ", ...)");
 
 		if(si.equals(getString(R.string.add_server))) showAddServerActivity();
