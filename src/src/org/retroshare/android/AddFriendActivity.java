@@ -16,13 +16,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class AddFriendActivity extends RsActivityBase {
+public class AddFriendActivity extends ProxiedActivityBase
+{
 	
 	TextView tv;
 	Button button;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addfriend);
         tv=(TextView) findViewById(R.id.textView2);
@@ -32,7 +34,8 @@ public class AddFriendActivity extends RsActivityBase {
     }
     
     @Override
-    public void onServiceConnected(){
+    public void onServiceConnected()
+	{
     	Uri uri = getIntent().getData();
         String cert=getCertFromUri(uri);
         
@@ -43,26 +46,26 @@ public class AddFriendActivity extends RsActivityBase {
     	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE;
     	msg.body=reqb.build().toByteArray();
-    	mRsService.mRsCtrlService.sendMsg(msg,new HandleRequestAddPeer());
-        
+    	getConnectedServer().sendMsg(msg,new HandleRequestAddPeer());
     }
     
-    private class HandleRequestAddPeer extends RsMessageHandler{
+    private class HandleRequestAddPeer extends RsMessageHandler
+	{
     	@Override
-    	public void rsHandleMsg(RsMessage msg){
+    	public void rsHandleMsg(RsMessage msg)
+		{
     		// TODO: add check for msgid
-    		try {
+    		try
+			{
 				ResponseAddPeer resp=ResponseAddPeer.parseFrom(msg.body);
 				tv.setText(resp.toString());
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-    		
+			catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
     	}
     }
     
-    public static String getCertFromUri(Uri uri){
+    public static String getCertFromUri(Uri uri)
+	{
     	if(uri.getScheme().equals("retroshare")&&uri.getHost().equals("certificate")){
     		String cert="-----BEGIN PGP PUBLIC KEY BLOCK-----\n";
     		cert+=uri.getQueryParameter("gpgbase64");

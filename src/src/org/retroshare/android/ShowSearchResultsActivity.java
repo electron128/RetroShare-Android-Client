@@ -1,10 +1,9 @@
 package org.retroshare.android;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.retroshare.java.RsCtrlService;
 import org.retroshare.java.SearchService.SearchServiceListener;
 
 import rsctrl.search.Search.SearchHit;
@@ -26,10 +25,11 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class ShowSearchResultsActivity extends RsActivityBase {
+public class ShowSearchResultsActivity extends ProxiedActivityBase
+{
 	private static final String TAG="ShowSearchResultsActivity";
 	
-	private static final int UPDATE_INTERVALL=1500;
+	private static final int UPDATE_INTERVAL =1500;
 	
 	private ListView listView;
 	
@@ -40,7 +40,8 @@ public class ShowSearchResultsActivity extends RsActivityBase {
 	int mId;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         
         mId=getIntent().getIntExtra("SearchId", 0);
@@ -57,42 +58,50 @@ public class ShowSearchResultsActivity extends RsActivityBase {
         
     	mHandler=new Handler();
     	
-    	//mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+    	//mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVAL);
     }
     
     @Override
-    protected void onServiceConnected(){
-        mRsService.mRsCtrlService.searchService.registerListener(adapter);
+    protected void onServiceConnected()
+	{
+		RsCtrlService server = getConnectedServer();
+        server.searchService.registerListener(adapter);
         
-        // remove this
-        mRsService.mRsCtrlService.searchService.updateSearchResults(mId);
+        // TODO remove this
+		server.searchService.updateSearchResults(mId);
     }
     
-    boolean isInForeground=false;
+    boolean isInForeground = false;
     
     @Override
-    public void onResume(){
+    public void onResume()
+	{
     	super.onResume();
-    	isInForeground=true;
+    	isInForeground = true;
     }
+
     @Override
-    public void onPause(){
+    public void onPause()
+	{
     	super.onPause();
-    	isInForeground=false;
+    	isInForeground = false;
     }
+
     @Override
-    public void onDestroy(){
+    public void onDestroy()
+	{
+		getConnectedServer().searchService.unregisterListener(adapter);
     	super.onDestroy();
-    	mRsService.mRsCtrlService.searchService.unregisterListener(adapter);
     }
     
-	private class updateRunnable implements Runnable{
+	private class updateRunnable implements Runnable
+	{
 		@Override
-		public void run() {
-			if(isInForeground && mBound && mRsService.mRsCtrlService.isOnline()){
-				mRsService.mRsCtrlService.searchService.updateSearchResults(mId);
-			}
-			mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+UPDATE_INTERVALL);
+		public void run()
+		{
+			RsCtrlService server = getConnectedServer();
+			if( isInForeground && mBound && server.isOnline()) server.searchService.updateSearchResults(mId);
+			mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}
     
@@ -193,9 +202,11 @@ public class ShowSearchResultsActivity extends RsActivityBase {
 		@Override public boolean isEnabled(int position) {return true;}
 
 		@Override
-		public void update() {
-			Log.v(TAG, "update: "+Integer.toString(mRsService.mRsCtrlService.searchService.getSearchResults(mId).size())+" items");
-			setData(mRsService.mRsCtrlService.searchService.getSearchResults(mId));
+		public void update()
+		{
+			RsCtrlService server = getConnectedServer();
+			Log.v(TAG, "update: "+Integer.toString( server.searchService.getSearchResults(mId).size())+" items");
+			setData(server.searchService.getSearchResults(mId));
 		}
     	
     }

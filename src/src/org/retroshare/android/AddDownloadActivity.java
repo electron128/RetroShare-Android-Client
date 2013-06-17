@@ -15,7 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class AddDownloadActivity extends RsActivityBase {
+public class AddDownloadActivity extends ProxiedActivityBase
+{
 	private static final String TAG="AddDownloadActivity";
 	
 	TextView textViewName;
@@ -67,13 +68,14 @@ public class AddDownloadActivity extends RsActivityBase {
     }
     
     @Override
-    protected void onServiceConnected(){
+    protected void onServiceConnected()
+	{
     	if(mFile!=null){
         	textViewName.setText(mFile.getName());
         	textViewSize.setText(Long.toString(mFile.getSize()));
         	textViewHash.setText(mFile.getHash());
     	}
-    	if(mRsService.mRsCtrlService.isOnline()){
+    	if(getConnectedServer().isOnline()){
     		buttonDownload.setVisibility(View.VISIBLE);
     		textViewResult.setVisibility(View.GONE);
     	}else{
@@ -84,12 +86,13 @@ public class AddDownloadActivity extends RsActivityBase {
     }
     
     
-    public void onButtonDownloadClick(View v){
+    public void onButtonDownloadClick(View v)
+	{
     	buttonDownload.setVisibility(View.GONE);
     	textViewResult.setVisibility(View.VISIBLE);
     	textViewResult.setText("processing...");
     	if(mFile!=null){
-        	mRsService.mRsCtrlService.filesService.sendRequestControlDownload(mFile, Action.ACTION_START,new RsMessageHandler(){
+        	getConnectedServer().filesService.sendRequestControlDownload(mFile, Action.ACTION_START,new RsMessageHandler(){
 
 				@Override
 				protected void rsHandleMsg(RsMessage msg) {

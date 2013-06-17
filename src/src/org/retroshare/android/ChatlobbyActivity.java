@@ -29,18 +29,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.retroshare.java.ChatService.ChatServiceListener;
+import org.retroshare.java.RsCtrlService;
 import org.retroshare.java.RsCtrlService.RsMessage;
 //import org.retroshare.android.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-public class ChatlobbyActivity extends RsActivityBase {
+public class ChatlobbyActivity extends ProxiedActivityBase
+{
 	private static final String TAG="ChatLobbyActivity";
 	
 	private TextView mText;
 	private ChatLobbyListAdapterListener mclla;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         
         /*
@@ -70,70 +73,32 @@ public class ChatlobbyActivity extends RsActivityBase {
     }
     
     @Override
-    protected void onServiceConnected(){
-    	//getChatLobbies();
-    	
-        mRsService.mRsCtrlService.chatService.registerListener(mclla);
-        mRsService.mRsCtrlService.chatService.updateChatLobbies();
+    protected void onServiceConnected()
+	{
+		RsCtrlService server = getConnectedServer();
+		server.chatService.registerListener(mclla);
+		server.chatService.updateChatLobbies();
     }
     
     @Override
-    public void onResume(){
+    public void onResume()
+	{
     	super.onResume();
-    	if(mRsService!=null){
-    		mRsService.mRsCtrlService.chatService.updateChatLobbies();
-    	}
+    	if ( mBound) getConnectedServer().chatService.updateChatLobbies();
     }
-    
-    /*
-    private void getChatLobbies(){
-    	RequestChatLobbies.Builder reqb=RequestChatLobbies.newBuilder();
-    	reqb.setLobbySet(RequestChatLobbies.LobbySet.LOBBYSET_ALL);
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestChatLobbies_VALUE;
-    	msg.body=reqb.build().toByteArray();
-    	mRsService.mRsCtrlService.sendMsg(msg, new ChatHandler());
-    }
-    */
-    /*
-    private static final int RESPONSE=(0x01<<24);
-    
-    private class ChatHandler extends RsMessageHandler{
-    	@Override
-    	protected void rsHandleMsg(RsMessage msg){
-    		Log.v(TAG,"ChatHandler:rsHandleMessage");
-    		
-    		if(msg.msgId==(RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE)){
-    			System.out.println("received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE");
-    			//mText.setText(mText.getText()+"received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE"+"\n");
-    			try {
-    				ResponseChatLobbies resp=Chat.ResponseChatLobbies.parseFrom(msg.body);
-    				//for(Chat.ChatLobbyInfo li:resp.getLobbiesList()){
-    				//	mText.setText(mText.getText()+li.getLobbyName()+"\n");
-    				//}
-    				mclla.setData(resp.getLobbiesList());
-    				
-    			} catch (InvalidProtocolBufferException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-    }
-    */
-    
-    private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener{
+
+    private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener
+	{
     	
     	private List<Chat.ChatLobbyInfo> LobbyList=new ArrayList<Chat.ChatLobbyInfo>();
     	private List<DataSetObserver> ObserverList=new ArrayList<DataSetObserver>();
     	
     	private LayoutInflater mInflater;
     	
-    	public ChatLobbyListAdapterListener(Context context) {
-    		 mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	}
+    	public ChatLobbyListAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
     	
-    	public void setData(List<Chat.ChatLobbyInfo> l){
+    	public void setData(List<Chat.ChatLobbyInfo> l)
+		{
     		LobbyList=l;
     		for(DataSetObserver obs:ObserverList){
     			obs.onChanged();
@@ -141,7 +106,8 @@ public class ChatlobbyActivity extends RsActivityBase {
     	}
     	
     	@Override
-    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
     		ChatLobbyInfo lobbyInfo=LobbyList.get(position);
     		
@@ -149,14 +115,6 @@ public class ChatlobbyActivity extends RsActivityBase {
     		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(lobbyInfo.getLobbyId()).build().toByteArray());
     		i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
     		startActivity(i);
-    		
-    		/*
-    		Intent i=new Intent(ChatlobbyActivity.this,ChatlobbyChatActivity.class);
-    		i.putExtra("lobbyId", lobbyInfo.getLobbyId());
-    		i.putExtra("lobbyName", lobbyInfo.getLobbyName());
-    		startActivity(i);
-    		*/
-    		
     	}
 
 		@Override
@@ -181,7 +139,8 @@ public class ChatlobbyActivity extends RsActivityBase {
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
 	        View view = mInflater.inflate(R.layout.activity_chalobby_lobby_item, parent, false);
 	        
 	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
@@ -189,7 +148,7 @@ public class ChatlobbyActivity extends RsActivityBase {
 	        ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
 	        
 	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(LobbyList.get(position).getLobbyId()).build();
-	        Boolean haveNewMesage = mRsService.mRsCtrlService.chatService.getChatChanged().get(chatId);
+	        Boolean haveNewMesage = getConnectedServer().chatService.getChatChanged().get(chatId);
 	        imageViewMessage.setVisibility(View.GONE);
 	        if(haveNewMesage!=null){
 	        	if(haveNewMesage.equals(Boolean.TRUE)){
@@ -241,8 +200,9 @@ public class ChatlobbyActivity extends RsActivityBase {
 		
 		// called by ChatService
 		@Override
-		public void update() {
-			setData(mRsService.mRsCtrlService.chatService.getChatLobbies());
+		public void update()
+		{
+			setData(getConnectedServer().chatService.getChatLobbies());
 		}
     	
     }

@@ -25,7 +25,8 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class ListSearchesActivity extends RsActivityBase {
+public class ListSearchesActivity extends ProxiedActivityBase
+{
 	
 	private static final String TAG="ListSearchesActivity";
 	
@@ -51,25 +52,28 @@ public class ListSearchesActivity extends RsActivityBase {
         listView.setOnItemLongClickListener(adapter);
     }
     
-	private class KeyListener implements OnKeyListener{
+	private class KeyListener implements OnKeyListener
+	{
 		@Override
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
 			
-			if((event.getAction()==KeyEvent.ACTION_DOWN)&(event.getKeyCode() == KeyEvent.KEYCODE_ENTER)){
+			if((event.getAction()==KeyEvent.ACTION_DOWN)&(event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+			{
 				Log.v(TAG,"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
-				mRsService.mRsCtrlService.searchService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
+				getConnectedServer().searchService.sendRequestBasicSearch(editText.getText().toString(), new ResponseHandler());
 				return true;
-			}else{
-				return false;
 			}
+			else return false;
 		}
 		
 	}
 	
 	// needed, because we know dont know the serach id before we received the result
-	private class ResponseHandler implements SearchResponseHandler{
+	private class ResponseHandler implements SearchResponseHandler
+	{
 		@Override
-		public void onSearchResponseReceived(int id) {
+		public void onSearchResponseReceived(int id)
+		{
 	   		Intent i=new Intent(ListSearchesActivity.this,ShowSearchResultsActivity.class);
     		i.putExtra("SearchId", id);
     		Log.v(TAG, "ResponseHandler: starting ShowSearchResultsActivity with Id "+Integer.toString(id));
@@ -79,26 +83,17 @@ public class ListSearchesActivity extends RsActivityBase {
 	}
     
     @Override
-    protected void onServiceConnected(){
-    	adapter.setData(mRsService.mRsCtrlService.searchService.getSearches());
-    }
+    protected void onServiceConnected() { adapter.setData(getConnectedServer().searchService.getSearches()); }
     
     @Override
-    public void onResume(){
-    	super.onResume();
-    	if(mBound){
-    		adapter.setData(mRsService.mRsCtrlService.searchService.getSearches());
-    	}
+    public void onResume()
+	{
+		super.onResume();
+    	if(mBound) adapter.setData(getConnectedServer().searchService.getSearches());
     }
-    @Override
-    public void onPause(){
-    	super.onPause();
-    	
-    }
-    
-    
-    
-    private class SearchListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener{
+
+    private class SearchListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener
+	{
     	
     	private Map<Integer,Integer> searchIdFromIndex=new HashMap<Integer,Integer>();
     	private List<String> list=new ArrayList<String>();

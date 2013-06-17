@@ -190,10 +190,10 @@ public class RsCtrlService implements Runnable
 		peersService = new PeersService(this, mUiThreadHandler);
 		Services.add(peersService);
 		
-		filesService = new FilesService(this);
+		filesService = new FilesService(this, mUiThreadHandler);
 		Services.add(filesService);
 		
-		searchService = new SearchService(this);
+		searchService = new SearchService(this, mUiThreadHandler);
 		Services.add(searchService);
 		
 		// preload own Name, needed for Chat
