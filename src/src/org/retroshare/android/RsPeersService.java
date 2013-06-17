@@ -31,6 +31,7 @@ public class RsPeersService implements RsServiceInterface
 		mRsCtrlService = s;
 		mUiThreadHandler = u;
 
+        // TODO Port/generalize this indipendent from ui message handling system to other Rs*Sevice too
         mOwnIdReceivedHandlerThread = new Thread(new Runnable() { @Override public void run() { Looper.prepare(); mOwnIdReceivedHandler = new OwnIdReceivedHandler(); Looper.loop(); } });
         mOwnIdReceivedHandlerThread.start();
 	}
