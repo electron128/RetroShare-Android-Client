@@ -268,7 +268,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
                         builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(1));
                         builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS_RES_PACKAGE, "org.retroshare.android.sync");
+                        builder.withValue(ContactsContract.StatusUpdates.STATUS_RES_PACKAGE, "org.retroshare.android.sync"); //TODO HARDCODED string
                         builder.withValue(ContactsContract.StatusUpdates.STATUS_LABEL, R.string.app_name);
                         builder.withValue(ContactsContract.StatusUpdates.STATUS_ICON, R.drawable.retrosharelogo2);
                         builder.withValue(ContactsContract.StatusUpdates.STATUS_TIMESTAMP, System.currentTimeMillis());
