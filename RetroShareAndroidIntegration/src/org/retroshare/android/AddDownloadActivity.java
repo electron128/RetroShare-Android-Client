@@ -51,13 +51,13 @@ public class AddDownloadActivity extends ProxiedActivityBase
 		}
 		*/
     	if(getIntent().hasExtra("File")){
-    		try {
-				mFile = File.parseFrom(getIntent().getByteArrayExtra("File"));
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}else{
+            try{
+            mFile = File.parseFrom(getIntent().getByteArrayExtra("File"));
+            }catch (InvalidProtocolBufferException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        }else{
 	    	Uri uri = getIntent().getData();
 	    	mFile=File.newBuilder()
 	    			.setName(uri.getQueryParameter("name"))
