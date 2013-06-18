@@ -11,7 +11,7 @@ import rsctrl.chat.Chat;
  * XXX: da rifare completamente, e' solo un test
  * ah, trovare un intent migliore rispetto a android.intent.action.VIEW (esiste?)
  */
-public class ChatActivityLauncher extends Activity {
+public class ChatActivityLauncher extends ProxiedActivityBase {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -24,7 +24,7 @@ public class ChatActivityLauncher extends Activity {
                 i.putExtra("ChatId", Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId(sslid).build().toByteArray());
                 // keine lobby info
                 //i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
-                startActivity(i);
+                startActivity(ChatActivity.class, i);
                 //XXX: mi suicido subito dopo aver lanciato l'altra activity
                 // tranquillo perche' ho il nohistory sul manifest (http://developer.android.com/guide/topics/manifest/activity-element.html#nohist)
                 finish();

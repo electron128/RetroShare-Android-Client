@@ -102,8 +102,25 @@
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
             <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
+            <meta-data android:name="android.provider.CONTACTS_STRUCTURE"  android:resource="@xml/contacts" />
         </service>
 
+
+        <activity
+                android:name=".ChatActivityLauncher"
+                android:noHistory="true"
+                android:theme="@android:style/Theme.Dialog">
+            <!--
+                We use the INVITE intent to add a raw contact to an existing contact.
+                It always comes with a lookup URI.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                        android:mimeType="retroshare.android.cursor.item/org.retroshare.android.sync.profile" />
+            </intent-filter>
+        </activity>
 
         <!-- <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" /> -->
         <!-- Android Sync Provide END -->
