@@ -5,30 +5,37 @@ A Client for retroshare-nogui(ssh).
 [Download RetroShare Remote.apk](https://github.com/electron128/RetroShare-Android-Client/raw/master/Releases/RetroShare%20Remote3.apk)
 
 
-Note: at the moment (12.09.2012) you can find retroshare-nogui at the [v0.5-gxs-b1](http://retroshare.svn.sourceforge.net/viewvc/retroshare/branches/v0.5-gxs-b1/) branch.
-
 ## How to run from source ##
 you need:
 
-	- Android SDK, see http://developer.android.com/sdk/index.html#Requirements
-	- git
+	- [Android Studio](http://developer.android.com/sdk/installing/studio.html)
+	- [git](http://git-scm.com/)
+	- [ant](http://ant.apache.org/)
+	- The other tools ( JVM, unzip, wget ) are usually already installed on almost all android developer computers.
 
-create a new folder and copy these things to it:
+Clone RetroShare Android Client source running:
 
-	jaramiko-151		http://lag.net/jaramiko/download/jaramiko-151.zip
-	protobuf-2.4.1		http://code.google.com/p/protobuf/downloads/detail?name=protobuf-2.4.1.zip&can=2&q=
-	ZXing-2.0			http://code.google.com/p/zxing/downloads/detail?name=ZXing-2.0.zip&can=2&q=
-	
-	run:
-	git clone https://github.com/electron128/RetroShare-Android-Client.git
+	# git clone https://github.com/G10h4ck/RetroShare-Android-Client.git
 
-Your folder "Java_Dev" should now look like this:
+Prepare library dependency:
 
-	Java_Dev
-	+-- jaramiko-151
-	+-- protobuf-2.4.1
-	+-- RetroShare-Android-Client
-	+-- zxing-2.0
+	## If you miss some command install it ;)
+	# cd RetroShare-Android-Client/lib
+	# wget http://lag.net/jaramiko/download/jaramiko-151.zip
+	# unzip jaramiko-151.zip
+	# cd jaramiko-151
+	# ant jar
+
+Create Android Studio Project:
+
+	From Android Studio main window:
+		File -> Import Project -> select RetroShare-Android-Client/src
+		File -> Import Module -> select RetroShare-Android-Client/lib/rsctrl
+		File -> Project Structure -> Libraries -> + -> Java -> select RetroShare-Android-Client/lib/jaramiko-151/jaramiko.jar ( Doing this you will probably asked what modules of your project depends on that library, select the one created importing RetroShare-Android-Client/src )
+		File -> Project Structure -> Libraries -> + -> From Maven... -> put com.google.protobuf in the search box -> press search -> select version 2.4.1 -> set Dwonload to RetroShare-Android-Client/lib -> press OK
+		File -> Project Structure -> Libraries -> + -> From Maven... -> put com.google.zxing in the search box -> press search -> select version core:2.0 -> set Dwonload to RetroShare-Android-Client/lib -> press OK
+
+Now you should be ready to contribute to the project editing the source and tunning it for testing on your emulator
 
 ## What is Retroshare? ##
 
