@@ -1,2 +1,0 @@
-set solib-search-path D:/Java_Dev/RetroShareRemote/RetroShareRemote//obj/local/armeabi
-directory D:/Java_Dev/android-ndk-r8b/platforms/android-3/arch-arm/usr/include D:/Java_Dev/android-ndk-r8b/sources/cxx-stl/stlport/stlport D:/Java_Dev/android-ndk-r8b/sources/cxx-stl//gabi++/include D:/Java_Dev/RetroShareRemote/RetroShareRemote//jni
