@@ -8,9 +8,9 @@ A Client for retroshare-nogui(ssh).
 ## How to run from source ##
 you need:
 
-	- [Android Studio](http://developer.android.com/sdk/installing/studio.html)
-	- [git](http://git-scm.com/)
-	- [ant](http://ant.apache.org/)
+	- Android Studio (http://developer.android.com/sdk/installing/studio.html)
+	- git (http://git-scm.com/)
+	- ant (http://ant.apache.org/)
 	- The other tools ( JVM, unzip, wget ) are usually already installed on almost all android developer computers.
 
 Clone RetroShare Android Client source running:
