@@ -18,18 +18,18 @@
 *.iml
 *.ipr
 *.iws
-.idea/
+.idea
 
 # Locally stored "Eclipse launch configurations"
 *.launch
 
-src/.classpath
-src/.settings
-src/gen/
-out/
-lib/
-src/.externalToolBuilders/
-src/.settings/
-src/.project
-src/.cproject
-src/.buildpath
+RetroShareAndroidIntegration/.classpath
+RetroShareAndroidIntegration/.settings
+RetroShareAndroidIntegration/gen
+out
+lib
+RetroShareAndroidIntegration/.externalToolBuilders
+RetroShareAndroidIntegration/.settings
+RetroShareAndroidIntegration/.project
+RetroShareAndroidIntegration/.cproject
+RetroShareAndroidIntegration/.buildpath
