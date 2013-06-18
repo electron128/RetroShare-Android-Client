@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import rsctrl.chat.Chat;
 
@@ -14,8 +15,12 @@ import rsctrl.chat.Chat;
  */
 public class ChatActivityLauncher extends ProxiedActivityBase
 {
+    private static final String TAG = "ChatActivityLauncher";
+
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreateBeforeConnectionInit(Bundle savedInstanceState)");
+
         if (getIntent().getData() != null)
         {
             Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
@@ -23,6 +28,7 @@ public class ChatActivityLauncher extends ProxiedActivityBase
             {
                 serverName = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_NAME));
                 String sslid = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DATA2));
+
                 Intent i = new Intent();
                 i.putExtra("ChatId", Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId(sslid).build().toByteArray());
                 startActivity(ChatActivity.class, i);
@@ -31,7 +37,7 @@ public class ChatActivityLauncher extends ProxiedActivityBase
                 finish();
             }
         }
-        else { finish(); } // How did we get here without data?
+        else finish(); // How did we get here without data?
     }
 
 }

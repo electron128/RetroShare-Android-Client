@@ -227,10 +227,10 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
 		operationList.add(builder.build());
 
-        String nickname=name;
+        String nickname = name;
         if(!listl.isEmpty()){
-            l=listl.get(0); //XXX: a muzzo, sperimentalmente funziona, sarebbe interessante anche capire perche'
-            nickname=l.getLocation();
+            l = listl.get(0); //XXX: a muzzo, sperimentalmente funziona, sarebbe interessante anche capire perche'
+            nickname = l.getLocation();
         }
 
         builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
@@ -238,7 +238,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
         builder.withValue(ContactsContract.Data.MIMETYPE, MIME);
         builder.withValue(ContactsContract.Data.DATA1, nickname);
         builder.withValue(ContactsContract.Data.DATA2, l.getSslId());
-        builder.withValue(ContactsContract.Data.DATA3, "Send message");
+        builder.withValue(ContactsContract.Data.DATA3, "Send message"); //TODO HARDCODED string
         operationList.add(builder.build());
 
 
