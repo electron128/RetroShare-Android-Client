@@ -213,6 +213,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 
 		String name = peer.getName();
         List<Location> listl=peer.getLocationsList();
+        Location l=null;
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
 		builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 		builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
@@ -228,7 +229,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 
         String nickname=name;
         if(!listl.isEmpty()){
-            Location l=listl.get(0);
+            l=listl.get(0); //XXX: a muzzo, sperimentalmente funziona, sarebbe interessante anche capire perche'
             nickname=l.getLocation();
         }
 
@@ -236,8 +237,8 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
         builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
         builder.withValue(ContactsContract.Data.MIMETYPE, MIME);
         builder.withValue(ContactsContract.Data.DATA1, nickname);
-        builder.withValue(ContactsContract.Data.DATA2, "RetroshareContact Test");
-        builder.withValue(ContactsContract.Data.DATA3, "View profile");
+        builder.withValue(ContactsContract.Data.DATA2, l.getSslId());
+        builder.withValue(ContactsContract.Data.DATA3, "Send message");
         operationList.add(builder.build());
 
 
