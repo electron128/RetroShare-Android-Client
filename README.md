@@ -29,9 +29,9 @@ Prepare library dependency:
 Create Android Studio Project:
 
 	From Android Studio main window:
-		File -> Import Project -> select RetroShare-Android-Client/src
+		File -> Import Project -> select RetroShare-Android-Client/RetroShareAndroidIntegration
 		File -> Import Module -> select RetroShare-Android-Client/lib/rsctrl
-		File -> Project Structure -> Libraries -> + -> Java -> select RetroShare-Android-Client/lib/jaramiko-151/jaramiko.jar ( Doing this you will probably asked what modules of your project depends on that library, select the one created importing RetroShare-Android-Client/src )
+		File -> Project Structure -> Libraries -> + -> Java -> select RetroShare-Android-Client/lib/jaramiko-151/jaramiko.jar ( Doing this you will probably asked what modules of your project depends on that library, select the one created importing RetroShare-Android-Client/RetroShareAndroidIntegration )
 		File -> Project Structure -> Libraries -> + -> From Maven... -> put com.google.protobuf in the search box -> press search -> select version 2.4.1 -> set Dwonload to RetroShare-Android-Client/lib -> press OK
 		File -> Project Structure -> Libraries -> + -> From Maven... -> put com.google.zxing in the search box -> press search -> select version core:2.0 -> set Dwonload to RetroShare-Android-Client/lib -> press OK
 
