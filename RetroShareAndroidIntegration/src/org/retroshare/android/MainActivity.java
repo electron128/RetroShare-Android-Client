@@ -268,13 +268,19 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
                 builder.setView(view)
                         .setTitle(R.string.enter_ssh_password)
                         .setPositiveButton(
-                                "login",
+                                "login",//TODO HARDCODED string
                                 new DialogInterface.OnClickListener()
                                 {
                                     @Override public void onClick(DialogInterface dialog, int which)
                                     {
                                         serverData.password = et.getText().toString();
-                                        serverData.savePassword = cbsp.isChecked();
+										boolean savePwd = cbsp.isChecked();
+										if(savePwd ^ serverData.savePassword)
+										{
+											serverData.savePassword = savePwd;
+											rsProxy.addServer(serverData);
+											rsProxy.saveData();
+										}
                                         _connect();
                                     }
                                 });

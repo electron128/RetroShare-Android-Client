@@ -20,7 +20,7 @@ public class RsServerData implements Serializable, Cloneable
 	public String name;
 	
 	public String user;
-	public String password;
+	public transient String password;
 	public boolean savePassword = false;
 	public String hostname;
 	public String dhtKey;
@@ -28,7 +28,8 @@ public class RsServerData implements Serializable, Cloneable
 	public transient PKey hostkey;
 	
 	@Override
-	public String toString(){
+	public String toString()
+	{
 		//if(hostkey!=null){
 			try{
 				return "Servername:"+name+" \""+user+":"+password+"@"+hostname+":"+Integer.toString(port)+" key="+hostkey+"\"";
@@ -64,38 +65,54 @@ public class RsServerData implements Serializable, Cloneable
 		return s;
 	}
 	
-	private void writeObject(ObjectOutputStream out){
-		if(DEBUG){System.err.println("RsServerData::writeObject: "+this);}
-		try {
+	private void writeObject(ObjectOutputStream out)
+	{
+		if(DEBUG) System.err.println("RsServerData::writeObject: "+this);
+
+		try
+		{
 			out.defaultWriteObject();
-			if(hostkey!=null){
+			if(hostkey != null)
+			{
 				out.writeBoolean(true);
 				out.writeObject(hostkey.toByteArray());
 			}
-			else{
-				out.writeBoolean(false);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			else out.writeBoolean(false);
 
-		
+			if(savePassword)
+			{
+				out.writeBoolean(true);
+				out.writeObject(password);
+			}
+			else out.writeBoolean(false);
+
+
+		}
+		catch (IOException e) { e.printStackTrace(); } // TODO Auto-generated catch block
 	}
 	
-	private void readObject(ObjectInputStream in) throws NotActiveException, IOException, ClassNotFoundException{
-		if(DEBUG){System.err.println("RsServerData::readObject begin: ");}
+	private void readObject(ObjectInputStream in) throws NotActiveException, IOException, ClassNotFoundException
+	{
+		if(DEBUG) System.err.println("RsServerData::readObject begin: ");
+
 		in.defaultReadObject();
-		if(in.readBoolean()){
-			if(DEBUG){System.err.println("RsServerData::readObject: PKey!=null");}
+		if(in.readBoolean())
+		{
+			if(DEBUG) System.err.println("RsServerData::readObject: PKey!=null");
+
 			byte[] b=(byte[]) in.readObject();
-			hostkey= PKey.createFromData(b);
+			hostkey = PKey.createFromData(b);
 		}
-		else{
-			if(DEBUG){System.err.println("RsServerData::readObject: PKey==null");}
+		else
+		{
+			if(DEBUG) System.err.println("RsServerData::readObject: PKey==null");
 			hostkey=null;
 		}
-		if(DEBUG){System.err.println("RsServerData::readObject end: "+this);}
+
+		if(in.readBoolean()) password = (String) in.readObject();
+		else password = null;
+
+		if(DEBUG) System.err.println("RsServerData::readObject end: "+this);
 	}
 	
 	protected RsServerData clone(){
