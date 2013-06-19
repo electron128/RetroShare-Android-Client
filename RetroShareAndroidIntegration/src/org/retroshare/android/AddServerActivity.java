@@ -1,5 +1,8 @@
 package org.retroshare.android;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -66,7 +69,7 @@ public class AddServerActivity extends ProxiedActivityBase
 			EditText editTextPort     = (EditText) findViewById(R.id.editTextPort);
 			EditText editTextUser     = (EditText) findViewById(R.id.editTextUser);
 			CheckBox resetPwdChkb     = (CheckBox) findViewById(R.id.resetPasswordCheckBox);
-			CheckBox reseteSshSrvKey  = (CheckBox) findViewById(R.id.resetSshServerKeyCheckBox);
+			CheckBox resetSshSrvKey  = (CheckBox) findViewById(R.id.resetSshServerKeyCheckBox);
 
 			if(!util.hasContent(editTextPort) || !util.hasContent(editTextName) || !util.hasContent(editTextHostname) || !util.hasContent(editTextUser))
 			{
@@ -74,8 +77,11 @@ public class AddServerActivity extends ProxiedActivityBase
 				return;
 			}
 
-			RsServerData sd = rsProxy.getSavedServers().get(serverName);
+			RsServerData sd;
+			if(editServer) sd = rsProxy.getSavedServers().get(serverName);
+			else sd = new RsServerData();
 
+			sd.name = editTextName.getText().toString();
 			sd.hostname = editTextHostname.getText().toString();
 
 			if(util.hasContent(editTextPort)) sd.port = Integer.parseInt(editTextPort.getText().toString());
@@ -88,22 +94,42 @@ public class AddServerActivity extends ProxiedActivityBase
 				sd.savePassword = false;
 			}
 
-			if(reseteSshSrvKey.isChecked()) sd.hostkey = null;
+			if(resetSshSrvKey.isChecked()) sd.hostkey = null;
 
 			rsProxy.addServer(sd);
+			Toast.makeText(getApplicationContext(), "Server saved", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string
+			startActivity(MainActivity.class);
 		}
-		startActivity(MainActivity.class);
 	}
 
-	public void onDeleteButtonPressed(View v)
+	public void onDeleteButtonPressed(View v) { showDialog(DIALOG_DELETE_SERVER); }
+
+	private static final int DIALOG_DELETE_SERVER = 0;
+	@Override
+	protected Dialog onCreateDialog(int id)
 	{
-		// TODO ask for confirmation before deleting the server
-		_deleteServer();
+		switch (id)
+		{
+			case DIALOG_DELETE_SERVER:
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.are_you_sure)
+						.setMessage(R.string.do_you_want_delete_server)
+						.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) { _deleteServer(); } })
+						.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} });
+				return builder.create();
+			}
+		}
+
+		return null;
 	}
 
-	private void _deleteServer()
+	private final void _deleteServer()
 	{
-		if(mBound) rsProxy.delServer(serverName);
-		startActivity(MainActivity.class);
+		if(mBound)
+		{
+			rsProxy.delServer(serverName);
+			startActivity(MainActivity.class);
+		}
 	}
 }

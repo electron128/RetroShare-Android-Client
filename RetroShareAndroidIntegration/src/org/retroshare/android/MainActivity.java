@@ -87,9 +87,9 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		try { serverName = rsAvailableServers.get(0); } catch (IndexOutOfBoundsException e) {}
 		rsAvailableServers.add(getString(R.string.add_server));
 
-		ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.text_view, rsAvailableServers);
+		ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, rsAvailableServers);
 		Spinner serverSpinner = (Spinner) findViewById(R.id.serverSpinner);
-		serverSpinner.setAdapter(spinnerAdapter);
+		serverSpinner.setAdapter(spinnerAdapter); //TODO WTF makes you crash ??
 
     	updateViews();
     }
@@ -98,8 +98,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     public void onResume()
     {
     	super.onResume();
+		isInForeground = true;
     	updateViews();
-    	isInForeground = true;
     }
 
     @Override
@@ -135,14 +135,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
             setVisibility(showIfConnected, View.GONE);
             setVisibility(showIfNotConnected, View.VISIBLE);
         }
-    }
-    
-    public void deleteServerKey(View v)
-    {
-		RsCtrlService server = rsProxy.getActiveServers().get(serverName);
-    	RsServerData sd = server.getServerData();
-		sd.hostkey = null;
-		server.setServerData(sd);
     }
     
     public void showPeers(View v) { startActivity(PeersActivity.class); };
@@ -220,10 +212,10 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 				TextView peersTextView     = (TextView) findViewById(R.id.peersTextView);
 
 
-		    	textViewNetStatus.setText( getResources().getText(R.string.network_status) + ":\n" + resp.getNetStatus().toString() );
+		    	textViewNetStatus.setText( getResources().getText(R.string.network_status) + ": " + resp.getNetStatus().toString() );
 				peersTextView.setText( getResources().getText(R.string.peers) + " (" + Integer.toString(resp.getNoConnected())+ "/" +Integer.toString(resp.getNoPeers()) + ")" );
 		    	DecimalFormat df = new DecimalFormat("#.##");
-		    	textViewBandwidth.setText(getResources().getText( R.string.bandwidth_up_down) + ":\n" + df.format(resp.getBwTotal().getUp()) + "/" + df.format(resp.getBwTotal().getDown()) + " (kB/s)");
+		    	textViewBandwidth.setText(getResources().getText( R.string.bandwidth_up_down) + ": " + df.format(resp.getBwTotal().getUp()) + "/" + df.format(resp.getBwTotal().getDown()) + " (kB/s)");
 		    	
 		    	textViewNetStatus.setVisibility(View.VISIBLE);
 		    	textViewBandwidth.setVisibility(View.VISIBLE);
@@ -298,7 +290,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
                 builder2.setTitle(R.string.connection_error)
                         // TODO solve the connection error thing
                         .setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())
-                        .setPositiveButton("ok", new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} }); // TODO HARDCODED string
+                        .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} });
                 return builder2.create();
         }
 

@@ -49,7 +49,7 @@ public class AccountActivity extends ProxiedActivityBase
         if(rsAvailableServers.size() < 1) return;
 
         // Put available servers inside the Spinner
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, R.layout.text_view, rsAvailableServers);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(AccountActivity.this, android.R.layout.simple_spinner_item, rsAvailableServers);
         Spinner accountSpinner = (Spinner) this.findViewById(R.id.available_account_spinner);
         accountSpinner.setAdapter(spinnerAdapter);
     }
