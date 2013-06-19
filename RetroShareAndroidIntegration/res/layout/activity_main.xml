@@ -18,125 +18,36 @@
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_launcher" />
 
-
-        <EditText
-            android:id="@+id/editTextHostname"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/hostname"
-            android:inputType="text" >
-        </EditText>
-
-
-        <EditText
-            android:id="@+id/editTextPort"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/port"
-            android:inputType="number" >
-        </EditText>
-
-
-        <EditText
-            android:id="@+id/editTextUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/user"
-            android:inputType="text" />
-
-
-        <EditText
-            android:id="@+id/editTextPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
-
+		<Spinner
+				android:id="@+id/serverSpinner"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-
-            <TextView
-                android:id="@+id/textViewServerKey"
-                android:layout_width="293dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="0.62"
-                android:text="verylongserverkeyandstillnotstoppingendlesslong"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:orientation="horizontal" >
 
-
-
-
-            <ImageView
-                android:id="@+id/ImageView05"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                android:onClick="deleteServerKey"
-                android:src="@drawable/cancel" />
+            <Button
+                android:id="@+id/buttonConnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onConnectButtonPressed"
+                android:text="@string/connect" />
+            <Button
+                    android:id="@+id/buttonDisconnect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onDisconnectButtonPressed"
+                    android:text="@string/disconnect" />
+            <Button
+                    android:id="@+id/buttonEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onEditButtonPressed"
+                    android:text="@string/edit" />
 
         </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/textViewConnectionState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-        <Button
-            android:id="@+id/buttonConnect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onConnectButtonPressed"
-            android:text="@string/connect" />
-
-
-
-
-        <TextView
-            android:id="@+id/textViewNetStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-
-
-        <TextView
-            android:id="@+id/textViewNoPeers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-
-        <TextView
-            android:id="@+id/textViewBandwidth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -151,12 +62,12 @@
 
 
             <LinearLayout
+                    android:id="@+id/chatLobbiesClickContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showChatLobbies" >
 
                 <ImageView
-                    android:id="@+id/ImageView01"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_margin="8dp"
@@ -164,7 +75,6 @@
 
 
                 <TextView
-                    android:id="@+id/TextView01"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -181,12 +91,12 @@
 
 
             <LinearLayout
+                    android:id="@+id/peersClickContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showPeers" >
 
                 <ImageView
-                    android:id="@+id/ImageView02"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_margin="8dp"
@@ -194,7 +104,7 @@
 
 
                 <TextView
-                    android:id="@+id/TextView02"
+					android:id="@+id/peersTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -211,12 +121,12 @@
 
 
             <LinearLayout
+                android:id="@+id/filesClickContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showFilesActivity" >
 
                 <ImageView
-                    android:id="@+id/ImageView03"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_margin="8dp"
@@ -224,7 +134,6 @@
 
 
                 <TextView
-                    android:id="@+id/TextView03"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -234,19 +143,18 @@
             </LinearLayout>
 
             <View
-                android:id="@+id/View02"
                 android:layout_width="wrap_content"
                 android:layout_height="2dp"
                 android:background="@android:drawable/divider_horizontal_bright" />
 
 
             <LinearLayout
+                    android:id="@+id/searchClickContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="showSearchActivity" >
 
                 <ImageView
-                    android:id="@+id/ImageView04"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_margin="8dp"
@@ -254,16 +162,28 @@
 
 
                 <TextView
-                    android:id="@+id/TextView04"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="@string/search"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
-
             </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+		<TextView
+				android:id="@+id/textViewNetStatus"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="8dp"
+				android:text="@string/network_status" />
+
+		<TextView
+				android:id="@+id/textViewBandwidth"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="8dp"
+				android:text="@string/bandwidth_up_down" />
+
+	</LinearLayout>
 
 </ScrollView>

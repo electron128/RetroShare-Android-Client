@@ -56,41 +56,52 @@
         android:hint="@string/ssh_username"
         android:inputType="text" />
 
+	<EditText
+			android:id="@+id/editTextSshKey"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:editable="false"
+			android:ems="10"
+			android:inputType="text" />
 
-    <FrameLayout
+	<CheckBox
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/reset_ssh_key"
+			android:id="@+id/resetSshServerKeyCheckBox"
+			/>
+
+	<CheckBox
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/reset_password"
+			android:id="@+id/resetPasswordCheckBox"
+			/>
+
+	<FrameLayout
             android:layout_width="fill_parent" android:layout_height="fill_parent"
             android:layout_weight="1">
     </FrameLayout>
 
     <!-- content fixated to the bottom of the screen -->
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_alignParentBottom="true"
-                android:onClick="addServer" >
+    <LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_gravity="center_horizontal"
+			android:layout_alignParentBottom="true">
 
+		<Button android:id="@+id/saveServerButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onSaveButtonPressed"
+				android:text="@string/save"  />
 
-            <ImageView
-                    android:id="@+id/ImageView01"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_margin="8dp"
-                    android:src="@android:drawable/ic_input_add" />
+		<Button android:id="@+id/deleteServerButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onDeleteButtonPressed"
+				android:text="@string/delete"  />
 
-
-            <TextView
-                    android:id="@+id/TextView01"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/add"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-
-
+	</LinearLayout>
 </LinearLayout>

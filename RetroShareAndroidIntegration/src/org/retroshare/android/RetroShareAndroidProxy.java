@@ -179,13 +179,13 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	}
 
 	/**
-	 * This method del a server to the internal server pack ( server is disconnected before deletion )
-	 * @param serverData the server data
+	 * This method del a server from the internal server pack ( server is disconnected before deletion )
+	 * @param serverName the server name
 	 */
-	public void delServer(RsServerData serverData)
+	public void delServer(String serverName)
 	{
-		_deactivateServer(serverData.name);
-		mDatapack.serverDataMap.remove(serverData);
+		deactivateServer(serverName);
+		mDatapack.serverDataMap.remove(serverName);
 		saveData();
 	}
 
@@ -246,7 +246,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 * Deactivate given server if is active
 	 * @param serverName Local RetroShare server name ( to not be confused with hostname )
 	 */
-	private void _deactivateServer(String serverName)
+	public void deactivateServer(String serverName)
 	{
 		RsBund bund = serverBunds.get(serverName);
 		if( bund != null ) _deactivateServer(bund);
