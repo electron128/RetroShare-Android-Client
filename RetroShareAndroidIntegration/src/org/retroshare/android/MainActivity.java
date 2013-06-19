@@ -202,6 +202,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		@Override
 		protected void rsHandleMsg(RsMessage msg)
 		{
+			// TODO make this multi server aware, at moment handle all message the same...
+
 			ResponseSystemStatus resp;
 			try
 			{
@@ -216,9 +218,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 				peersTextView.setText( getResources().getText(R.string.peers) + " (" + Integer.toString(resp.getNoConnected())+ "/" +Integer.toString(resp.getNoPeers()) + ")" );
 		    	DecimalFormat df = new DecimalFormat("#.##");
 		    	textViewBandwidth.setText(getResources().getText( R.string.bandwidth_up_down) + ": " + df.format(resp.getBwTotal().getUp()) + "/" + df.format(resp.getBwTotal().getDown()) + " (kB/s)");
-		    	
-		    	textViewNetStatus.setVisibility(View.VISIBLE);
-		    	textViewBandwidth.setVisibility(View.VISIBLE);
 			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 		}
 	}
