@@ -129,6 +129,7 @@ public class AddServerActivity extends ProxiedActivityBase
 		if(mBound)
 		{
 			rsProxy.delServer(serverName);
+			Toast.makeText(getApplicationContext(), "Server deleted", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string
 			startActivity(MainActivity.class);
 		}
 	}

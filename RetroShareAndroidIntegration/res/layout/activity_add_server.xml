@@ -60,8 +60,9 @@
 			android:id="@+id/editTextSshKey"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:editable="false"
+			android:enabled="false"
 			android:ems="10"
+			android:hint="@string/server_key_not_available"
 			android:inputType="text" />
 
 	<CheckBox

@@ -20,6 +20,7 @@
     <string name="user">user</string>
 	<string name="reset_password">Reset Password</string>
 	<string name="reset_ssh_key">Reset Server SSH hostkey</string>
+	<string name="server_key_not_available">server key not available</string>
     <string name="password">password</string>
     <string name="error">error</string>
     <string name="err_unknown_host">could not get ip for  this hostname</string>
