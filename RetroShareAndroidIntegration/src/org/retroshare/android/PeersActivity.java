@@ -84,15 +84,15 @@ public class PeersActivity extends ProxiedActivityBase
     		personList = pl;
     		locationList.clear();
     		mapLocationToPerson.clear();
-    		for(Person p:personList)
+    		for(Person p : personList)
 			{
-    			for(Location l:p.getLocationsList())
+    			for(Location l : p.getLocationsList())
 				{
     				locationList.add(l);
     				mapLocationToPerson.put(l, p);
     			}
     		}
-    		for(DataSetObserver obs:observerList) { obs.onChanged(); }
+    		for(DataSetObserver obs : observerList) { obs.onChanged(); }
     	}
     	
     	@Override
@@ -126,16 +126,17 @@ public class PeersActivity extends ProxiedActivityBase
 	        
 	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
 	        
-	        ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
-	        ImageView imageViewUserState=(ImageView) view.findViewById(R.id.imageViewUserState);
+	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.imageViewMessage);
+	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
 	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
 	        
-	        ChatId chatId=ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
+	        ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
 	        Boolean haveNewMessage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);
-	        imageViewMessage.setVisibility(View.GONE);
-	        if( haveNewMessage != null && haveNewMessage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
 
-	        if( (l.getState()&Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
+	        if( haveNewMessage != null && haveNewMessage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
+			else imageViewMessage.setVisibility(View.GONE);
+
+	        if( (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
 			{
 	        	imageViewUserState.setImageResource(R.drawable.ic_contact_color);
 	        	textView1.setTextColor(Color.BLUE);

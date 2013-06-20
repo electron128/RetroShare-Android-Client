@@ -55,7 +55,7 @@ public class RsPeersService implements RsServiceInterface
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(PeersServiceListener l:mListeners){ l.update(); }; }}); }
 
-	private List<Person> Persons=new ArrayList<Person>();
+	private List<Person> Persons = new ArrayList<Person>();
 	public List<Person> getPeersList(){ return Persons; }
 	public Person getPersonFromSslId(String sslId)
 	{

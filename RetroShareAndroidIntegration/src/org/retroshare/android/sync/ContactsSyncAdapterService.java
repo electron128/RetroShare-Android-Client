@@ -25,6 +25,7 @@ import android.util.Log;
 
 import org.retroshare.android.R;
 import org.retroshare.android.ProxiedServiceBase;
+import org.retroshare.android.RsPeersService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -42,9 +43,6 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
     private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
     private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
     private static String MIME="retroshare.android.cursor.item/org.retroshare.android.sync.profile"; // TODO Shouldn't this be of the form vnd.*/vnd.* ? // TODO Move to string.xml
-    private List<Location> locationList=new ArrayList<Location>();
-    private Map<Location,Person> mapLocationToPerson=new HashMap<Location,Person>();
-    private List<Person> peers=null;
 
     // TODO Check if we can to it smarter
     private static class SyncEntry
@@ -112,9 +110,15 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			mContentResolver = context.getContentResolver();
             updateContactList(account);
 
-			peers = rsProxy.activateServer(account.name).mRsPeersService.getPeersList();
-            locationList.clear();
-            mapLocationToPerson.clear();
+			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
+
+			List<Person> peers = new ArrayList<Person>();
+			List<Location> locationList = new ArrayList<Location>();
+			Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
+
+			peers.add(peersService.getOwnPerson());
+			peers.addAll(peersService.getPeersList());
+
             String name;
             boolean online = false;
             Location lfound = null;
@@ -127,50 +131,52 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
                 }
 
                 ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-                try {
-                    // If we don't have any contacts, create one. Otherwise, set a
-                    // status message
-                    if (!_contactExist(account,peer)) {
+                try
+				{
+                    // If the contact doesn't exist, create it. Otherwise, set a status message
+                    if (!_contactExist(account,peer))
+					{
                         _addContact(account, peer);
                         updateContactList(account);
-                    } else {
-                        name=peer.getName();
-                        online=false;
-                        for(Location l:locationList){
-                            Person p=mapLocationToPerson.get(l);
-                            if(p.equals(peer)){
-                                if((l.getState()&Location.StateFlags.CONNECTED_VALUE)==Location.StateFlags.CONNECTED_VALUE){online=true; lfound=l; break;}
+                    }
+					else
+					{
+                        name = peer.getName();
+                        online = false;
+                        for(Location l : locationList)
+						{
+                            Person p = mapLocationToPerson.get(l);
+                            if(p.equals(peer))
+							{
+                                if( (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE )
+								{
+									online = true;
+									lfound = l;
+									break;
+								}
                                 lfound=l;
                             }
                         }
                         //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
-                          if(true){  //bisogna trovare il modo di capire se e' lo stato del peer e' cambiato oppure come sopra
-                                     //aggiornare ogni tot invece che ogni volta
+						// TODO bisogna trovare il modo di capire se lo stato del peer e' cambiato oppure come sopra aggiornare ogni tot invece che ogni volta
+                        if(true)
+						{
                             //You would probably download an image file and just pass the bytes, but this sample doesn't use network so we'll decode and re-compress the icon resource to get the bytes
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
                             Bitmap icon = null;
-                            if(online) icon=BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2);
-                            else icon=BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2_gray);
+                            if(online) icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2);
+                            else icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2_gray);
                             icon.compress(CompressFormat.PNG, 0, stream);
                             _updateContactPhoto(operationList, localContacts.get(name).raw_id, stream.toByteArray());
                         }
                         _updateContactStatus(operationList, localContacts.get(name).raw_id, "Test aggiornamento ("+ lfound.getLocation()+")");
                     }
-                    if (operationList.size() > 0)
-                        mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    if (operationList.size() > 0) mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
                 }
+				catch (Exception e1) { e1.printStackTrace(); } // TODO Auto-generated catch block
 
-
-
-
-				if(!_contactExist(account,peer)) _addContact(account, peer);
-                else{
-                    //peer.
-                }
+				if( ! _contactExist(account,peer) ) _addContact(account, peer); // TODO why we do this another time ??
             }
 		}
 	}
