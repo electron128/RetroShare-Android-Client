@@ -30,7 +30,7 @@ public class ChatActivityLauncher extends ProxiedActivityBase
                 String sslid = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DATA2));
 
                 Intent i = new Intent();
-                i.putExtra("ChatId", Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId(sslid).build().toByteArray());
+                i.putExtra("ChatId", Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId(sslid).build().toByteArray()); // TODO HARCODED string
                 startActivity(ChatActivity.class, i);
                 //XXX: mi suicido subito dopo aver lanciato l'altra activity
                 // tranquillo perche' ho il nohistory sul manifest (http://developer.android.com/guide/topics/manifest/activity-element.html#nohist)

@@ -101,8 +101,8 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	@Override
 	public void onPause()
 	{
-		super.onPause();
 		if(mBound) getConnectedServer().mRsChatService.setNotifyBlockedChat(null);
+		super.onPause();
 	}
 	
 	@Override

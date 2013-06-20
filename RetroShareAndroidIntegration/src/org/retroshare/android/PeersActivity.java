@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,12 +37,10 @@ public class PeersActivity extends ProxiedActivityBase
 	private PeersListAdapterListener adapter;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
-        super.onCreate(savedInstanceState);
-
         adapter=new PeersListAdapterListener(this);
-        ListView lv=new ListView(this);
+        ListView lv = new ListView(this);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(adapter);
         lv.setOnItemLongClickListener(adapter);
@@ -51,26 +50,29 @@ public class PeersActivity extends ProxiedActivityBase
     @Override
     protected void onServiceConnected()
 	{
-		RsCtrlService server = getConnectedServer();
-		server.mRsPeersService.registerListener(adapter);
-		server.mRsChatService.registerListener(adapter);
-		server.mRsPeersService.updatePeersList();
-    }
+		_registerListeners();
+		getConnectedServer().mRsPeersService.updateFriendsList();
+	}
     
     @Override
     public void onResume()
 	{
     	super.onResume();
-    	if(mBound)
-		{
-			getConnectedServer().mRsPeersService.updatePeersList();
-    		adapter.update();
-    	}
+		_registerListeners();
+		if(mBound) getConnectedServer().mRsPeersService.updateFriendsList();
     }
+
+	@Override
+	public void onPause()
+	{
+		_unregisterListeners();
+		super.onPause();
+	}
     
     private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener, PeersServiceListener, ChatServiceListener
 	{
-    	private List<Person> personList = new ArrayList<Person>();
+		private final static String TAG = "PeersListAdapterListener";
+
     	private List<Location> locationList = new ArrayList<Location>();
     	private Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
     	private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
@@ -78,22 +80,6 @@ public class PeersActivity extends ProxiedActivityBase
     	private LayoutInflater mInflater;
     	
     	public PeersListAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
-    	
-    	public void setData(List<Person> pl)
-		{
-    		personList = pl;
-    		locationList.clear();
-    		mapLocationToPerson.clear();
-    		for(Person p : personList)
-			{
-    			for(Location l : p.getLocationsList())
-				{
-    				locationList.add(l);
-    				mapLocationToPerson.put(l, p);
-    			}
-    		}
-    		for(DataSetObserver obs : observerList) { obs.onChanged(); }
-    	}
     	
     	@Override
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -163,6 +149,50 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() { setData(getConnectedServer().mRsPeersService.getPeersList()); } // called by RsChatService
+		@Override public void update() // called by RsChatService and RsPeersService
+		{
+			Log.d(TAG, "update()");
+
+			RsPeersService peersService = getConnectedServer().mRsPeersService;
+			peersService.updateFriendsList();
+
+			List<Person> personList = peersService.getPeersList();
+			locationList.clear();
+			mapLocationToPerson.clear();
+			for(Person p : personList)
+			{
+				for(Location l : p.getLocationsList())
+				{
+					locationList.add(l);
+					mapLocationToPerson.put(l, p);
+				}
+			}
+
+			for(DataSetObserver obs : observerList) { obs.onChanged(); }
+		}
     }
+
+	private void _registerListeners()
+	{
+		Log.d(TAG, "_registerListeners()");
+
+		if( ! mBound ) return;
+
+		Log.d(TAG, "_registerListeners() bound");
+
+		RsCtrlService server = getConnectedServer();
+		server.mRsPeersService.registerListener(adapter);
+		server.mRsChatService.registerListener(adapter);
+	}
+
+	private void _unregisterListeners()
+	{
+		Log.d(TAG, "_unregisterListeners()");
+
+		if( ! mBound ) return;
+
+		RsCtrlService server = getConnectedServer();
+		server.mRsPeersService.unregisterListener(adapter);
+		server.mRsChatService.unregisterListener(adapter);
+	}
 }

@@ -304,8 +304,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
     private void _connect()
     {
+		showDialog(DIALOG_CONNECT);
         rsProxy.activateServer(serverName).registerListener(this);
-        showDialog(DIALOG_CONNECT);
     }
 
     private void _disconnect() { rsProxy.deactivateServer(serverName); }

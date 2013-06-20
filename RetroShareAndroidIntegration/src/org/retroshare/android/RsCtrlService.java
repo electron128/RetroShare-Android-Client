@@ -195,7 +195,7 @@ public class RsCtrlService implements Runnable
 		// preload own Name, needed for Chat
 		mRsPeersService.getOwnPerson();
 		// preload peers list, needed for chat notification
-		mRsPeersService.updatePeersList();
+		mRsPeersService.updateFriendsList();
 		// preload chatobby list, because first request returns just an empty list
 		mRsChatService.updateChatLobbies();
 	}

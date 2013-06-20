@@ -81,12 +81,12 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
         _bindRsService();
     }
 
-    @Override
-    public void onDestroy()
-    {
-        _unBindRsService();
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy()
+	{
+		_unBindRsService();
+		super.onDestroy();
+	}
 
 	private void _bindRsService()
 	{
@@ -96,7 +96,14 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		bindService(intent, this, Context.BIND_AUTO_CREATE);
 	}
 
-	private void _unBindRsService() { if(mBound) unbindService(this); }
+	private void _unBindRsService()
+	{
+		if(mBound)
+		{
+			unbindService(this);
+			mBound = false;
+		}
+	}
 
 	/**
 	 * This method launch an activity putting the server name as intent extra data transparently

@@ -1,6 +1,7 @@
 package org.retroshare.android;
 
 import android.os.Looper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class RsPeersService implements RsServiceInterface
 {
+	private static final String TAG = "RsPeersService";
+
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
 
@@ -50,16 +53,39 @@ public class RsPeersService implements RsServiceInterface
 		public void update();
 	}
 	
-	private Set<PeersServiceListener>mListeners=new HashSet<PeersServiceListener>();
+	private Set<PeersServiceListener> mListeners = new HashSet<PeersServiceListener>();
 	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(PeersServiceListener l:mListeners){ l.update(); }; }}); }
+	private void _notifyListeners()
+	{
+		Log.d(TAG, "_notifyListeners()");
 
-	private List<Person> Persons = new ArrayList<Person>();
-	public List<Person> getPeersList(){ return Persons; }
+		if(mUiThreadHandler != null)
+		{
+			Log.d(TAG, "_notifyListeners() not null");
+			mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners)
+			{
+				Log.d(TAG, "_notifyListeners() notiyin " + l.toString());
+				l.update();
+			}; }});
+		}
+	}
+
+	private List<Person> mPersons = new ArrayList<Person>();
+	public List<Person> getPeersList()
+	{
+		ArrayList pr = new ArrayList();
+
+		if(ownPerson == null) getOwnPerson();
+		else pr.add(ownPerson);
+
+		pr.addAll(mPersons);
+
+		return pr;
+	}
 	public Person getPersonFromSslId(String sslId)
 	{
-		for(Person p:Persons){for(Location l:p.getLocationsList()){ if(l.getSslId().equals(sslId)){ return p; } }}
+		for(Person p: getPeersList()){for(Location l:p.getLocationsList()){ if(l.getSslId().equals(sslId)){ return p; } }}
 		return null;
 	}
 	
@@ -83,35 +109,38 @@ public class RsPeersService implements RsServiceInterface
 		return ownPerson;
 	}
 
-	public void updatePeersList()
+	public void updateFriendsList()
 	{
+		getOwnPerson();
+
 		RequestPeers.Builder reqb = RequestPeers.newBuilder();
 		reqb.setSet(RequestPeers.SetOption.FRIENDS);
 		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
-		RequestPeers req=reqb.build();
+		RequestPeers req = reqb.build();
 		byte[] b;
-		b=req.toByteArray();
-    	RsMessage msg= new RsMessage();
+		b = req.toByteArray();
+    	RsMessage msg = new RsMessage();
     	//         TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
-    	msg.body=b;
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
+    	msg.body = b;
     	mRsCtrlService.sendMsg(msg);
 	}
 
 	@Override
 	public void handleMessage(RsMessage msg)
 	{
-   		System.err.println("PeersHandler:rsHandleMessage");
-   		
+		Log.d(TAG, "handleMessage(RsMessage msg) is the message for us?");
+
    		//            TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
-		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.PEERS_VALUE<<8)|Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE))
+		if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.PEERS_VALUE<<8) | Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE ) )
 		{
-			System.err.println("received Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE");
+
+			Log.d(TAG, "handleMessage(RsMessage msg) The message is for us");
 			
 			try
 			{
-				Persons = ResponsePeerList.parseFrom(msg.body).getPeersList();
-				System.err.println(Persons);
+				mPersons = ResponsePeerList.parseFrom(msg.body).getPeersList();
+				System.err.println(mPersons);
 				_notifyListeners();
 			}
 			catch (InvalidProtocolBufferException e) { e.printStackTrace();	}

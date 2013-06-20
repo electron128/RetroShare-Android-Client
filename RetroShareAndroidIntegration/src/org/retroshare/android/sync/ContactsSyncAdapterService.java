@@ -111,17 +111,11 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
             updateContactList(account);
 
 			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
-			// Ask refresh data inside RsPeersService
-			peersService.getOwnPerson();
-			peersService.updatePeersList();
+			peersService.updateFriendsList(); // Ask refresh data inside RsPeersService
 
-			List<Person> peers = new ArrayList<Person>();
+			List<Person> peers = peersService.getPeersList();
 			List<Location> locationList = new ArrayList<Location>();
 			Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
-
-			Person rsMe = peersService.getOwnPerson();
-			if(rsMe != null) peers.add(rsMe);
-			peers.addAll(peersService.getPeersList());
 
             String name;
             boolean online = false;
@@ -162,7 +156,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
                             }
                         }
                         //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
-						// TODO bisogna trovare il modo di capire se lo stato del peer e' cambiato oppure come sopra aggiornare ogni tot invece che ogni volta
+						// TODO bisogna trovare il modo di capire se lo stato del peer e' cambiato ( guardare se sono diversi ? ) oppure come sopra aggiornare ogni tot invece che ogni volta
                         if(true)
 						{
                             //You would probably download an image file and just pass the bytes, but this sample doesn't use network so we'll decode and re-compress the icon resource to get the bytes
