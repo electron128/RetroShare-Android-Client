@@ -56,20 +56,7 @@ public class RsPeersService implements RsServiceInterface
 	private Set<PeersServiceListener> mListeners = new HashSet<PeersServiceListener>();
 	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners()
-	{
-		Log.d(TAG, "_notifyListeners()");
-
-		if(mUiThreadHandler != null)
-		{
-			Log.d(TAG, "_notifyListeners() not null");
-			mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners)
-			{
-				Log.d(TAG, "_notifyListeners() notiyin " + l.toString());
-				l.update();
-			}; }});
-		}
-	}
+	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners) { l.update(); }; }}); }	}
 
 	private List<Person> mPersons = new ArrayList<Person>();
 	public List<Person> getPeersList()
@@ -120,7 +107,6 @@ public class RsPeersService implements RsServiceInterface
 		byte[] b;
 		b = req.toByteArray();
     	RsMessage msg = new RsMessage();
-    	//         TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
     	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
     	msg.body = b;
     	mRsCtrlService.sendMsg(msg);
@@ -129,14 +115,8 @@ public class RsPeersService implements RsServiceInterface
 	@Override
 	public void handleMessage(RsMessage msg)
 	{
-		Log.d(TAG, "handleMessage(RsMessage msg) is the message for us?");
-
-   		//            TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
 		if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.PEERS_VALUE<<8) | Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE ) )
 		{
-
-			Log.d(TAG, "handleMessage(RsMessage msg) The message is for us");
-			
 			try
 			{
 				mPersons = ResponsePeerList.parseFrom(msg.body).getPeersList();
