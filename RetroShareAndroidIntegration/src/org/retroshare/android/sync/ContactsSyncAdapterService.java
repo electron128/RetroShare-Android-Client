@@ -240,8 +240,6 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
         if(!listl.isEmpty())
 		{
 
-
-
         for(Location ll:listl){
             if( (ll.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE){
                 l=ll; // XXX: se ne trovo una connessa la prendo per buona
@@ -252,6 +250,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
             if(l==null){l=listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
             //TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
             locname=l.getLocation();
+        }
         }
 
         builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);

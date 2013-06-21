@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
 
 import rsctrl.chat.Chat;
 
@@ -44,7 +46,6 @@ public class ChatActivityLauncher extends Activity
             // How did we get here without data?
             finish();
         }
-        else finish(); // How did we get here without data?
     }
 
 }

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import org.retroshare.android.R;
 
 public class AddDownloadActivity extends ProxiedActivityBase
 {
