@@ -56,75 +56,68 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	private ChatMessage lastPrivateChatMessage;
 	private ChatMessage lastChatlobbyMessage;
 	
-	public ChatMessage getLastPrivateChatMessage(){
-		return lastPrivateChatMessage;
-	}
-	public ChatMessage getLastChatlobbyMessage(){
-		return lastChatlobbyMessage;
-	}
+	public ChatMessage getLastPrivateChatMessage() { return lastPrivateChatMessage; }
+	public ChatMessage getLastChatlobbyMessage() { return lastChatlobbyMessage; }
 	
 	
 	public void setNotifyBlockedChat(ChatId id)
     {
-		NotifyBlockedChat=id;
-		if(id!=null){
-			if(lastPrivateChatMessage!=null){
-				if(id.equals(lastPrivateChatMessage.getId())){
-					lastPrivateChatMessage=null;
-				}
+		NotifyBlockedChat = id;
+		if( id != null)
+		{
+			if(lastPrivateChatMessage != null)
+			{
+				if(id.equals(lastPrivateChatMessage.getId())) lastPrivateChatMessage = null;
 			}
-			if(lastChatlobbyMessage!=null){
-				if(id.equals(lastChatlobbyMessage.getId())){
-					lastChatlobbyMessage=null;
-				}
+			if(lastChatlobbyMessage != null)
+			{
+				if(id.equals(lastChatlobbyMessage.getId())) lastChatlobbyMessage = null;
 			}
 			clearChatChanged(id);
 		}
 	}
-	public void clearChatChanged(ChatId ci){
+	public void clearChatChanged(ChatId ci)
+	{
 		ChatChanged.put(ci, false);
 		_notifyListeners();
 	}
-	public Map<ChatId,Boolean> getChatChanged(){
-		return ChatChanged;
-	}
+	public Map<ChatId,Boolean> getChatChanged() { return ChatChanged; }
 	
-	public void updateChatLobbies(){
-    	RequestChatLobbies.Builder reqb=RequestChatLobbies.newBuilder();
+	public void updateChatLobbies()
+	{
+    	RequestChatLobbies.Builder reqb = RequestChatLobbies.newBuilder();
     	reqb.setLobbySet(RequestChatLobbies.LobbySet.LOBBYSET_ALL);
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestChatLobbies_VALUE;
-    	msg.body=reqb.build().toByteArray();
-    	requestChatLobbiesRequestId=mRsCtrlService.sendMsg(msg);
+    	RsMessage msg = new RsMessage();
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestChatLobbies_VALUE;
+    	msg.body = reqb.build().toByteArray();
+    	requestChatLobbiesRequestId = mRsCtrlService.sendMsg(msg);
 	}
 	
 	public List<Chat.ChatLobbyInfo> getChatLobbies() { return ChatLobbies; }
 	
 	public List<ChatMessage> getChatHistoryForChatId(ChatId id)
 	{
-		if(ChatHistory.get(id)==null) return new ArrayList<ChatMessage>();
+		if( ChatHistory.get(id) == null ) return new ArrayList<ChatMessage>();
 		return ChatHistory.get(id);
 	}
-	
-	
-	
-	
-	int requestChatLobbiesRequestId=0;
+
+	int requestChatLobbiesRequestId = 0;
 
 	@Override
 	public void handleMessage(RsMessage msg)
 	{
 		
 		// check reqId, because JoinOrLeaveLobby answers with ResponseChatLobbies, but without ChatLobbyInfos
-		if(msg.reqId==requestChatLobbiesRequestId)
+		if( msg.reqId == requestChatLobbiesRequestId )
 		{
 			// response ChatLobbies
-			if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE)){
+			if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.CHAT_VALUE<<8) | Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE ) )
+			{
 				System.err.println("received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE");
 				try
 				{
-					ResponseChatLobbies resp=Chat.ResponseChatLobbies.parseFrom(msg.body);
-					ChatLobbies=resp.getLobbiesList();
+					ResponseChatLobbies resp = Chat.ResponseChatLobbies.parseFrom(msg.body);
+					ChatLobbies = resp.getLobbiesList();
 					
 					System.err.println("RsChatService::handleMessage: ResponseChatLobbies\n"+ChatLobbies);
 					
@@ -135,27 +128,28 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 		}
 		
 		// response ChatMessage
-		if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE)){
+		if( msg.msgId == (RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|ResponseMsgIds.MsgId_EventChatMessage_VALUE) )
+		{
 			System.err.println("received Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE");
-			try {
+			try
+			{
 				EventChatMessage resp=EventChatMessage.parseFrom(msg.body);
 				
-				ChatMessage m=resp.getMsg();
-				// ad name information, and update lastChatMessage
-		    	if(m.getId().getChatType()==ChatType.TYPE_LOBBY){
+				ChatMessage m = resp.getMsg();
+				// add name information, and update lastChatMessage
+		    	if(m.getId().getChatType()==ChatType.TYPE_LOBBY)
+				{
 		    		// we have lobby
 		    		// so names are included in the ChatMessage
 		    		
 		    		lastChatlobbyMessage=m;
-		    	}else{
+		    	}
+				else
+				{
 		    		// private chat, we have to add names
-		    		Person p=mRsCtrlService.mRsPeersService.getPersonFromSslId(m.getId().getChatId());
-			    	if(p!=null){
-			    		m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(
-				    				p.getName()
-				    			).build();
-			    	}
-			    	lastPrivateChatMessage=m;
+		    		Person p = mRsCtrlService.mRsPeersService.getPersonFromSslId(m.getId().getChatId());
+			    	if( p != null ) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( p.getName() ).build();
+			    	lastPrivateChatMessage = m;
 		    	}
 		    	
 				_addChatMessageToHistory(m);
@@ -163,13 +157,9 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 				
 				System.err.println(resp.getMsg());
 				
-			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+			catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
 		}
-		
-		
 	}
 	
 	// called once in onConnected()
@@ -186,86 +176,75 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	
 	
 
-	public void joinChatLobby(ChatLobbyInfo li){
+	public void joinChatLobby(ChatLobbyInfo li)
+	{
 		
-		RequestJoinOrLeaveLobby.Builder reqb= RequestJoinOrLeaveLobby.newBuilder();
+		RequestJoinOrLeaveLobby.Builder reqb = RequestJoinOrLeaveLobby.newBuilder();
 		reqb.setLobbyId(li.getLobbyId());
 		reqb.setAction(RequestJoinOrLeaveLobby.LobbyAction.JOIN_OR_ACCEPT);
 		
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
-    	msg.body=reqb.build().toByteArray();
+    	RsMessage msg = new RsMessage();
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
+    	msg.body = reqb.build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
 	}
 	
-	public void leaveChatLobby(ChatLobbyInfo li){
-		RequestJoinOrLeaveLobby.Builder reqb= RequestJoinOrLeaveLobby.newBuilder();
+	public void leaveChatLobby(ChatLobbyInfo li)
+	{
+		RequestJoinOrLeaveLobby.Builder reqb = RequestJoinOrLeaveLobby.newBuilder();
 		reqb.setLobbyId(li.getLobbyId());
 		reqb.setAction(RequestJoinOrLeaveLobby.LobbyAction.LEAVE_OR_DENY);
 		
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
-    	msg.body=reqb.build().toByteArray();
+    	RsMessage msg = new RsMessage();
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE;
+    	msg.body = reqb.build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
 	}
 	
-	public void sendChatMessage(ChatMessage m){
+	public void sendChatMessage(ChatMessage m)
+	{
 		System.err.println("RsChatService: Sending Message:\n"+m);
 		
-    	RsMessage msg=new RsMessage();
-    	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
-    	msg.body=RequestSendMessage.newBuilder().setMsg(m).build().toByteArray();
+    	RsMessage msg = new RsMessage();
+    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
+    	msg.body = RequestSendMessage.newBuilder().setMsg(m).build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
     	
 		// ad name information
-    	if(m.getId().getChatType().equals(ChatType.TYPE_LOBBY)){
+    	if(m.getId().getChatType().equals(ChatType.TYPE_LOBBY))
+		{
     		System.err.println("RsChatService::_sendChatMessage: ChatLobbies:\n"+ChatLobbies);
     		// we have lobby
-    		for(ChatLobbyInfo i:ChatLobbies){
-    			if(i.getLobbyId().equals(m.getId().getChatId())){
+    		for(ChatLobbyInfo i:ChatLobbies)
+			{
+    			if(i.getLobbyId().equals(m.getId().getChatId()))
+				{
     				System.err.println("RsChatService::_sendChatMessage: Lobby found");
-	    			// no nick set
-	    			if(i.getLobbyNickname().equals("")){
-	    				m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
-	    			}
-	    			//nick set
-	    			else{
-	    				m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(i.getLobbyNickname()).build();
-	    			}
+	    			if(i.getLobbyNickname().equals("")) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( mRsCtrlService.mRsPeersService.getOwnPerson().getName() ).build(); // no nick set
+	    			else m = ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(i.getLobbyNickname()).build(); //nick set
 	    			break;
     			}
     		}
-    		
-    	}else{
+    	}
+		else
+		{
     		// private chat
-	    	if(mRsCtrlService.mRsPeersService.getOwnPerson()!=null){
-	    		m=ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
-	    	}else{
-	    		// no name available
-	    	}
+	    	if(mRsCtrlService.mRsPeersService.getOwnPerson() != null) m = ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
+	    	else {} // no name available
     	}
     	
     	_addChatMessageToHistory(m);
 	}
 	
-	private void _addChatMessageToHistory(ChatMessage m){
-		
-		if(ChatHistory.get(m.getId())==null){
-			ChatHistory.put(m.getId(), new ArrayList<ChatMessage>());
-		}
+	private void _addChatMessageToHistory(ChatMessage m)
+	{
+		if( ChatHistory.get(m.getId()) == null ) ChatHistory.put(m.getId(), new ArrayList<ChatMessage>());
 
 		ChatHistory.get(m.getId()).add(m);
-		if(! m.getId().equals(NotifyBlockedChat)){
-			ChatChanged.put(m.getId(), true);
-		}
+		if(! m.getId().equals(NotifyBlockedChat)) ChatChanged.put(m.getId(), true);
 		_notifyListeners();
 	}
 	
 	@Override
-	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
-	{
-		if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED) registerForEventsAtServer();
-	}
-	
-	
+	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce) { if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED) registerForEventsAtServer(); }
 }
