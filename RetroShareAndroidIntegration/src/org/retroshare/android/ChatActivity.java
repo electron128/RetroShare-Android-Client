@@ -23,10 +23,10 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener
 {
-	private static final String TAG = "ChatActivity";
+	@Override public String TAG() { return "ChatActivity"; }
 
-	public final static String CHAT_ID_EXTRA = "ChatId";
-	public final static String CHAT_LOBBY_INFO_EXTRA = "ChatLobbyInfo";
+	public final static String CHAT_ID_EXTRA = "org.retroshare.android.intent_extra_keys.ChatId";
+	public final static String CHAT_LOBBY_INFO_EXTRA = "org.retroshare.android.intent_extra_keys.ChatLobbyInfo";
 	
 	@Override
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
@@ -44,7 +44,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		{
 			if(( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER ))
 			{
-				Log.v(TAG,"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
+				Log.v(TAG(),"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
 				sendChatMsg(null);
 				return true;
 			}
@@ -63,7 +63,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	
 	protected void onServiceConnected()
 	{
-		util.uDebug(this, TAG, "onServiceConnected()");
+		util.uDebug(this, TAG(), "onServiceConnected()");
 
 		RsCtrlService server = getConnectedServer();
 
@@ -100,7 +100,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		server.mRsChatService.setNotifyBlockedChat(mChatId);
 		server.mRsChatService.registerListener(this);
 		
-		Log.v(TAG,"onServiceConnected(): mChatId=" + mChatId);
+		Log.v(TAG(),"onServiceConnected(): mChatId=" + mChatId);
 	}
 
 	@Override
@@ -119,6 +119,8 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 	public void updateViews()
 	{
+		Log.d(TAG(), "updateViews()");
+
 		if(isBound())
 		{
 			List<ChatMessage> ChatHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(mChatId);
@@ -132,7 +134,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
 			((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64");
 		}
-		else Log.e(TAG, "updateViews() Why am I not bound?");
+		else Log.e(TAG(), "updateViews() Why am I not bound?");
 	}
 	
 	public void sendChatMsg(View v)

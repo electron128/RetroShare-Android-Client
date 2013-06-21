@@ -85,7 +85,7 @@ public class NotifyService implements ChatServiceListener
 			notification = new Notification(icon, tickerText, System.currentTimeMillis());
 
 			Intent notificationIntent = new Intent(mService, PeersActivity.class);
-            notificationIntent.putExtra(PeersActivity.serverNameExtraName, serverName);
+            notificationIntent.putExtra(PeersActivity.SERVER_NAME_EXTRA, serverName);
 			PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 			
 			notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
@@ -109,7 +109,7 @@ public class NotifyService implements ChatServiceListener
 			notification = new Notification(icon, tickerText, System.currentTimeMillis());
 
 			Intent notificationIntent = new Intent(mService, ChatlobbyActivity.class);
-            notificationIntent.putExtra(ChatlobbyActivity.serverNameExtraName, serverName);
+            notificationIntent.putExtra(ChatlobbyActivity.SERVER_NAME_EXTRA, serverName);
 			PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 			
 			notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
@@ -131,7 +131,7 @@ public class NotifyService implements ChatServiceListener
 		notification = new Notification(icon, tickerText, System.currentTimeMillis());
 
 		Intent notificationIntent = new Intent(mService, PeersActivity.class);
-        notificationIntent.putExtra(PeersActivity.serverNameExtraName, serverName);
+        notificationIntent.putExtra(PeersActivity.SERVER_NAME_EXTRA, serverName);
 		PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 		
 		notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);

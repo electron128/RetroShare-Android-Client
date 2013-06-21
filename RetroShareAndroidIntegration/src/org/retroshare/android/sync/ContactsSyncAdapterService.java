@@ -156,7 +156,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
                             }
                         }
                         //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
-						// TODO bisogna trovare il modo di capire se lo stato del peer e' cambiato ( guardare se sono diversi ? ) oppure come sopra aggiornare ogni tot invece che ogni volta
+						// TODO update status only if changed or like in the commented if periodically
                         if(true)
 						{
                             //You would probably download an image file and just pass the bytes, but this sample doesn't use network so we'll decode and re-compress the icon resource to get the bytes
@@ -216,8 +216,8 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 
 		String name = peer.getName();
-        List<Location> listl=peer.getLocationsList();
-        Location l=null;
+        List<Location> listl = peer.getLocationsList();
+        Location l = null;
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
 		builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 		builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
@@ -231,9 +231,12 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
 		operationList.add(builder.build());
 
+		//TODO Take the right sslid giusto, now sslid is not taken correctly so when you open the from anrdoid contacts you are talking with one location of thet peer but probably not with the one you selected!!!
+		// @autoscatto this is what was making me crazy! :P
         String nickname = name;
-        if(!listl.isEmpty()){
-            l = listl.get(0); //XXX: a muzzo, sperimentalmente funziona, sarebbe interessante anche capire perche'
+        if(!listl.isEmpty())
+		{
+            l = listl.get(0);
             nickname = l.getLocation();
         }
 

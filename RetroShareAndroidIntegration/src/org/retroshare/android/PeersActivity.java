@@ -86,9 +86,10 @@ public class PeersActivity extends ProxiedActivityBase
 		{
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
     		Location loc = locationList.get(position);
-    		
+			String sslId = loc.getSslId();
+
     		Intent i = new Intent(PeersActivity.this,ChatActivity.class);
-    		i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
+    		i.putExtra(ChatActivity.CHAT_ID_EXTRA, ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(sslId).build().toByteArray());
 			startActivity(ChatActivity.class, i);
     	}
     	
@@ -98,8 +99,8 @@ public class PeersActivity extends ProxiedActivityBase
 			Location loc = locationList.get(position);
 			Person p = mapLocationToPerson.get(loc);
     		Intent i = new Intent(PeersActivity.this,PeerDetailsActivity.class);
-    		i.putExtra("GpgId", p.getGpgId());
-    		i.putExtra("SslId", loc.getSslId());
+    		i.putExtra("GpgId", p.getGpgId()); // TODO HARDCODED string
+    		i.putExtra("SslId", loc.getSslId()); // TODO HARDCODED string
     		startActivity(i);
 			return true;
 		}

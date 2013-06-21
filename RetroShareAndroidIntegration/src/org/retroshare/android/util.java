@@ -34,10 +34,13 @@ public class util
 
     static boolean hasContent(EditText et) { return (et.getText().toString().trim().length() > 0); }
 
+	private static Long dCounter = 0L;
 	public static void uDebug(Context c, String tag, String msg)
 	{
-		Log.d(tag, msg);
-		Toast.makeText(c, tag + " " + msg, Toast.LENGTH_LONG).show();
+		Log.d(tag, msg + " <n" + dCounter.toString() + ">" );
+		Toast.makeText(c, tag + " " + msg  + " <n" + dCounter.toString() + ">", Toast.LENGTH_LONG).show();
+
+		++dCounter;
 	}
 
 /*
