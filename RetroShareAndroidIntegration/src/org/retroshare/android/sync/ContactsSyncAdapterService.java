@@ -233,17 +233,28 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 
 		//TODO Take the right sslid giusto, now sslid is not taken correctly so when you open the from anrdoid contacts you are talking with one location of thet peer but probably not with the one you selected!!!
 		// @autoscatto this is what was making me crazy! :P
-        String nickname = name;
+        String locname = name;
         if(!listl.isEmpty())
 		{
-            l = listl.get(0);
-            nickname = l.getLocation();
+
+
+
+        for(Location ll:listl){
+            if( (ll.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE){
+                l=ll; // XXX: se ne trovo una connessa la prendo per buona
+                break;
+            }
+
+        }
+            if(l==null){l=listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
+            //TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
+            locname=l.getLocation();
         }
 
         builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
         builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
         builder.withValue(ContactsContract.Data.MIMETYPE, MIME);
-        builder.withValue(ContactsContract.Data.DATA1, nickname);
+        builder.withValue(ContactsContract.Data.DATA1, locname);
         builder.withValue(ContactsContract.Data.DATA2, l.getSslId());
         builder.withValue(ContactsContract.Data.DATA3, "Send message"); //TODO HARDCODED string
         operationList.add(builder.build());
