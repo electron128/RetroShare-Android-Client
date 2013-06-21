@@ -237,6 +237,8 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
         if(!listl.isEmpty())
 		{
 			// TODO: for the actual retroshare multiple location logic we should display all location, and leave to the user the choice of what location message, this is crappy and i hope this will change in future version of RetroShare at moment we are displayng just the first location found online...
+			// instead of choose one location or make the user choose we will create chats handling all location so we send/receive messages to/from all location of the user
+			// this is different from the RetroShare actual logic but we hope can focus RetroShare developer attention on this iussue particularly important for mobile
 
 			for(Location ll:listl)
 			{
