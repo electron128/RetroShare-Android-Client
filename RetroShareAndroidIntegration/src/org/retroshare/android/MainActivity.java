@@ -115,7 +115,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     {
         boolean actualServerConnected = false;
 
-    	if(mBound)
+    	if(isBound())
     	{
 			RsCtrlService server = rsProxy.getActiveServers().get(serverName);
 			if (server != null && server.isOnline()) actualServerConnected = true;
@@ -174,7 +174,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	
 	private void requestSystemStatus()
 	{
-    	if(mBound)
+    	if(isBound())
     	{
 			RsCtrlService server = rsProxy.getActiveServers().get(serverName);
 			if(server != null && server.isOnline())
@@ -316,7 +316,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
         connectButtonRecentlyPressed = true;
 
-        if(mBound)
+        if(isBound())
         {
             if(rsProxy.getSavedServers().get(serverName).password == null) showDialog(DIALOG_PASSWORD);
             else _connect();

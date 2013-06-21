@@ -1,10 +1,13 @@
 package org.retroshare.android;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
 
+import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 
 /*
 import com.google.zxing.WriterException;
@@ -30,6 +33,12 @@ public class util
 	}
 
     static boolean hasContent(EditText et) { return (et.getText().toString().trim().length() > 0); }
+
+	public static void uDebug(Context c, String tag, String msg)
+	{
+		Log.d(tag, msg);
+		Toast.makeText(c, tag + " " + msg, Toast.LENGTH_LONG).show();
+	}
 
 /*
     static Bitmap encodeQrCode(String contents) throws WriterException {

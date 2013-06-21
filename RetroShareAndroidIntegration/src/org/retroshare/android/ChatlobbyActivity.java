@@ -78,7 +78,7 @@ public class ChatlobbyActivity extends ProxiedActivityBase
     public void onResume()
 	{
     	super.onResume();
-    	if ( mBound) getConnectedServer().mRsChatService.updateChatLobbies();
+    	if ( isBound()) getConnectedServer().mRsChatService.updateChatLobbies();
     }
 
     private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener

@@ -23,7 +23,10 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener
 {
-	private static final String TAG="ChatActivity";
+	private static final String TAG = "ChatActivity";
+
+	public final static String CHAT_ID_EXTRA = "ChatId";
+	public final static String CHAT_LOBBY_INFO_EXTRA = "ChatLobbyInfo";
 	
 	@Override
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
@@ -60,12 +63,14 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	
 	protected void onServiceConnected()
 	{
+		util.uDebug(this, TAG, "onServiceConnected()");
+
 		RsCtrlService server = getConnectedServer();
 
 		try
 		{
-			mChatId = ChatId.parseFrom(getIntent().getByteArrayExtra("ChatId"));
-			if(getIntent().hasExtra("ChatLobbyInfo")) mChatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra("ChatLobbyInfo"));
+			mChatId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_ID_EXTRA));
+			if(getIntent().hasExtra(CHAT_LOBBY_INFO_EXTRA)) mChatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_INFO_EXTRA));
 		}
 		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
 
@@ -95,13 +100,13 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		server.mRsChatService.setNotifyBlockedChat(mChatId);
 		server.mRsChatService.registerListener(this);
 		
-		Log.v(TAG,"onServiceConnected(): mChatId="+mChatId);
+		Log.v(TAG,"onServiceConnected(): mChatId=" + mChatId);
 	}
 
 	@Override
 	public void onPause()
 	{
-		if(mBound) getConnectedServer().mRsChatService.setNotifyBlockedChat(null);
+		if(isBound()) getConnectedServer().mRsChatService.setNotifyBlockedChat(null);
 		super.onPause();
 	}
 	
@@ -109,31 +114,38 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	public void onResume()
 	{
 		super.onResume();
-		if(mBound) getConnectedServer().mRsChatService.setNotifyBlockedChat(mChatId);
+		if(isBound()) getConnectedServer().mRsChatService.setNotifyBlockedChat(mChatId);
 	}
 
 	public void updateViews()
 	{
-		List<ChatMessage> ChatHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(mChatId);
-		
-		String historyString = "";
-		//ad meta to define encoding, needed to display
-		historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">"; //TODO HARDCODED string
-		
-		for(ChatMessage msg:ChatHistory) historyString+="<span style=\"color:dodgerblue;\">"+msg.getPeerNickname()+":</span> "+msg.getMsg()+"</br>";  //TODO HARDCODED string
+		if(isBound())
+		{
+			List<ChatMessage> ChatHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(mChatId);
 
-		String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
-		((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64");
+			String historyString = "";
+			//ad meta to define encoding, needed to display
+			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">"; //TODO HARDCODED string
+
+			for(ChatMessage msg:ChatHistory) historyString+="<span style=\"color:dodgerblue;\">"+msg.getPeerNickname()+":</span> "+msg.getMsg()+"</br>";  //TODO HARDCODED string
+
+			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
+			((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64");
+		}
+		else Log.e(TAG, "updateViews() Why am I not bound?");
 	}
 	
 	public void sendChatMsg(View v)
 	{
-		EditText et = (EditText) findViewById(R.id.editText1);
-		ChatMessage msg = ChatMessage.newBuilder().setId(mChatId).setMsg((et.getText().toString())).build();
-		et.setText("");
+		if(isBound())
+		{
+			EditText et = (EditText) findViewById(R.id.editText1);
+			ChatMessage msg = ChatMessage.newBuilder().setId(mChatId).setMsg((et.getText().toString())).build();
+			et.setText("");
 
-		if(msg.getMsg().equals("a")) sendAndroid(null);
-		else getConnectedServer().mRsChatService.sendChatMessage(msg);
+			if(msg.getMsg().equals("a")) sendAndroid(null); // TODO easter eggs ?
+			else getConnectedServer().mRsChatService.sendChatMessage(msg);
+		}
 	}
 
 	public void sendAndroid(View v)
@@ -152,6 +164,12 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 			finish();
 		}
 	}
+
+	@Override
+	public void update() // will be called by RsChatService
+	{
+		updateViews();
+	}
 	
 	//private void _sayHi(){
 /*************************************
@@ -167,11 +185,4 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		
 //		_sendChatMsg("<pre>  \\___/\n  /o o\\       |_| '\n '-----'      | | |\n||     ||\n||     ||\n||     ||\n '-----'\n   | |</pre>");
 //	}
-	
-	// will be called by RsChatService
-	@Override
-	public void update()
-	{
-		updateViews();
-	}
 }

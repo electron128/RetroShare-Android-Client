@@ -173,7 +173,7 @@ public class FilesActivity extends ProxiedActivityBase
 		public void run()
 		{
 			RsCtrlService server = getConnectedServer();
-			if( isInForeground && mBound && server.isOnline() ) { server.mRsFilesService.updateTransfers(mDirection); }
+			if( isInForeground && isBound() && server.isOnline() ) { server.mRsFilesService.updateTransfers(mDirection); }
 			mHandler.postAtTime( new requestFilesRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVALL );
 		}
 	}

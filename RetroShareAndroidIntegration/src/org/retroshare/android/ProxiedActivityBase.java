@@ -21,7 +21,14 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
     private static final String TAG="ProxiedActivityBase";
 
     protected RetroShareAndroidProxy rsProxy;
-    protected boolean mBound = false;
+
+    private boolean mBound = false;
+	public boolean isBound(){return mBound;};
+	protected void setBound(boolean v)
+	{
+		util.uDebug(this, TAG, "setBound(" + String.valueOf(v) + ")");
+		mBound = v;
+	}
 
 	public static final String serverNameExtraName = "serverName";
 	protected String serverName;
@@ -47,9 +54,9 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	{
 		Log.d(TAG, "getConnectedServer() -> " + serverName );
 
-		if(mBound) return rsProxy.activateServer(serverName);
+		if(isBound()) return rsProxy.activateServer(serverName);
 
-		Log.wtf(TAG, "getConnectedServer() shouldn't be called before binding");
+		Log.e(TAG, "getConnectedServer() shouldn't be called before binding");
 		return null;
 	}
 
@@ -60,7 +67,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
-		mBound = true;
+		setBound(true);
         if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.UiThreadHandler();
 		onServiceConnected();
 	}
@@ -68,8 +75,8 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	@Override
 	public void onServiceDisconnected(ComponentName arg0)
 	{
-		Log.d(TAG, "onServiceDisconnected(ComponentName arg0)");
-		mBound = false;
+		Log.d(TAG, "onServiceDisconnected(" + arg0.toShortString() + ")" );
+		setBound(false);
 	}
 
     @Override
@@ -90,18 +97,19 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 
 	private void _bindRsService()
 	{
-		if(mBound) return;
+		if(isBound()) return;
 
 		Intent intent = new Intent(this, RetroShareAndroidProxy.class);
-		bindService(intent, this, Context.BIND_AUTO_CREATE);
+		startService(intent);
+		bindService(intent, this, 0);
 	}
 
 	private void _unBindRsService()
 	{
-		if(mBound)
+		if(isBound())
 		{
 			unbindService(this);
-			mBound = false;
+			setBound(false);
 		}
 	}
 

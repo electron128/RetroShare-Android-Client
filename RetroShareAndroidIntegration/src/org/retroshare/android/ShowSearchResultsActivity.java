@@ -99,7 +99,7 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 		public void run()
 		{
 			RsCtrlService server = getConnectedServer();
-			if( isInForeground && mBound && server.isOnline()) server.mRsSearchService.updateSearchResults(mId);
+			if( isInForeground && isBound() && server.isOnline()) server.mRsSearchService.updateSearchResults(mId);
 			mHandler.postAtTime(new updateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}

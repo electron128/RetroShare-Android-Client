@@ -43,7 +43,7 @@ public class AddServerActivity extends ProxiedActivityBase
 
 	protected void onServiceConnected()
 	{
-		if(mBound && editServer)
+		if(isBound() && editServer)
 		{
 			EditText editTextName     = (EditText) findViewById(R.id.editTextName);
 			EditText editTextHostname = (EditText) findViewById(R.id.editTextHostname);
@@ -62,7 +62,7 @@ public class AddServerActivity extends ProxiedActivityBase
     
 	public void onSaveButtonPressed(View v)
 	{
-		if(mBound)
+		if(isBound())
 		{
 			EditText editTextName     = (EditText) findViewById(R.id.editTextName);
 			EditText editTextHostname = (EditText) findViewById(R.id.editTextHostname);
@@ -126,7 +126,7 @@ public class AddServerActivity extends ProxiedActivityBase
 
 	private final void _deleteServer()
 	{
-		if(mBound)
+		if(isBound())
 		{
 			rsProxy.delServer(serverName);
 			Toast.makeText(getApplicationContext(), "Server deleted", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string

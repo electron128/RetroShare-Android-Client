@@ -89,7 +89,7 @@ public class ListSearchesActivity extends ProxiedActivityBase
     public void onResume()
 	{
 		super.onResume();
-    	if(mBound) adapter.setData(getConnectedServer().mRsSearchService.getSearches());
+    	if(isBound()) adapter.setData(getConnectedServer().mRsSearchService.getSearches());
     }
 
     private class SearchListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener

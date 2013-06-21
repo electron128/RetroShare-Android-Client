@@ -59,7 +59,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
     	super.onResume();
 		_registerListeners();
-		if(mBound) getConnectedServer().mRsPeersService.updateFriendsList();
+		if(isBound()) getConnectedServer().mRsPeersService.updateFriendsList();
     }
 
 	@Override
@@ -176,7 +176,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
 		Log.d(TAG, "_registerListeners()");
 
-		if( ! mBound ) return;
+		if( ! isBound() ) return;
 
 		Log.d(TAG, "_registerListeners() bound");
 
@@ -189,7 +189,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
 		Log.d(TAG, "_unregisterListeners()");
 
-		if( ! mBound ) return;
+		if( ! isBound() ) return;
 
 		RsCtrlService server = getConnectedServer();
 		server.mRsPeersService.unregisterListener(adapter);
