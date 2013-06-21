@@ -22,12 +22,8 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
     protected RetroShareAndroidProxy rsProxy;
 
     private boolean mBound = false;
-	public boolean isBound(){return mBound;};
-	protected void setBound(boolean v)
-	{
-		util.uDebug(this, TAG(), "setBound(" + String.valueOf(v) + ")");
-		mBound = v;
-	}
+	public boolean isBound(){return mBound;}
+	protected void setBound(boolean v) { mBound = v; }
 
 	public static final String SERVER_NAME_EXTRA = "org.retroshare.android.intent_extra_keys.serverName";
 	protected String serverName;
