@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import rsctrl.chat.Chat;
 
@@ -39,7 +37,12 @@ public class ChatActivityLauncher extends Activity
                 //XXX: mi suicido subito dopo aver lanciato l'altra activity
                 // tranquillo perche' ho il nohistory sul manifest (http://developer.android.com/guide/topics/manifest/activity-element.html#nohist)
                 finish();
+
+
             }
+        } else {
+            // How did we get here without data?
+            finish();
         }
         else finish(); // How did we get here without data?
     }
