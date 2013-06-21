@@ -39,13 +39,8 @@ public class ChatActivityLauncher extends Activity
                 //XXX: mi suicido subito dopo aver lanciato l'altra activity
                 // tranquillo perche' ho il nohistory sul manifest (http://developer.android.com/guide/topics/manifest/activity-element.html#nohist)
                 finish();
-
-
             }
-        } else {
-            // How did we get here without data?
-            finish();
         }
+		else finish(); // How did we get here without data?
     }
-
 }

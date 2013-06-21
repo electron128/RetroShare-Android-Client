@@ -43,9 +43,6 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
     private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
     private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
     private static String MIME="retroshare.android.cursor.item/org.retroshare.android.sync.profile"; // TODO Shouldn't this be of the form vnd.*/vnd.* ? // TODO Move to string.xml
-    private List<Location> locationList=new ArrayList<Location>();
-    private Map<Location,Person> mapLocationToPerson=new HashMap<Location,Person>();
-    private List<Person> peers=null;
 
     // TODO Check if we can to it smarter
     private static class SyncEntry
@@ -240,17 +237,22 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
         if(!listl.isEmpty())
 		{
 
-        for(Location ll:listl){
-            if( (ll.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE){
-                l=ll; // XXX: se ne trovo una connessa la prendo per buona
-                break;
-            }
+			for(Location ll:listl)
+			{
+				if( (ll.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
+				{
+					l = ll; // XXX: se ne trovo una connessa la prendo per buona
+					break;
+				}
 
-        }
-            if(l==null){l=listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
-            //TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
-            locname=l.getLocation();
-        }
+			}
+
+            if( l == null )
+			{
+				l = listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
+            	//TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
+            	locname=l.getLocation();
+        	}
         }
 
         builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
