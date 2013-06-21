@@ -231,11 +231,12 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
 		operationList.add(builder.build());
 
-		//TODO Take the right sslid giusto, now sslid is not taken correctly so when you open the from anrdoid contacts you are talking with one location of thet peer but probably not with the one you selected!!!
+		//TODO Take the right sslid, now sslid is not taken correctly so when you open the chat from anrdoid contacts you are talking with one location of that peer but probably not with the one you selected!!!
 		// @autoscatto this is what was making me crazy! :P
         String locname = name;
         if(!listl.isEmpty())
 		{
+			// TODO: for the actual retroshare multiple location logic we should display all location, and leave to the user the choice of what location message, this is crappy and i hope this will change in future version of RetroShare at moment we are displayng just the first location found online...
 
 			for(Location ll:listl)
 			{
@@ -251,7 +252,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			{
 				l = listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
             	//TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
-            	locname=l.getLocation();
+            	locname = l.getLocation();
         	}
         }
 
