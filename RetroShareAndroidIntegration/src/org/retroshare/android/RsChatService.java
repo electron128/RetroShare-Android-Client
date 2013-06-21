@@ -48,7 +48,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	public void unregisterListener(ChatServiceListener l){ mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }
 	
-	private List<Chat.ChatLobbyInfo> ChatLobbies=new ArrayList<Chat.ChatLobbyInfo>();
+	private List<Chat.ChatLobbyInfo> ChatLobbies = new ArrayList<Chat.ChatLobbyInfo>();
 	private Map<ChatId,List<ChatMessage>> ChatHistory=new HashMap<ChatId,List<ChatMessage>>();
 	private Map<ChatId,Boolean> ChatChanged=new HashMap<ChatId,Boolean>();
 	private ChatId NotifyBlockedChat;
@@ -98,19 +98,12 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     	requestChatLobbiesRequestId=mRsCtrlService.sendMsg(msg);
 	}
 	
-	public List<Chat.ChatLobbyInfo>
-	getChatLobbies(){
-		return ChatLobbies;
-	}
+	public List<Chat.ChatLobbyInfo> getChatLobbies() { return ChatLobbies; }
 	
-	public List<ChatMessage> 
-	getChatHistoryForChatId(ChatId id){
-		if(ChatHistory.get(id)==null){
-			return new ArrayList<ChatMessage>();
-		}
-		else{
-			return ChatHistory.get(id);
-		}
+	public List<ChatMessage> getChatHistoryForChatId(ChatId id)
+	{
+		if(ChatHistory.get(id)==null) return new ArrayList<ChatMessage>();
+		return ChatHistory.get(id);
 	}
 	
 	
@@ -119,24 +112,25 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	int requestChatLobbiesRequestId=0;
 
 	@Override
-	public void handleMessage(RsMessage msg) {
+	public void handleMessage(RsMessage msg)
+	{
 		
 		// check reqId, because JoinOrLeaveLobby answers with ResponseChatLobbies, but without ChatLobbyInfos
-		if(msg.reqId==requestChatLobbiesRequestId){
+		if(msg.reqId==requestChatLobbiesRequestId)
+		{
 			// response ChatLobbies
 			if(msg.msgId==(RsCtrlService.RESPONSE|(Core.PackageId.CHAT_VALUE<<8)|Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE)){
 				System.err.println("received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE");
-				try {
+				try
+				{
 					ResponseChatLobbies resp=Chat.ResponseChatLobbies.parseFrom(msg.body);
 					ChatLobbies=resp.getLobbiesList();
 					
 					System.err.println("RsChatService::handleMessage: ResponseChatLobbies\n"+ChatLobbies);
 					
 					_notifyListeners();
-				} catch (InvalidProtocolBufferException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
 			}
 		}
 		
