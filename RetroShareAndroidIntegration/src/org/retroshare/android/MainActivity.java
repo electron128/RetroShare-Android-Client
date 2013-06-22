@@ -138,7 +138,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     }
     
     public void showPeers(View v) { startActivity(PeersActivity.class); };
-    public void showChatLobbies(View v) { startActivity(ChatlobbyActivity.class); }
+    public void showChatLobbies(View v) { startActivity(ChatLobbiesActivity.class); }
     public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); startActivity(ShowQrCodeActivity.class, intent ); }
     public void showFilesActivity(View v) { startActivity(FilesActivity.class); }
     public void showSearchActivity(View v) { startActivity(ListSearchesActivity.class); }

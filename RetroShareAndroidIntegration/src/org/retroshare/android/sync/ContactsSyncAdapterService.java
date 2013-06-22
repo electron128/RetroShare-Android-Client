@@ -37,12 +37,14 @@ import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
 public class ContactsSyncAdapterService extends ProxiedServiceBase
 {
-	private static final String TAG = "ContactsSyncAdapterService";
+	public String TAG() { return "ContactsSyncAdapterService"; }
+
+	private static final String MIME = "vnd.retroshare.android.cursor.item/vnd.org.retroshare.android.sync.profile";
+
 	private static SyncAdapterImpl sSyncAdapter = null;
 	private static ContentResolver mContentResolver = null;
-    private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
-    private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
-    private static String MIME="retroshare.android.cursor.item/org.retroshare.android.sync.profile"; // TODO Shouldn't this be of the form vnd.*/vnd.* ? // TODO Move to string.xml
+	private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
+	private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
 
     // TODO Check if we can to it smarter
     private static class SyncEntry
@@ -103,7 +105,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 
 	private void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) throws OperationCanceledException
 	{
-		Log.i(TAG, "performSync( .., " + account.toString() + ", .. )");
+		Log.i(TAG(), "performSync( .., " + account.toString() + ", .. )");
 
 		if(mBound)
 		{
@@ -152,7 +154,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 									lfound = l;
 									break;
 								}
-                                lfound=l;
+                                lfound = l;
                             }
                         }
                         //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
@@ -211,7 +213,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
     }
 
-	private static void _addContact(Account account, Person peer)
+	private void _addContact(Account account, Person peer)
 	{
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 
@@ -231,7 +233,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
 		operationList.add(builder.build());
 
-		//TODO Take the right sslid, now sslid is not taken correctly so when you open the chat from anrdoid contacts you are talking with one location of that peer but probably not with the one you selected!!!
+		//TODO Take the right sslid, now sslid is not taken correctly so when you open the chat from android contacts you are talking with one location of that peer but probably not with the one you selected!!!
 		// @autoscatto this is what was making me crazy! :P
         String locname = name;
         if(!listl.isEmpty())
@@ -271,7 +273,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		try { mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList); }
 		catch (Exception e)
 		{
-			Log.e(TAG, "Something went wrong during creation! " + e);
+			Log.e(TAG(), "Something went wrong during creation! " + e);
 			e.printStackTrace();
 		}
 	}

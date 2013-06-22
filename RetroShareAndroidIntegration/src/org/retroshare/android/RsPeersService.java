@@ -1,7 +1,6 @@
 package org.retroshare.android;
 
 import android.os.Looper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +71,7 @@ public class RsPeersService implements RsServiceInterface
 	}
 	public Person getPersonFromSslId(String sslId)
 	{
-		for(Person p: getPeersList()){for(Location l:p.getLocationsList()){ if(l.getSslId().equals(sslId)){ return p; } }}
+		for( Person p : getPeersList() ) for( Location l : p.getLocationsList() ) if ( l.getSslId().equals(sslId) ) return p;
 		return null;
 	}
 	

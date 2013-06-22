@@ -1,10 +1,14 @@
 package org.retroshare.android;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatLobbyInfo;
 import rsctrl.chat.Chat.ChatMessage;
+import rsctrl.core.Core;
 import rsctrl.core.Core.Person;
 
 import android.os.Bundle;
@@ -13,12 +17,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
-//import org.retroshare.android.RsService.RsMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener
@@ -26,8 +28,10 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	@Override public String TAG() { return "ChatActivity"; }
 
 	public final static String CHAT_ID_EXTRA = "org.retroshare.android.intent_extra_keys.ChatId";
-	public final static String CHAT_LOBBY_INFO_EXTRA = "org.retroshare.android.intent_extra_keys.ChatLobbyInfo";
-	
+
+	ChatId chatInitId;
+	private Set<ChatId> privateChatIds = new HashSet<ChatId>();
+
 	@Override
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
@@ -35,6 +39,9 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	    
 	    findViewById(R.id.button1).setVisibility(View.GONE);
 	    findViewById(R.id.editText1).setOnKeyListener(new KeyListener());
+
+		try { chatInitId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_ID_EXTRA)); }
+		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
 	}
 	
 	private class KeyListener implements OnKeyListener
@@ -44,69 +51,47 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		{
 			if(( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER ))
 			{
-				Log.v(TAG(),"KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
+				Log.d(TAG(), "KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
 				sendChatMsg(null);
 				return true;
 			}
-			else return false;
+
+			return false;
 		}
 	}
-	
-	//private ChatHandler mChatHandler=null;
-	
-	// set to true once, to prevent multiple registration
-	// rs-nogui will send events twice if we register twice
-	//private static boolean haveRegisteredEventsOnServer=false;
-	
-	private ChatId mChatId;
-	private ChatLobbyInfo mChatLobbyInfo;
-	
+
 	protected void onServiceConnected()
 	{
-		util.uDebug(this, TAG(), "onServiceConnected()");
+		Log.d(TAG(), "onServiceConnected()");
 
 		RsCtrlService server = getConnectedServer();
-
-		try
+		Person person = server.mRsPeersService.getPersonFromSslId(chatInitId.getChatId());
+		if(person == null)
 		{
-			mChatId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_ID_EXTRA));
-			if(getIntent().hasExtra(CHAT_LOBBY_INFO_EXTRA)) mChatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_INFO_EXTRA));
+			util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + chatInitId.getChatId() + " is null??");
+			return;
 		}
+
+		privateChatIds.clear();
+
+		try { for ( Core.Location location : person.getLocationsList() ) privateChatIds.add(ChatId.parseFrom(location.getSslId().getBytes())); }
 		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
 
-		if( mChatLobbyInfo != null ) //chatlobby
-		{
-			server.mRsChatService.joinChatLobby(mChatLobbyInfo); // TODO here it get nullpointer
-			TextView tv = (TextView) findViewById(R.id.textView1);
-			tv.setText(mChatLobbyInfo.getLobbyName());
-			
-		    Button b=(Button) findViewById(R.id.buttonLeaveLobby);
-		    b.setVisibility(View.VISIBLE);
-		}
-		else //private chat
-		{
-			TextView tv = (TextView) findViewById(R.id.textView1);
-			Person p = server.mRsPeersService.getPersonFromSslId(mChatId.getChatId());
-			String name="Error: no Person found"; // TODO HARDCODED string
-			if(p != null) name = p.getName();
-			tv.setText(name);
-			
-		    Button b=(Button) findViewById(R.id.buttonLeaveLobby);
-		    b.setVisibility(View.GONE);
-		}
-		
-		updateViews();
+		TextView tv = (TextView) findViewById(R.id.textView1);
+		String name = "Error: no Person found"; // TODO HARDCODED string
+		if( person != null ) name = person.getName();
+		tv.setText(name);
 
-		server.mRsChatService.setNotifyBlockedChat(mChatId);
+		server.mRsChatService.disableNotificationForChats(privateChatIds);
+
+		updateViews();
 		server.mRsChatService.registerListener(this);
-		
-		Log.v(TAG(),"onServiceConnected(): mChatId=" + mChatId);
 	}
 
 	@Override
 	public void onPause()
 	{
-		if(isBound()) getConnectedServer().mRsChatService.setNotifyBlockedChat(null);
+		if(isBound()) getConnectedServer().mRsChatService.enableNotificationForChats(privateChatIds);
 		super.onPause();
 	}
 	
@@ -114,7 +99,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	public void onResume()
 	{
 		super.onResume();
-		if(isBound()) getConnectedServer().mRsChatService.setNotifyBlockedChat(mChatId);
+		if(isBound()) getConnectedServer().mRsChatService.disableNotificationForChats(privateChatIds);
 	}
 
 	public void updateViews()
@@ -123,13 +108,20 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 		if(isBound())
 		{
-			List<ChatMessage> ChatHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(mChatId);
+			RsChatService cs = getConnectedServer().mRsChatService;
+			Set<_ChatMsg> messages = new TreeSet<_ChatMsg>();
+
+			for (ChatId lChat : privateChatIds)
+			{
+				List<ChatMessage> lChatMessages = cs.getChatHistoryForChatId(lChat);
+				for ( ChatMessage msg : lChatMessages ) messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getSendTime()));
+			}
 
 			String historyString = "";
 			//ad meta to define encoding, needed to display
-			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">"; //TODO HARDCODED string
+			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">";
 
-			for(ChatMessage msg:ChatHistory) historyString+="<span style=\"color:dodgerblue;\">"+msg.getPeerNickname()+":</span> "+msg.getMsg()+"</br>";  //TODO HARDCODED string
+			for(_ChatMsg msg : messages) historyString+="<span style=\"color:dodgerblue;\">" + msg.getNick() + ":</span> " + msg.getBody() + "</br>";
 
 			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
 			((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64");
@@ -142,28 +134,23 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		if(isBound())
 		{
 			EditText et = (EditText) findViewById(R.id.editText1);
-			ChatMessage msg = ChatMessage.newBuilder().setId(mChatId).setMsg((et.getText().toString())).build();
+			String msgText = et.getText().toString();
+
+			for ( ChatId sChatId : privateChatIds )
+			{
+				ChatMessage msg;
+
+				if( msgText.equals("a") ) // Easter egg
+				{
+					String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
+					msg = ChatMessage.newBuilder().setId(sChatId).setMsg(android).build();
+				}
+				else msg = ChatMessage.newBuilder().setId(sChatId).setMsg(msgText).build();
+
+				getConnectedServer().mRsChatService.sendChatMessage(msg);
+			}
+
 			et.setText("");
-
-			if(msg.getMsg().equals("a")) sendAndroid(null); // TODO easter eggs ?
-			else getConnectedServer().mRsChatService.sendChatMessage(msg);
-		}
-	}
-
-	public void sendAndroid(View v)
-	{
-		String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>"; //TODO HARDCODED string
-		String desktop = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAjdJREFUOI2lkztrVFEUhb9zzr2ZSTRhYojGBCEgNtrYaGEjWAgpBQtbK0Gwihb+Aa1s9E+klTSRoIUBUSsxJiIhYDAPY2Zy53Xn3nte22L+QbKbVa3Fx957KRHhNKNP5QbU3OKrBwv37r82GlJjSLzFFxWDPBBcgAiEQPSOaD3Rg4TIYbMjn1ffPk68yIXL4+n006mM54eTbHQMuqewuSM6hxYQCWAjqQLnhc2djIPf+0jem0kKJ367lbO8/4cfpPzqJoxVCqyGApS3GGdRUTjqVOztZdAtAAch+iQKrGWerdBg49w4tfkzGCeErI9tZoRWQdUvyLISshJsBVJC2QXnSHI9KnNna7y/M8X8R9j5WzCaD5BmRuy2sa0mtAdgBZyHvA+hHC6wNkoiu002v27zaWqWnbWf4FMKCTDoQ9kDW4KuwdgIlA5KC2Ubqg6UfUmoPMe7R7z8PgHNFrQLqI2AWPB2eKtRA5KACqAU+AjeISjR9J3cnq2z/PAm1xoptI7BVxAiRA1iwAlU1ZAmuGG4BNA1EtQI3XaXlW97bKwfQGqG5uDBBVApVAV4B0UOeTZU70AZEiZn9JetgoVHS3C+AWkdBgAJ1OtQH4FEDwkMEC34PmDBjOkE4M2zuyd64yeLL0huXKz3lj7sumiMkdRo0QqMRmtAa5AI1qGch+hQMUKw0TgXbl2/2lMr71brjelLVwSZACZQjIFKETGIKIZtFRQBwSmkALpK6U7e+beVACWwftI2/gfYDUdg4soRigAAAABJRU5ErkJggg==\"/></span></span>"; //TODO HARDCODED string
-		ChatMessage msg = ChatMessage.newBuilder().setId(mChatId).setMsg(android).build();
-		getConnectedServer().mRsChatService.sendChatMessage(msg);
-	}
-	
-	public void leaveLobby(View v)
-	{
-		if( mChatLobbyInfo != null )
-		{
-			getConnectedServer().mRsChatService.leaveChatLobby(mChatLobbyInfo);
-			finish();
 		}
 	}
 
@@ -172,19 +159,55 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	{
 		updateViews();
 	}
-	
-	//private void _sayHi(){
+
+	private class _ChatMsg implements Comparable
+	{
+		public _ChatMsg(String nick, String body, int time)
+		{
+			this.nick = nick;
+			this.body = body;
+			this.time = time;
+		}
+
+		public String getNick() { return nick; }
+		public String getBody() { return body; }
+		public int getTime() { return time; }
+
+		private String nick;
+		private String body;
+		private int time;
+
+		@Override
+		public int compareTo(Object o)
+		{
+			_ChatMsg m = (_ChatMsg) o;
+
+			int thisTime = this.getTime();
+			int otherTime = m.getTime();
+			if( thisTime != otherTime ) return otherTime - thisTime;
+
+			return this.getBody().compareTo(m.getBody());
+
+			// TODO make it sense to take in account nick too ? I think it would break anti duplicate, more over is quite difficult that two different people send same message at the identical same time...
+		}
+	}
+}
+
+
+
+
+
+//private void _sayHi(){
 /*************************************
-		  \___/
-		  /o o\       |_| '
-		 '-----'      | | |
-		||     ||
-		||     ||
-		||     ||
-		 '-----'
-		   | |
-**************************************/   
-		
+ \___/
+ /o o\       |_| '
+ '-----'      | | |
+ ||     ||
+ ||     ||
+ ||     ||
+ '-----'
+ | |
+ **************************************/
+
 //		_sendChatMsg("<pre>  \\___/\n  /o o\\       |_| '\n '-----'      | | |\n||     ||\n||     ||\n||     ||\n '-----'\n   | |</pre>");
 //	}
-}

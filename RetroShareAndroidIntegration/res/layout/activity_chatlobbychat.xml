@@ -3,31 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/insert_message_here"
         android:text="TextView" />
-
+
     <Button
         android:id="@+id/buttonLeaveLobby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="leaveLobby"
         android:text="@string/leave_lobby" />
-
+
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.08" >
-
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
-
+
             <WebView
                 android:id="@+id/webView1"
                 android:layout_width="match_parent"
@@ -35,18 +35,13 @@
 
         </LinearLayout>
     </ScrollView>
-
+
+
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10" />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="sendChatMsg"
-        android:text="@string/send_chat" />
+
 
 </LinearLayout>

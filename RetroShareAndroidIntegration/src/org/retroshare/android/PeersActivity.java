@@ -39,7 +39,7 @@ public class PeersActivity extends ProxiedActivityBase
     @Override
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
-        adapter=new PeersListAdapterListener(this);
+        adapter = new PeersListAdapterListener(this);
         ListView lv = new ListView(this);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(adapter);
@@ -88,7 +88,7 @@ public class PeersActivity extends ProxiedActivityBase
     		Location loc = locationList.get(position);
 			String sslId = loc.getSslId();
 
-    		Intent i = new Intent(PeersActivity.this,ChatActivity.class);
+    		Intent i = new Intent(PeersActivity.this, ChatActivity.class);
     		i.putExtra(ChatActivity.CHAT_ID_EXTRA, ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(sslId).build().toByteArray());
 			startActivity(ChatActivity.class, i);
     	}
@@ -161,13 +161,11 @@ public class PeersActivity extends ProxiedActivityBase
 			locationList.clear();
 			mapLocationToPerson.clear();
 			for(Person p : personList)
-			{
 				for(Location l : p.getLocationsList())
 				{
 					locationList.add(l);
 					mapLocationToPerson.put(l, p);
 				}
-			}
 
 			for(DataSetObserver obs : observerList) { obs.onChanged(); }
 		}

@@ -1,6 +1,9 @@
 package org.retroshare.android;
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,12 +31,14 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener
 {
+	public String TAG() { return "RsChatService"; }
+
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
 
 	RsChatService(RsCtrlService s, UiThreadHandlerInterface u)
 	{
-		mRsCtrlService=s;
+		mRsCtrlService = s;
 		mRsCtrlService.registerListener(this);
 		mUiThreadHandler = u;
 	}
@@ -43,15 +48,15 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 		public void update();
 	}
 	
-	private Set<ChatServiceListener>mListeners = new HashSet<ChatServiceListener>();
+	private Set<ChatServiceListener> mListeners = new HashSet<ChatServiceListener>();
 	public void registerListener(ChatServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(ChatServiceListener l){ mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }
 	
-	private List<Chat.ChatLobbyInfo> ChatLobbies = new ArrayList<Chat.ChatLobbyInfo>();
-	private Map<ChatId,List<ChatMessage>> ChatHistory=new HashMap<ChatId,List<ChatMessage>>();
-	private Map<ChatId,Boolean> ChatChanged=new HashMap<ChatId,Boolean>();
-	private ChatId NotifyBlockedChat;
+	private List<Chat.ChatLobbyInfo> mChatLobbies = new ArrayList<Chat.ChatLobbyInfo>();
+	private Map<ChatId,List<ChatMessage>> mChatHistory = new HashMap<ChatId,List<ChatMessage>>();
+	private Map<ChatId,Boolean> mChatChanged = new HashMap<ChatId,Boolean>();
+	private Set<ChatId> notificationDisabledChats = new HashSet<ChatId>();
 	
 	private ChatMessage lastPrivateChatMessage;
 	private ChatMessage lastChatlobbyMessage;
@@ -60,28 +65,54 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	public ChatMessage getLastChatlobbyMessage() { return lastChatlobbyMessage; }
 	
 	
-	public void setNotifyBlockedChat(ChatId id)
+	public void disableNotificationForChat(ChatId id)
     {
-		NotifyBlockedChat = id;
-		if( id != null)
+		if( id != null )
 		{
-			if(lastPrivateChatMessage != null)
-			{
-				if(id.equals(lastPrivateChatMessage.getId())) lastPrivateChatMessage = null;
-			}
-			if(lastChatlobbyMessage != null)
-			{
-				if(id.equals(lastChatlobbyMessage.getId())) lastChatlobbyMessage = null;
-			}
-			clearChatChanged(id);
+			Collection<ChatId> c = new HashSet<ChatId>();
+			c.add(id);
+			disableNotificationForChats(c);
 		}
+		else Log.wtf(TAG(), "disableNotificationForChat(null)");
 	}
+	public void disableNotificationForChats(Collection<ChatId> ids)
+	{
+		if(ids != null)
+		{
+			for ( ChatId chatId : ids )
+			{
+				if( chatId != null )
+				{
+					if( lastPrivateChatMessage != null && chatId.equals(lastPrivateChatMessage.getId()) ) lastPrivateChatMessage = null;
+					if( lastChatlobbyMessage != null && chatId.equals(lastChatlobbyMessage.getId()) ) lastChatlobbyMessage = null;
+
+					clearChatChanged(chatId);
+				}
+				else ids.remove(chatId);
+			}
+
+			notificationDisabledChats.addAll(ids);
+		}
+		else Log.wtf(TAG(), "disableNotificationForChats(null)" );
+	}
+
+	public void enableNotificationForChat(ChatId id)
+	{
+		if( id != null) notificationDisabledChats.remove(id);
+		else Log.wtf(TAG(), "enableNotificationForChat(null)");
+	}
+	public void enableNotificationForChats(Collection<ChatId> ids)
+	{
+		if ( ids != null ) notificationDisabledChats.removeAll(ids);
+		else Log.wtf(TAG(), "enableNotificationForChats(null)");
+	}
+
 	public void clearChatChanged(ChatId ci)
 	{
-		ChatChanged.put(ci, false);
+		mChatChanged.put(ci, false);
 		_notifyListeners();
 	}
-	public Map<ChatId,Boolean> getChatChanged() { return ChatChanged; }
+	public Map<ChatId,Boolean> getChatChanged() { return mChatChanged; }
 	
 	public void updateChatLobbies()
 	{
@@ -93,12 +124,12 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     	requestChatLobbiesRequestId = mRsCtrlService.sendMsg(msg);
 	}
 	
-	public List<Chat.ChatLobbyInfo> getChatLobbies() { return ChatLobbies; }
+	public List<Chat.ChatLobbyInfo> getChatLobbies() { return mChatLobbies; }
 	
 	public List<ChatMessage> getChatHistoryForChatId(ChatId id)
 	{
-		if( ChatHistory.get(id) == null ) return new ArrayList<ChatMessage>();
-		return ChatHistory.get(id);
+		if( mChatHistory.get(id) == null ) return new ArrayList<ChatMessage>();
+		return mChatHistory.get(id);
 	}
 
 	int requestChatLobbiesRequestId = 0;
@@ -110,16 +141,16 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 		// check reqId, because JoinOrLeaveLobby answers with ResponseChatLobbies, but without ChatLobbyInfos
 		if( msg.reqId == requestChatLobbiesRequestId )
 		{
-			// response ChatLobbies
+			// response mChatLobbies
 			if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.CHAT_VALUE<<8) | Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE ) )
 			{
 				System.err.println("received Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE");
 				try
 				{
 					ResponseChatLobbies resp = Chat.ResponseChatLobbies.parseFrom(msg.body);
-					ChatLobbies = resp.getLobbiesList();
+					mChatLobbies = resp.getLobbiesList();
 					
-					System.err.println("RsChatService::handleMessage: ResponseChatLobbies\n"+ChatLobbies);
+					System.err.println("RsChatService::handleMessage: ResponseChatLobbies\n"+ mChatLobbies);
 					
 					_notifyListeners();
 				}
@@ -173,8 +204,6 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     	msg.body = reqb.build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
 	}
-	
-	
 
 	public void joinChatLobby(ChatLobbyInfo li)
 	{
@@ -204,6 +233,8 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	public void sendChatMessage(ChatMessage m)
 	{
 		System.err.println("RsChatService: Sending Message:\n"+m);
+
+		//mRsCtrlService.mRsPeersService
 		
     	RsMessage msg = new RsMessage();
     	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
@@ -211,11 +242,11 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     	mRsCtrlService.sendMsg(msg);
     	
 		// ad name information
-    	if(m.getId().getChatType().equals(ChatType.TYPE_LOBBY))
+    	if(m.getId().getChatType().equals(ChatType.TYPE_LOBBY)) // chat lobby
 		{
-    		System.err.println("RsChatService::_sendChatMessage: ChatLobbies:\n"+ChatLobbies);
+    		System.err.println("RsChatService::_sendChatMessage: ChatLobbies:\n"+ mChatLobbies);
     		// we have lobby
-    		for(ChatLobbyInfo i:ChatLobbies)
+    		for(ChatLobbyInfo i: mChatLobbies)
 			{
     			if(i.getLobbyId().equals(m.getId().getChatId()))
 				{
@@ -226,10 +257,9 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     			}
     		}
     	}
-		else
+		else // private chat
 		{
-    		// private chat
-	    	if(mRsCtrlService.mRsPeersService.getOwnPerson() != null) m = ChatMessage.newBuilder().setId(m.getId()).setMsg(m.getMsg()).setPeerNickname(mRsCtrlService.mRsPeersService.getOwnPerson().getName()).build();
+	    	if(mRsCtrlService.mRsPeersService.getOwnPerson() != null) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( mRsCtrlService.mRsPeersService.getOwnPerson().getName() ).build();
 	    	else {} // no name available
     	}
     	
@@ -238,10 +268,9 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	
 	private void _addChatMessageToHistory(ChatMessage m)
 	{
-		if( ChatHistory.get(m.getId()) == null ) ChatHistory.put(m.getId(), new ArrayList<ChatMessage>());
-
-		ChatHistory.get(m.getId()).add(m);
-		if(! m.getId().equals(NotifyBlockedChat)) ChatChanged.put(m.getId(), true);
+		if( mChatHistory.get(m.getId()) == null ) mChatHistory.put(m.getId(), new ArrayList<ChatMessage>());
+		mChatHistory.get(m.getId()).add(m);
+		if( ! notificationDisabledChats.contains(m.getId()) ) mChatChanged.put(m.getId(), true);
 		_notifyListeners();
 	}
 	

@@ -108,8 +108,8 @@ public class NotifyService implements ChatServiceListener
 			
 			notification = new Notification(icon, tickerText, System.currentTimeMillis());
 
-			Intent notificationIntent = new Intent(mService, ChatlobbyActivity.class);
-            notificationIntent.putExtra(ChatlobbyActivity.SERVER_NAME_EXTRA, serverName);
+			Intent notificationIntent = new Intent(mService, ChatLobbiesActivity.class);
+            notificationIntent.putExtra(ChatLobbiesActivity.SERVER_NAME_EXTRA, serverName);
 			PendingIntent contentIntent = PendingIntent.getActivity(mService, 0, notificationIntent, 0);
 			
 			notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
