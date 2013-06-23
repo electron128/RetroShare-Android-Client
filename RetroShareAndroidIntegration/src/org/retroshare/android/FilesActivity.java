@@ -236,12 +236,12 @@ public class FilesActivity extends ProxiedActivityBase
 	        
 	        //ImageView imageViewMessage=(ImageView) view.findViewById(R.id.imageViewMessage);
 	        //ImageView imageViewUserState=(ImageView) view.findViewById(R.id.imageViewUserState);
-	        TextView textViewName = (TextView) view.findViewById(R.id.textViewName);
-	        TextView textViewSize = (TextView) view.findViewById(R.id.textViewSize);
-	        TextView textViewHash = (TextView) view.findViewById(R.id.textViewHash);
-	        TextView textViewRate = (TextView) view.findViewById(R.id.textViewRate);
+	        TextView textViewName = (TextView) view.findViewById(R.id.textViewFileName_FileItem);
+	        TextView textViewSize = (TextView) view.findViewById(R.id.textViewFileSize_FileItem);
+	        TextView textViewHash = (TextView) view.findViewById(R.id.textViewFileHash_FileItem);
+	        TextView textViewRate = (TextView) view.findViewById(R.id.textViewRate_FileItem);
 	        
-	        ProgressBar progressBar1=(ProgressBar)view.findViewById(R.id.progressBar1);
+	        ProgressBar progressBar1=(ProgressBar)view.findViewById(R.id.progressBar_FileItem);
 	        
 	        textViewName.setText(ft.getFile().getName());
 	        textViewSize.setText(Long.toString(ft.getFile().getSize()));

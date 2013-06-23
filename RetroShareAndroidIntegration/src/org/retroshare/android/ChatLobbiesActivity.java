@@ -126,9 +126,9 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
 		{
 	        View view = mInflater.inflate(R.layout.activity_chalobby_lobby_item, parent, false);
 	        
-	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
-	        TextView textView2 = (TextView) view.findViewById(R.id.textView2);
-	        ImageView imageViewMessage = (ImageView) view.findViewById(R.id.imageViewMessage);
+	        TextView textView1 = (TextView) view.findViewById(R.id.lobbyNameTextView);
+	        TextView textView2 = (TextView) view.findViewById(R.id.lobbyTopicTextView);
+	        ImageView imageViewMessage = (ImageView) view.findViewById(R.id.imageViewLobbyUnreadMessage);
 	        
 	        ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_LOBBY).setChatId(LobbyList.get(position).getLobbyId()).build();
 	        Boolean haveNewMesage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);
@@ -158,6 +158,6 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { ObserverList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() { setData(getConnectedServer().mRsChatService.getChatLobbies()); } // called by RsChatService
+		@Override public void update() { setData(getConnectedServer().mRsChatService.getChatLobbies()); } // called by RsChatService // TODO here it sometimes raise NullPointerException
     }
 }

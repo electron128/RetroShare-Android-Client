@@ -325,7 +325,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
         }
         else
         {
-            EditText text = (EditText) findViewById(R.id.editText1);
+            EditText text = (EditText) findViewById(R.id.chatMessageEditText);
             text.setText("Error: not bound"); // TODO HARDCODED string
         }
         updateViews();

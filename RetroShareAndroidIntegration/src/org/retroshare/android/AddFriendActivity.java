@@ -27,7 +27,7 @@ public class AddFriendActivity extends ProxiedActivityBase
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addfriend);
-        tv=(TextView) findViewById(R.id.textView2);
+        tv = (TextView) findViewById(R.id.certificateTextView);
         button=(Button) findViewById(R.id.buttonAddFriend);
         tv.setText("waiting for ResponseAddPeer...\n");
         button.setVisibility(View.GONE);

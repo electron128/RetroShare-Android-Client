@@ -6,13 +6,11 @@
 
 
     <TextView
-        android:id="@+id/textView1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/new_retroshare_nogui_server"
         android:background="@android:color/darker_gray"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
 
 
     <EditText

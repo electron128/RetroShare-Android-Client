@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import rsctrl.chat.Chat.ChatId;
-import rsctrl.chat.Chat.ChatLobbyInfo;
+import rsctrl.chat.Chat.ChatType;
 import rsctrl.chat.Chat.ChatMessage;
 import rsctrl.core.Core;
 import rsctrl.core.Core.Person;
@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
@@ -36,9 +37,9 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
 	    setContentView(R.layout.activity_chatlobbychat);
-	    
-	    findViewById(R.id.button1).setVisibility(View.GONE);
-	    findViewById(R.id.editText1).setOnKeyListener(new KeyListener());
+
+		findViewById(R.id.buttonLeaveLobby).setVisibility(View.GONE);
+	    findViewById(R.id.chatMessageEditText).setOnKeyListener(new KeyListener());
 
 		try { chatInitId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_ID_EXTRA)); }
 		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
@@ -74,10 +75,14 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 		privateChatIds.clear();
 
-		try { for ( Core.Location location : person.getLocationsList() ) privateChatIds.add(ChatId.parseFrom(location.getSslId().getBytes())); }
-		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
+		for ( Core.Location location : person.getLocationsList() )
+		{
+			ChatId newChatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(location.getSslId()).build();
+			Log.wtf(TAG(), "onServiceConnected() adding location ->" + location.getLocation() + "<- with sslid ->" + location.getSslId() + "<- that generated ChatId ->" + newChatId.toString() + "<-" );
+			privateChatIds.add(newChatId);
+		}
 
-		TextView tv = (TextView) findViewById(R.id.textView1);
+		TextView tv = (TextView) findViewById(R.id.chatHeaderTextView);
 		String name = "Error: no Person found"; // TODO HARDCODED string
 		if( person != null ) name = person.getName();
 		tv.setText(name);
@@ -102,6 +107,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		if(isBound()) getConnectedServer().mRsChatService.disableNotificationForChats(privateChatIds);
 	}
 
+	private boolean recentlySentMessage = false;
 	public void updateViews()
 	{
 		Log.d(TAG(), "updateViews()");
@@ -114,44 +120,67 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 			for (ChatId lChat : privateChatIds)
 			{
 				List<ChatMessage> lChatMessages = cs.getChatHistoryForChatId(lChat);
-				for ( ChatMessage msg : lChatMessages ) messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getSendTime()));
+				for ( ChatMessage msg : lChatMessages )
+				{
+					Log.d(TAG(), "updateViews() sendTime=" + String.valueOf(msg.getSendTime()) + " recvTime=" + String.valueOf(msg.getRecvTime()));
+					if (msg.getSendTime() == 0) messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getRecvTime()));
+					else messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getSendTime()));
+				}
 			}
 
 			String historyString = "";
 			//ad meta to define encoding, needed to display
-			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">";
+			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />";
 
-			for(_ChatMsg msg : messages) historyString+="<span style=\"color:dodgerblue;\">" + msg.getNick() + ":</span> " + msg.getBody() + "</br>";
+			for(_ChatMsg msg : messages) historyString += "<span style=\"color:dodgerblue;\">" + msg.getNick() + ":</span> " + msg.getBody() + "<br/>";
+			historyString += "<br/>";
 
 			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
-			((WebView) findViewById(R.id.webView1)).loadData(base64, "text/html", "base64");
+
+			WebView messageView = (WebView) findViewById(R.id.chatWebView);
+			messageView.loadData(base64, "text/html", "base64");
+
+			if(recentlySentMessage)
+			{
+				ScrollView scrollView = (ScrollView) findViewById(R.id.chatScrollView);
+				scrollView.scrollTo( 0, messageView.getBottom());
+				recentlySentMessage = false;
+			}
 		}
 		else Log.e(TAG(), "updateViews() Why am I not bound?");
 	}
 	
 	public void sendChatMsg(View v)
 	{
+		Log.d(TAG(), "sendChatMsg(View v)");
+
 		if(isBound())
 		{
-			EditText et = (EditText) findViewById(R.id.editText1);
+			EditText et = (EditText) findViewById(R.id.chatMessageEditText);
 			String msgText = et.getText().toString();
+			RsChatService chatService = getConnectedServer().mRsChatService;
+
+			//                                                                     TODO ask drBob to put long instead of int
+			ChatMessage.Builder msgBuilder = ChatMessage.newBuilder().setSendTime( (int)(System.currentTimeMillis()/1000L) );
+
+			if( msgText.equals("a") ) // Easter egg
+			{
+				String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
+				msgBuilder.setMsg(android);
+			}
+			else msgBuilder.setMsg(msgText);
 
 			for ( ChatId sChatId : privateChatIds )
 			{
-				ChatMessage msg;
-
-				if( msgText.equals("a") ) // Easter egg
-				{
-					String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
-					msg = ChatMessage.newBuilder().setId(sChatId).setMsg(android).build();
-				}
-				else msg = ChatMessage.newBuilder().setId(sChatId).setMsg(msgText).build();
-
-				getConnectedServer().mRsChatService.sendChatMessage(msg);
+				msgBuilder.setId(sChatId);
+				chatService.sendChatMessage(msgBuilder.build());
 			}
 
 			et.setText("");
+
+			recentlySentMessage = true;
 		}
+		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
 
 	@Override
@@ -164,6 +193,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	{
 		public _ChatMsg(String nick, String body, int time)
 		{
+			Log.d(TAG(), "_ChatMsg(" + nick +", " + body +", " + time +")");
 			this.nick = nick;
 			this.body = body;
 			this.time = time;
@@ -184,11 +214,8 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 			int thisTime = this.getTime();
 			int otherTime = m.getTime();
-			if( thisTime != otherTime ) return otherTime - thisTime;
-
+			if( thisTime != otherTime ) return thisTime - otherTime;
 			return this.getBody().compareTo(m.getBody());
-
-			// TODO make it sense to take in account nick too ? I think it would break anti duplicate, more over is quite difficult that two different people send same message at the identical same time...
 		}
 	}
 }

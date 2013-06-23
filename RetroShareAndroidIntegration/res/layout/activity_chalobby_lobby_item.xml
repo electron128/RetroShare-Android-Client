@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
 
     <LinearLayout
-        android:id="@+id/LinearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-
-
-
-
         <ImageView
-            android:id="@+id/imageViewMessage"
+            android:id="@+id/imageViewLobbyUnreadMessage"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginBottom="8dp"
@@ -23,21 +17,14 @@
             android:layout_marginTop="8dp"
             android:src="@android:drawable/sym_action_chat" />
 
-
-
-
-
-
-
         <LinearLayout
-            android:id="@+id/LinearLayout1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/lobbyNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
@@ -46,7 +33,7 @@
 
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/lobbyTopicTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"

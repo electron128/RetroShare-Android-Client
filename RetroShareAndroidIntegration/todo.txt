@@ -1,6 +1,5 @@
 update readme
 {
-	TODO Add instruction on how to contribute with the new restructured code
 	TODO Move todo relative to source in the code
 }
 

@@ -33,12 +33,12 @@ public class AddDownloadActivity extends ProxiedActivityBase
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_download);
         
-    	textViewName=(TextView)findViewById(R.id.textViewName);
-    	textViewSize=(TextView)findViewById(R.id.textViewSize);
-    	textViewHash=(TextView)findViewById(R.id.textViewHash);
-    	textViewResult=(TextView)findViewById(R.id.textViewResult);
+    	textViewName=(TextView)findViewById(R.id.textViewFileName_DownloadActivity);
+    	textViewSize=(TextView)findViewById(R.id.textViewFileSize_DownloadActivity);
+    	textViewHash=(TextView)findViewById(R.id.textViewFileHash_DownloadActivity);
+    	textViewResult=(TextView)findViewById(R.id.textViewResult_DownloadActivity);
     	
-    	buttonDownload=(Button)findViewById(R.id.buttonDownload);
+    	buttonDownload=(Button)findViewById(R.id.buttonDownload_DownloadActivity);
     	
     	buttonDownload.setVisibility(View.GONE);
     	

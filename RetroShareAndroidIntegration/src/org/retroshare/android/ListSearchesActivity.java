@@ -41,8 +41,8 @@ public class ListSearchesActivity extends ProxiedActivityBase
         
         setContentView(R.layout.activity_listsearches);
         
-        editText=(EditText) findViewById(R.id.editText);
-        listView=(ListView) findViewById(R.id.listView);
+        editText=(EditText) findViewById(R.id.searchEditText_ListSearchesActivity);
+        listView=(ListView) findViewById(R.id.searchListView_ListSearchesActivity);
         
         editText.setOnKeyListener(new KeyListener());
         

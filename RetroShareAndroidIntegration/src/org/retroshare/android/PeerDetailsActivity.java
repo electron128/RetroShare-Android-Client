@@ -2,7 +2,6 @@ package org.retroshare.android;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.TextView;
 
 
@@ -16,8 +15,8 @@ public class PeerDetailsActivity extends ProxiedActivityBase
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_peerdetails);
         
-        TextView textViewName=(TextView) findViewById(R.id.textViewName);
-        TextView textViewLocation=(TextView) findViewById(R.id.textViewName);
+        TextView textViewName=(TextView) findViewById(R.id.peerNameTextView);
+        TextView textViewLocation=(TextView) findViewById(R.id.peerNameTextView);
         
         Intent i = getIntent();
         textViewName.setText(i.getStringExtra("GpgId"));

@@ -113,9 +113,9 @@ public class PeersActivity extends ProxiedActivityBase
 	        
 	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
 	        
-	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.imageViewMessage);
+	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.newMessageImageView);
 	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
-	        TextView textView1 = (TextView) view.findViewById(R.id.textView1);
+	        TextView textView1 = (TextView) view.findViewById(R.id.PeerNameTextView);
 	        
 	        ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
 	        Boolean haveNewMessage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);

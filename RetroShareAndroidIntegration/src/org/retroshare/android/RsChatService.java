@@ -164,22 +164,25 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 			System.err.println("received Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE");
 			try
 			{
-				EventChatMessage resp=EventChatMessage.parseFrom(msg.body);
+				EventChatMessage resp = EventChatMessage.parseFrom(msg.body);
 				
 				ChatMessage m = resp.getMsg();
 				// add name information, and update lastChatMessage
-		    	if(m.getId().getChatType()==ChatType.TYPE_LOBBY)
+		    	if(m.getId().getChatType() == ChatType.TYPE_LOBBY)
 				{
 		    		// we have lobby
 		    		// so names are included in the ChatMessage
 		    		
-		    		lastChatlobbyMessage=m;
+		    		lastChatlobbyMessage = m;
 		    	}
 				else
 				{
 		    		// private chat, we have to add names
+					// We are adding receive time too because we need it for message ordering in set
 		    		Person p = mRsCtrlService.mRsPeersService.getPersonFromSslId(m.getId().getChatId());
-			    	if( p != null ) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( p.getName() ).build();
+
+					//                                                                                                                               TODO ask drBob to put long instead of int
+			    	if( p != null ) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( p.getName() ).setRecvTime(  (int)(System.currentTimeMillis()/1000L)  ).build();
 			    	lastPrivateChatMessage = m;
 		    	}
 		    	
@@ -259,7 +262,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
     	}
 		else // private chat
 		{
-	    	if(mRsCtrlService.mRsPeersService.getOwnPerson() != null) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( mRsCtrlService.mRsPeersService.getOwnPerson().getName() ).build();
+	    	if(mRsCtrlService.mRsPeersService.getOwnPerson() != null) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setSendTime( m.getSendTime() ).setPeerNickname( mRsCtrlService.mRsPeersService.getOwnPerson().getName() ).build();
 	    	else {} // no name available
     	}
     	
