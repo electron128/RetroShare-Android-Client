@@ -32,7 +32,7 @@ import rsctrl.core.Core.Person;
 
 public class PeersActivity extends ProxiedActivityBase
 {
-	private static final String TAG="PeersActivity";
+	public String TAG() { return "PeersActivity"; }
 	
 	private PeersListAdapterListener adapter;
 	
@@ -173,11 +173,9 @@ public class PeersActivity extends ProxiedActivityBase
 
 	private void _registerListeners()
 	{
-		Log.d(TAG, "_registerListeners()");
+		Log.d(TAG(), "_registerListeners()");
 
 		if( ! isBound() ) return;
-
-		Log.d(TAG, "_registerListeners() bound");
 
 		RsCtrlService server = getConnectedServer();
 		server.mRsPeersService.registerListener(adapter);
@@ -186,7 +184,7 @@ public class PeersActivity extends ProxiedActivityBase
 
 	private void _unregisterListeners()
 	{
-		Log.d(TAG, "_unregisterListeners()");
+		Log.d(TAG(), "_unregisterListeners()");
 
 		if( ! isBound() ) return;
 

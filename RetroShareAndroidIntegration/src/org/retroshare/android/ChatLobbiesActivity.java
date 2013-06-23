@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,37 +31,15 @@ import org.retroshare.android.RsChatService.ChatServiceListener;
 
 public class ChatLobbiesActivity extends ProxiedActivityBase
 {
-	private static final String TAG="ChatLobbyActivity";
-	
-	private TextView mText;
+	public String TAG() { return "ChatLobbyActivity"; }
+
 	private ChatLobbyListAdapterListener mclla;
 	
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
-        super.onCreate(savedInstanceState);
-        
-        /*
-        mText=new TextView(this);
-        mText.setHeight(100);
-        
-        LinearLayout layout=new LinearLayout(this);
-        //layout.addView(mText);
-        Button button=new Button(this);
-        //button.setWidth(-1);
-        button.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-        button.setOnClickListener(new OnClickListener(){@Override public void onClick(View v){getChatLobbies();}});
-        layout.addView(button);
-        Button b2=new Button(this);
-        b2.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-        layout.addView(b2);
-        
-        //TabHost th=new TabHost();
-        //th.addTab(tabSpec)
-        setContentView(layout);*/
-        
-        mclla=new ChatLobbyListAdapterListener(this);
-        ListView lv=new ListView(this);
+        mclla = new ChatLobbyListAdapterListener(this);
+        ListView lv = new ListView(this);
         lv.setAdapter(mclla);
         lv.setOnItemClickListener(mclla);
         setContentView(lv);
@@ -70,16 +49,22 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		RsCtrlService server = getConnectedServer();
-		server.mRsChatService.registerListener(mclla);
-		server.mRsChatService.updateChatLobbies();
+		_registerListeners();
     }
     
     @Override
     public void onResume()
 	{
     	super.onResume();
-    	if ( isBound()) getConnectedServer().mRsChatService.updateChatLobbies();
+		_registerListeners();
+
     }
+
+	public void onPause()
+	{
+		_unregisterListeners();
+		super.onPause();
+	}
 
     private class ChatLobbyListAdapterListener implements ListAdapter, OnItemClickListener, ChatServiceListener
 	{
@@ -160,4 +145,25 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
 		@Override public boolean isEnabled(int position) {return true;}
 		@Override public void update() { setData(getConnectedServer().mRsChatService.getChatLobbies()); } // called by RsChatService // TODO here it sometimes raise NullPointerException
     }
+
+	private void _registerListeners()
+	{
+		Log.d(TAG(), "_registerListeners()");
+
+		if( ! isBound() ) return;
+
+		RsCtrlService server = getConnectedServer();
+		server.mRsChatService.registerListener(mclla);
+		server.mRsChatService.updateChatLobbies();
+	}
+
+	private void _unregisterListeners()
+	{
+		Log.d(TAG(), "_unregisterListeners()");
+
+		if( ! isBound() ) return;
+
+		RsCtrlService server = getConnectedServer();
+		server.mRsChatService.unregisterListener(mclla);
+	}
 }
