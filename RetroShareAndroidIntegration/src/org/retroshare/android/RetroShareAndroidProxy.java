@@ -291,10 +291,11 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	private void _deactivateServer(RsBund bund)
 	{
+        String serverName = bund.getServer().getServerData().name;
 		bund.server.disconnect();
 		bund.server.unregisterListener(this);
 		bund.server.destroy();
 		bund.notifier.cancelAll();
-		serverBunds.remove(bund);
+		serverBunds.remove(serverName);
 	}
 }
