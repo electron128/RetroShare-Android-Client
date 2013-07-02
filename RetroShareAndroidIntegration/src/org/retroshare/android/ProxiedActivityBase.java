@@ -7,6 +7,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 
 /**
@@ -20,6 +22,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
     public String TAG() { return "ProxiedActivityBase"; }
 
     protected RetroShareAndroidProxy rsProxy;
+    protected ProgressBar rsProxyConnectionProgressBar;
 
     private boolean mBound = false;
 	public boolean isBound(){return mBound;}
@@ -65,6 +68,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		setBound(true);
         if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.UiThreadHandler();
 		onServiceConnected();
+        rsProxyConnectionProgressBar.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -78,6 +82,11 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        rsProxyConnectionProgressBar = new ProgressBar(this);
+        rsProxyConnectionProgressBar.setIndeterminate(true);
+        rsProxyConnectionProgressBar.setVisibility(View.VISIBLE);
+
 		serverName = getIntent().getStringExtra(SERVER_NAME_EXTRA);
         onCreateBeforeConnectionInit(savedInstanceState);
         _bindRsService();
