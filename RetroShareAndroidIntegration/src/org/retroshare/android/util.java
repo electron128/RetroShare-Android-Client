@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 
+import android.net.Uri;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
 */
 public class util
 {
+	public static final String TAG() { return "util"; }
 	
 	// stolen from the internet
 	public static String byteArrayToHexString(byte[] b)
@@ -82,4 +84,25 @@ public class util
 		bitmap=Bitmap.createScaledBitmap(bitmap, imagewidth*6, imageheight*6, false);
 		return bitmap;
 		}*/
+
+	public static String getCertFromUri(Uri uri)
+	{
+		if( uri.getScheme().equals("retroshare") && uri.getHost().equals("certificate") )
+		{
+			String cert="-----BEGIN PGP PUBLIC KEY BLOCK-----\n";
+			cert+=uri.getQueryParameter("gpgbase64");
+			cert+="\n=";
+			cert+=uri.getQueryParameter("gpgchecksum");
+			cert+="\n-----END PGP PUBLIC KEY BLOCK-----\n";
+			cert+="--SSLID--"+uri.getQueryParameter("sslid")+";--LOCATION--"+uri.getQueryParameter("location")+";\n";
+			// Note: at locipp and extipp, the ';' is included in the query string
+			cert+="--LOCAL--"+uri.getQueryParameter("locipp")+"--EXT--"+uri.getQueryParameter("extipp");
+			return cert;
+		}
+		else
+		{
+			Log.e( TAG(), "getCertFromUri( "+ uri.toString() +" ): wrong scheme or host");
+			return null;
+		}
+	}
 }

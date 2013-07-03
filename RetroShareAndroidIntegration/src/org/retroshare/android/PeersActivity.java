@@ -214,4 +214,6 @@ public class PeersActivity extends ProxiedActivityBase
 		server.mRsPeersService.unregisterListener(adapter);
 		server.mRsChatService.unregisterListener(adapter);
 	}
+
+	public void onAddFriendsButtonPressed(View v) { startActivity(AddFriendMethodChooserActivity.class); }
 }

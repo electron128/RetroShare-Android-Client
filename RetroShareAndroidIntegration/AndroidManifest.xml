@@ -46,7 +46,7 @@
 		<activity android:name=".ChatLobbiesActivity" android:label="@string/chat_lobbies"></activity>
 		<activity android:name=".ChatLobbyActivity"></activity>
 		<activity android:name=".ChatActivity"></activity>
-		<activity android:name=".AddFriendActivity">
+		<activity android:name=".AddFriendMethodChooserActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />

@@ -14,5 +14,6 @@
 			android:layout_width="match_parent"
 			android:text="@string/add_friend"
 			android:layout_weight="0.1"
+			android:onClick="onAddFriendsButtonPressed"
 			/>
 </LinearLayout>

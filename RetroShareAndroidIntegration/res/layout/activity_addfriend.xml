@@ -10,32 +10,16 @@
         android:text="@string/add_friend"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <ScrollView
+	<Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.30" >
+        android:onClick="onFromKnownPeersButtonPressed"
+        android:text="@string/from_known_peers" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <TextView
-                android:id="@+id/certificateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
-        </LinearLayout>
-    </ScrollView>
-
-
-
-
-
-    <Button
-        android:id="@+id/buttonAddFriend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="addFriend"
-        android:text="@string/add_friend" />
+	<Button
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:onClick="onFromQrCodeButtonPressed"
+			android:text="@string/from_qr_code" />
 
 </LinearLayout>
