@@ -137,7 +137,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
         }
     }
     
-    public void showPeers(View v)
+	public void showPeers(View v)
 	{
 		Intent i = new Intent();
 		i.putExtra(PeersActivity.SHOW_ADD_FRIEND_BUTTON, true);
