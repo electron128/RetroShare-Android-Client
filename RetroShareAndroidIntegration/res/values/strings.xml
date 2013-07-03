@@ -16,6 +16,7 @@
     <string name="chat">chat</string>
     <string name="chat_lobbies">chat lobbies</string>
     <string name="add_friend">Add Friends</string>
+	<string name="add_as_friend">Add as Friend</string>
 	<string name="from_known_peers">From Known Peers</string>
 	<string name="from_qr_code">From QR Code</string>
     <string name="hostname">hostname</string>
@@ -33,7 +34,7 @@
     <string name="err_auth_failed">ssh authentification failed: wrong  user or password</string>
     <string name="err_send">error while sending</string>
     <string name="err_receive">error while receiving</string>
-    <string name="block_friend">(TODO) block friend</string>
+    <string name="block_friend">Remove from Friends</string>
     <string name="system_status">(TODO) system status</string>
     <string name="connection_error">connection error</string>
     <string name="connected">connected</string>

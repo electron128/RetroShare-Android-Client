@@ -179,7 +179,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 				{
 		    		// private chat, we have to add names
 					// We are adding receive time too because we need it for message ordering in set
-		    		Person p = mRsCtrlService.mRsPeersService.getPersonFromSslId(m.getId().getChatId());
+		    		Person p = mRsCtrlService.mRsPeersService.getPersonBySslId(m.getId().getChatId());
 
 					//                                                                                                                               TODO ask drBob to put long instead of int
 			    	if( p != null ) m = ChatMessage.newBuilder().setId( m.getId() ).setMsg( m.getMsg() ).setPeerNickname( p.getName() ).setRecvTime(  (int)(System.currentTimeMillis()/1000L)  ).build();

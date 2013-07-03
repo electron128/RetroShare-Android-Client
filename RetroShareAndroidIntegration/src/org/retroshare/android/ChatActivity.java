@@ -66,7 +66,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		Log.d(TAG(), "onServiceConnected()");
 
 		RsCtrlService server = getConnectedServer();
-		Person person = server.mRsPeersService.getPersonFromSslId(chatInitId.getChatId());
+		Person person = server.mRsPeersService.getPersonBySslId(chatInitId.getChatId());
 		if(person == null)
 		{
 			util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + chatInitId.getChatId() + " is null??");

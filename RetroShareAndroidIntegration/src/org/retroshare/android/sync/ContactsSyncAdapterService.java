@@ -29,6 +29,7 @@ import org.retroshare.android.RsPeersService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
 			peersService.updateFriendsList(); // Ask refresh data inside RsPeersService
 
-			List<Person> peers = peersService.getPersons();
+			Collection<Person> peers = peersService.getPersons();
 			List<Location> locationList = new ArrayList<Location>();
 			Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
 

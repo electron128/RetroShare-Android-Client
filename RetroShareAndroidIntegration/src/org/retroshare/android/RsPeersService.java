@@ -4,8 +4,10 @@ import android.os.Looper;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import rsctrl.core.Core;
@@ -58,21 +60,23 @@ public class RsPeersService implements RsServiceInterface
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners) { l.update(); }; }}); }	}
 
-	private List<Person> mPersons = new ArrayList<Person>();
+	// TODO take more advantage of the fact we have peers in a map in PeersService clients
+	private Map<String, Person> mPersons = new HashMap<String, Person>();
+	public Person getPersonByPgpId(String pgpId) { return mPersons.get(pgpId); }
 	public List<Person> getPersonsByRelationship(Collection<Person.Relationship> relationships)
 	{
 		List<Person> ret = new ArrayList<Person>();
-		for (Person p : mPersons) if(relationships.contains(p.getRelation())) ret.add(p);
+		for (Person p : mPersons.values()) if(relationships.contains(p.getRelation())) ret.add(p);
 		return ret;
 	}
-	public List<Person> getPersonsByRelationship(Person.Relationship relationship)
+	public Collection<Person> getPersonsByRelationship(Person.Relationship relationship)
 	{
-		List<Person> ret = new ArrayList<Person>();
-		for (Person p : mPersons) if(relationship.equals(p.getRelation())) ret.add(p);
+		Collection<Person> ret = new ArrayList<Person>();
+		for (Person p : mPersons.values()) if(relationship.equals(p.getRelation())) ret.add(p);
 		return ret;
 	}
-	public List<Person> getPersons() { return mPersons; }
-	public Person getPersonFromSslId(String sslId)
+	public Collection<Person> getPersons() { return mPersons.values(); }
+	public Person getPersonBySslId(String sslId)
 	{
 		for( Person p : getPersons() ) for( Location l : p.getLocationsList() ) if ( l.getSslId().equals(sslId) ) return p;
 		return null;
@@ -82,7 +86,7 @@ public class RsPeersService implements RsServiceInterface
 	{
 		if(ownPerson == null)
 		{
-			for (Person p : mPersons)
+			for (Person p : mPersons.values())
 			{
 				if(p.getRelation() == Person.Relationship.YOURSELF)
 				{
@@ -116,8 +120,7 @@ public class RsPeersService implements RsServiceInterface
 		{
 			try
 			{
-				mPersons = ResponsePeerList.parseFrom(msg.body).getPeersList();
-				//System.err.println(mPersons);
+				for (Person p : ResponsePeerList.parseFrom(msg.body).getPeersList()) mPersons.put(p.getGpgId(), p);
 				_notifyListeners();
 			}
 			catch (InvalidProtocolBufferException e) { e.printStackTrace();	}

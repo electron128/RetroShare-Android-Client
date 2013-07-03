@@ -116,7 +116,7 @@ public class PeersActivity extends ProxiedActivityBase
 		{
 			Person p = personList.get(position);
     		Intent i = new Intent( PeersActivity.this, PeerDetailsActivity.class );
-    		i.putExtra("GpgId", p.getGpgId()); // TODO HARDCODED string
+    		i.putExtra(PeerDetailsActivity.PGP_ID_EXTRA, p.getGpgId()); // TODO HARDCODED string
     		startActivity(i);
 			return true;
 		}
@@ -139,7 +139,16 @@ public class PeersActivity extends ProxiedActivityBase
 				isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
 
 				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-				if( getConnectedServer().mRsChatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
+				RsCtrlService server = getConnectedServer();
+				if( server != null ) // TODO clean this porcata
+				{
+					RsChatService chatService = server.mRsChatService;
+					if ( chatService !=  null)
+					{
+						if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
+					}
+					else Log.e(TAG(), "Il chatService e' nullo");
+				}
 			}
 			if(isOnline)
 			{
