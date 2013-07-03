@@ -42,8 +42,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
 	Handler mHandler;
 	
-	boolean isInForeground = false;
-
     boolean connectButtonRecentlyPressed = false;
 
     List<View> showIfConnected;
@@ -98,15 +96,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     public void onResume()
     {
     	super.onResume();
-		isInForeground = true;
     	updateViews();
-    }
-
-    @Override
-    public void onPause()
-    {
-    	super.onPause();
-    	isInForeground = false;
     }
 
     private void setVisibility(List<View> views, int visibility) { for (View v : views) v.setVisibility(visibility); }
@@ -197,7 +187,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		@Override
 		public void run()
 		{
-			if(isInForeground) { requestSystemStatus(); }
+			if(isForeground()) { requestSystemStatus(); }
 			mHandler.postAtTime(new requestSystemStatusRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}

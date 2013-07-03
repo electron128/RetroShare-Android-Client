@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,9 @@ import rsctrl.core.Core.Person;
 public class PeersActivity extends ProxiedActivityBase
 {
 	public String TAG() { return "PeersActivity"; }
+
+	private static final int UPDATE_INTERVAL = 1000;
+	Handler mHandler;
 
 	private boolean showAllPeers = false;
 	public static final String SHOW_ALL_PEER_EXTRA = "showAllPeers";
@@ -67,7 +72,8 @@ public class PeersActivity extends ProxiedActivityBase
     protected void onServiceConnected()
 	{
 		_registerListeners();
-		getConnectedServer().mRsPeersService.updateFriendsList();
+		if(mHandler == null) mHandler = new Handler();
+		mHandler.post(new RequestPeersListUpdateRunnable());
 	}
     
     @Override
@@ -116,7 +122,7 @@ public class PeersActivity extends ProxiedActivityBase
 		{
 			Person p = personList.get(position);
     		Intent i = new Intent( PeersActivity.this, PeerDetailsActivity.class );
-    		i.putExtra(PeerDetailsActivity.PGP_ID_EXTRA, p.getGpgId()); // TODO HARDCODED string
+    		i.putExtra(PeerDetailsActivity.PGP_ID_EXTRA, p.getGpgId());
     		startActivity(i);
 			return true;
 		}
@@ -140,11 +146,8 @@ public class PeersActivity extends ProxiedActivityBase
 
 				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
 				RsChatService chatService = getConnectedServer().mRsChatService;
-				if ( chatService !=  null) // TODO clean this porcata
-				{
-					if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
-				}
-				else Log.wtf(TAG(), "chatService is null");
+				if ( chatService !=  null) if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
+				else Log.wtf(TAG(), "getView(...) chatService is null");
 			}
 			if(isOnline)
 			{
@@ -180,7 +183,6 @@ public class PeersActivity extends ProxiedActivityBase
 			Log.d(TAG, "update()");
 
 			RsPeersService peersService = getConnectedServer().mRsPeersService;
-			//peersService.updateFriendsList(); // Enabling this will cause a loop of request without timer, TODO refresh peers periodically ( like MainActivity do )
 
 			personList.clear();
 			if(showAllPeers)
@@ -245,4 +247,14 @@ public class PeersActivity extends ProxiedActivityBase
 	}
 
 	private class PersonByNameComparator implements Comparator<Person> { @Override public int compare( Person p1, Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
+
+	private class RequestPeersListUpdateRunnable implements Runnable
+	{
+		@Override
+		public void run()
+		{
+			if(isForeground()) getConnectedServer().mRsPeersService.updateFriendsList();
+			mHandler.postAtTime(new RequestPeersListUpdateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
+		}
+	}
 }

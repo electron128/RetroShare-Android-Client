@@ -31,6 +31,9 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	public static final String SERVER_NAME_EXTRA = "org.retroshare.android.intent_extra_keys.serverName";
 	protected String serverName;
 
+	private boolean isInForeground = false;
+	public boolean isForeground() { return isInForeground; }
+
 	/**
 	 * This method should be overridden by child classes that want to do something between Activity.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected
 	 * It is suggested for inflating your activity layout, so you are sure that your widget are in the right place when onServiceConnected() is called
@@ -145,5 +148,19 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	{
 		i.putExtra(SERVER_NAME_EXTRA, serverName);
 		super.startActivity(i);
+	}
+
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		isInForeground = false;
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		isInForeground = true;
 	}
 }
