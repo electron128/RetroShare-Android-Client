@@ -115,7 +115,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
 			peersService.updateFriendsList(); // Ask refresh data inside RsPeersService
 
-			List<Person> peers = peersService.getPeersList();
+			List<Person> peers = peersService.getPersons();
 			List<Location> locationList = new ArrayList<Location>();
 			Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
 

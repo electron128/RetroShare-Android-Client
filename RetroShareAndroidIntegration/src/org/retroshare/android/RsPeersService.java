@@ -3,6 +3,7 @@ package org.retroshare.android;
 import android.os.Looper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class RsPeersService implements RsServiceInterface
 {
-	private static final String TAG = "RsPeersService";
+	private static final String TAG() { return "RsPeersService"; }
 
 	RsCtrlService mRsCtrlService;
 	UiThreadHandlerInterface mUiThreadHandler;
@@ -58,49 +59,46 @@ public class RsPeersService implements RsServiceInterface
 	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners) { l.update(); }; }}); }	}
 
 	private List<Person> mPersons = new ArrayList<Person>();
-	public List<Person> getPeersList()
+	public List<Person> getPersonsByRelationship(Collection<Person.Relationship> relationships)
 	{
-		ArrayList pr = new ArrayList();
-
-		if(ownPerson == null) getOwnPerson();
-		else pr.add(ownPerson);
-
-		pr.addAll(mPersons);
-
-		return pr;
+		List<Person> ret = new ArrayList<Person>();
+		for (Person p : mPersons) if(relationships.contains(p.getRelation())) ret.add(p);
+		return ret;
 	}
+	public List<Person> getPersonsByRelationship(Person.Relationship relationship)
+	{
+		List<Person> ret = new ArrayList<Person>();
+		for (Person p : mPersons) if(relationship.equals(p.getRelation())) ret.add(p);
+		return ret;
+	}
+	public List<Person> getPersons() { return mPersons; }
 	public Person getPersonFromSslId(String sslId)
 	{
-		for( Person p : getPeersList() ) for( Location l : p.getLocationsList() ) if ( l.getSslId().equals(sslId) ) return p;
+		for( Person p : getPersons() ) for( Location l : p.getLocationsList() ) if ( l.getSslId().equals(sslId) ) return p;
 		return null;
 	}
-	
 	private Person ownPerson;
 	public Person getOwnPerson()
 	{
 		if(ownPerson == null)
 		{
-			RequestPeers.Builder reqb = RequestPeers.newBuilder();
-			reqb.setSet(RequestPeers.SetOption.OWNID);
-			reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
-			RequestPeers req = reqb.build();
-			byte[] b;
-			b = req.toByteArray();
-	    	RsMessage msg = new RsMessage();
-	    	//          TODO Code like that is repeated a lot in the sources there is a way to avoid ( maybe creating a function ) to avoid this ?
-	    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
-	    	msg.body=b;
-	    	mRsCtrlService.sendMsg(msg, mOwnIdReceivedHandler);
+			for (Person p : mPersons)
+			{
+				if(p.getRelation() == Person.Relationship.YOURSELF)
+				{
+					ownPerson = p;
+					break;
+				}
+			}
 		}
 		return ownPerson;
 	}
 
 	public void updateFriendsList()
 	{
-		getOwnPerson();
-
 		RequestPeers.Builder reqb = RequestPeers.newBuilder();
-		reqb.setSet(RequestPeers.SetOption.FRIENDS);
+		//reqb.setSet(RequestPeers.SetOption.FRIENDS);
+        reqb.setSet(RequestPeers.SetOption.ALL);
 		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
 		RequestPeers req = reqb.build();
 		byte[] b;
@@ -119,7 +117,7 @@ public class RsPeersService implements RsServiceInterface
 			try
 			{
 				mPersons = ResponsePeerList.parseFrom(msg.body).getPeersList();
-				System.err.println(mPersons);
+				//System.err.println(mPersons);
 				_notifyListeners();
 			}
 			catch (InvalidProtocolBufferException e) { e.printStackTrace();	}

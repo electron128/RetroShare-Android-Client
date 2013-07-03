@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -33,18 +34,33 @@ import rsctrl.core.Core.Person;
 public class PeersActivity extends ProxiedActivityBase
 {
 	public String TAG() { return "PeersActivity"; }
-	
+
+	private boolean showAllPeers = false;
+	public static final String SHOW_ALL_PEER_EXTRA = "showAllPeers";
+
+	private boolean showAddFriendButton = false;
+	public static final String SHOW_ADD_FRIEND_BUTTON = "shoAddFriendButton";
+
 	private PeersListAdapterListener adapter;
 	
     @Override
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
+		showAllPeers = getIntent().getBooleanExtra(SHOW_ALL_PEER_EXTRA, false);
+		showAddFriendButton = getIntent().getBooleanExtra(SHOW_ADD_FRIEND_BUTTON, false);
+
+		setContentView(R.layout.activity_peers);
+
+		ListView lv = (ListView) findViewById(R.id.peersList);
+		Button btn = (Button) findViewById(R.id.addFriendsButton);
+
+		if(showAddFriendButton) btn.setVisibility(View.VISIBLE);
+		else btn.setVisibility(View.GONE);
+
         adapter = new PeersListAdapterListener(this);
-        ListView lv = new ListView(this);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(adapter);
         lv.setOnItemLongClickListener(adapter);
-        setContentView(lv);
     }
     
     @Override
@@ -73,9 +89,8 @@ public class PeersActivity extends ProxiedActivityBase
 	{
 		private final static String TAG = "PeersListAdapterListener";
 
-    	private List<Location> locationList = new ArrayList<Location>();
-    	private Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
-    	private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
+		private List<Person> personList = new ArrayList<Person>();
+		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
     	
@@ -84,23 +99,24 @@ public class PeersActivity extends ProxiedActivityBase
     	@Override
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
-    		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
-    		Location loc = locationList.get(position);
-			String sslId = loc.getSslId();
+			//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
+			Person p = personList.get(position);
 
-    		Intent i = new Intent(PeersActivity.this, ChatActivity.class);
-    		i.putExtra(ChatActivity.CHAT_ID_EXTRA, ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(sslId).build().toByteArray());
-			startActivity(ChatActivity.class, i);
+			if ( p.getRelation().equals(Person.Relationship.FRIEND) || p.getRelation().equals(Person.Relationship.YOURSELF) )
+			{
+				String sslId = p.getLocations(0).getSslId();
+				Intent i = new Intent(PeersActivity.this, ChatActivity.class);
+				i.putExtra(ChatActivity.CHAT_ID_EXTRA, ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(sslId).build().toByteArray());
+				startActivity(ChatActivity.class, i);
+			}
     	}
     	
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
 		{
-			Location loc = locationList.get(position);
-			Person p = mapLocationToPerson.get(loc);
-    		Intent i = new Intent(PeersActivity.this,PeerDetailsActivity.class);
+			Person p = personList.get(position);
+    		Intent i = new Intent( PeersActivity.this, PeerDetailsActivity.class );
     		i.putExtra("GpgId", p.getGpgId()); // TODO HARDCODED string
-    		i.putExtra("SslId", loc.getSslId()); // TODO HARDCODED string
     		startActivity(i);
 			return true;
 		}
@@ -108,44 +124,48 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			Location l = locationList.get(position);
-	        Person p = mapLocationToPerson.get(l);
+	        Person p = personList.get(position);
 	        
 	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
 	        
 	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.newMessageImageView);
 	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
 	        TextView textView1 = (TextView) view.findViewById(R.id.PeerNameTextView);
-	        
-	        ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-	        Boolean haveNewMessage = getConnectedServer().mRsChatService.getChatChanged().get(chatId);
 
-	        if( haveNewMessage != null && haveNewMessage.equals(Boolean.TRUE) ) imageViewMessage.setVisibility(View.VISIBLE);
-			else imageViewMessage.setVisibility(View.GONE);
-
-	        if( (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
+			boolean isOnline = false;
+			boolean hasMessage = false;
+			for ( Location l : p.getLocationsList())
 			{
-	        	imageViewUserState.setImageResource(R.drawable.ic_contact_color);
-	        	textView1.setTextColor(Color.BLUE);
-	        }
+				isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
+
+				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
+				if( getConnectedServer().mRsChatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
+			}
+			if(isOnline)
+			{
+				imageViewUserState.setImageResource(R.drawable.ic_contact_color);
+				textView1.setTextColor(Color.BLUE);
+			}
 			else
 			{
-	        	imageViewUserState.setImageResource(R.drawable.ic_contact_picture);
-	        	textView1.setTextColor(Color.GRAY);
-	        }
-	        
-	        textView1.setText(p.getName()+" ("+l.getLocation()+") "/*+Integer.toBinaryString(l.getState())*/);
+				imageViewUserState.setImageResource(R.drawable.ic_contact_picture);
+				textView1.setTextColor(Color.GRAY);
+			}
+			if(hasMessage) imageViewMessage.setVisibility(View.VISIBLE);
+			else imageViewMessage.setVisibility(View.GONE);
+
+	        textView1.setText(p.getName());
 
 	        return view;
 		}
 
-		@Override public int getCount() { return locationList.size(); }
-		@Override public Object getItem(int position) { return locationList.get(position); }
+		@Override public int getCount() { return personList.size(); }
+		@Override public Object getItem(int position) { return personList.get(position); }
 		@Override public long getItemId(int position) { return 0; }
 		@Override public int getItemViewType(int position) { return 0; }
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public boolean hasStableIds() { return false; }
-		@Override public boolean isEmpty() { return locationList.isEmpty(); }
+		@Override public boolean isEmpty() { return personList.isEmpty(); }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
@@ -155,17 +175,19 @@ public class PeersActivity extends ProxiedActivityBase
 			Log.d(TAG, "update()");
 
 			RsPeersService peersService = getConnectedServer().mRsPeersService;
-			peersService.updateFriendsList();
+			//peersService.updateFriendsList(); // Enabling this will cause a loop of request without timer, TODO refresh peers periodically ( like MainActivity do )
 
-			List<Person> personList = peersService.getPeersList();
-			locationList.clear();
-			mapLocationToPerson.clear();
-			for(Person p : personList)
-				for(Location l : p.getLocationsList())
-				{
-					locationList.add(l);
-					mapLocationToPerson.put(l, p);
-				}
+			personList.clear();
+			if(showAllPeers) personList.addAll(peersService.getPersons());
+			else
+			{
+				List<Person.Relationship> r = new ArrayList<Person.Relationship>();
+				r.add(Person.Relationship.YOURSELF);
+				r.add(Person.Relationship.FRIEND);
+				personList.addAll(peersService.getPersonsByRelationship(r));
+			}
+
+			// TODO sort person list
 
 			for(DataSetObserver obs : observerList) { obs.onChanged(); }
 		}
