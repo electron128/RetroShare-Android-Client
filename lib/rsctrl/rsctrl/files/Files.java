@@ -12,10 +12,12 @@ public final class Files {
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_RequestTransferList(0, 1),
     MsgId_RequestControlDownload(1, 2),
+    MsgId_RequestShareDirList(2, 3),
     ;
     
     public static final int MsgId_RequestTransferList_VALUE = 1;
     public static final int MsgId_RequestControlDownload_VALUE = 2;
+    public static final int MsgId_RequestShareDirList_VALUE = 3;
     
     
     public final int getNumber() { return value; }
@@ -24,6 +26,7 @@ public final class Files {
       switch (value) {
         case 1: return MsgId_RequestTransferList;
         case 2: return MsgId_RequestControlDownload;
+        case 3: return MsgId_RequestShareDirList;
         default: return null;
       }
     }
@@ -54,7 +57,7 @@ public final class Files {
     }
     
     private static final RequestMsgIds[] VALUES = {
-      MsgId_RequestTransferList, MsgId_RequestControlDownload, 
+      MsgId_RequestTransferList, MsgId_RequestControlDownload, MsgId_RequestShareDirList, 
     };
     
     public static RequestMsgIds valueOf(
@@ -81,10 +84,12 @@ public final class Files {
       implements com.google.protobuf.ProtocolMessageEnum {
     MsgId_ResponseTransferList(0, 1),
     MsgId_ResponseControlDownload(1, 2),
+    MsgId_ResponseShareDirList(2, 3),
     ;
     
     public static final int MsgId_ResponseTransferList_VALUE = 1;
     public static final int MsgId_ResponseControlDownload_VALUE = 2;
+    public static final int MsgId_ResponseShareDirList_VALUE = 3;
     
     
     public final int getNumber() { return value; }
@@ -93,6 +98,7 @@ public final class Files {
       switch (value) {
         case 1: return MsgId_ResponseTransferList;
         case 2: return MsgId_ResponseControlDownload;
+        case 3: return MsgId_ResponseShareDirList;
         default: return null;
       }
     }
@@ -123,7 +129,7 @@ public final class Files {
     }
     
     private static final ResponseMsgIds[] VALUES = {
-      MsgId_ResponseTransferList, MsgId_ResponseControlDownload, 
+      MsgId_ResponseTransferList, MsgId_ResponseControlDownload, MsgId_ResponseShareDirList, 
     };
     
     public static ResponseMsgIds valueOf(
@@ -215,6 +221,93 @@ public final class Files {
     // @@protoc_insertion_point(enum_scope:rsctrl.files.Direction)
   }
   
+  public enum TransferState
+      implements com.google.protobuf.ProtocolMessageEnum {
+    TRANSFER_FAILED(0, 1),
+    TRANSFER_OKAY(1, 2),
+    TRANSFER_PAUSED(2, 3),
+    TRANSFER_QUEUED(3, 4),
+    TRANSFER_WAITING(4, 5),
+    TRANSFER_DOWNLOADING(5, 6),
+    TRANSFER_CHECKING_HASH(6, 7),
+    TRANSFER_COMPLETE(7, 8),
+    ;
+    
+    public static final int TRANSFER_FAILED_VALUE = 1;
+    public static final int TRANSFER_OKAY_VALUE = 2;
+    public static final int TRANSFER_PAUSED_VALUE = 3;
+    public static final int TRANSFER_QUEUED_VALUE = 4;
+    public static final int TRANSFER_WAITING_VALUE = 5;
+    public static final int TRANSFER_DOWNLOADING_VALUE = 6;
+    public static final int TRANSFER_CHECKING_HASH_VALUE = 7;
+    public static final int TRANSFER_COMPLETE_VALUE = 8;
+    
+    
+    public final int getNumber() { return value; }
+    
+    public static TransferState valueOf(int value) {
+      switch (value) {
+        case 1: return TRANSFER_FAILED;
+        case 2: return TRANSFER_OKAY;
+        case 3: return TRANSFER_PAUSED;
+        case 4: return TRANSFER_QUEUED;
+        case 5: return TRANSFER_WAITING;
+        case 6: return TRANSFER_DOWNLOADING;
+        case 7: return TRANSFER_CHECKING_HASH;
+        case 8: return TRANSFER_COMPLETE;
+        default: return null;
+      }
+    }
+    
+    public static com.google.protobuf.Internal.EnumLiteMap<TransferState>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<TransferState>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<TransferState>() {
+            public TransferState findValueByNumber(int number) {
+              return TransferState.valueOf(number);
+            }
+          };
+    
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return rsctrl.files.Files.getDescriptor().getEnumTypes().get(3);
+    }
+    
+    private static final TransferState[] VALUES = {
+      TRANSFER_FAILED, TRANSFER_OKAY, TRANSFER_PAUSED, TRANSFER_QUEUED, TRANSFER_WAITING, TRANSFER_DOWNLOADING, TRANSFER_CHECKING_HASH, TRANSFER_COMPLETE, 
+    };
+    
+    public static TransferState valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+    
+    private final int index;
+    private final int value;
+    
+    private TransferState(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+    
+    // @@protoc_insertion_point(enum_scope:rsctrl.files.TransferState)
+  }
+  
   public interface FileTransferOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
@@ -234,6 +327,10 @@ public final class Files {
     // required float rate_kBs = 4;
     boolean hasRateKBs();
     float getRateKBs();
+    
+    // required .rsctrl.files.TransferState state = 5;
+    boolean hasState();
+    rsctrl.files.Files.TransferState getState();
   }
   public static final class FileTransfer extends
       com.google.protobuf.GeneratedMessage
@@ -307,11 +404,22 @@ public final class Files {
       return rateKBs_;
     }
     
+    // required .rsctrl.files.TransferState state = 5;
+    public static final int STATE_FIELD_NUMBER = 5;
+    private rsctrl.files.Files.TransferState state_;
+    public boolean hasState() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    public rsctrl.files.Files.TransferState getState() {
+      return state_;
+    }
+    
     private void initFields() {
       file_ = rsctrl.core.Core.File.getDefaultInstance();
       direction_ = rsctrl.files.Files.Direction.DIRECTION_UPLOAD;
       fraction_ = 0F;
       rateKBs_ = 0F;
+      state_ = rsctrl.files.Files.TransferState.TRANSFER_FAILED;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -331,6 +439,10 @@ public final class Files {
         return false;
       }
       if (!hasRateKBs()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasState()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -357,6 +469,9 @@ public final class Files {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeFloat(4, rateKBs_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeEnum(5, state_.getNumber());
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -382,15 +497,17 @@ public final class Files {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(4, rateKBs_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(5, state_.getNumber());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
     
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
     
@@ -519,6 +636,8 @@ public final class Files {
         bitField0_ = (bitField0_ & ~0x00000004);
         rateKBs_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000008);
+        state_ = rsctrl.files.Files.TransferState.TRANSFER_FAILED;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       
@@ -577,6 +696,10 @@ public final class Files {
           to_bitField0_ |= 0x00000008;
         }
         result.rateKBs_ = rateKBs_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.state_ = state_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -605,6 +728,9 @@ public final class Files {
         if (other.hasRateKBs()) {
           setRateKBs(other.getRateKBs());
         }
+        if (other.hasState()) {
+          setState(other.getState());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -623,6 +749,10 @@ public final class Files {
           return false;
         }
         if (!hasRateKBs()) {
+          
+          return false;
+        }
+        if (!hasState()) {
           
           return false;
         }
@@ -684,6 +814,17 @@ public final class Files {
             case 37: {
               bitField0_ |= 0x00000008;
               rateKBs_ = input.readFloat();
+              break;
+            }
+            case 40: {
+              int rawValue = input.readEnum();
+              rsctrl.files.Files.TransferState value = rsctrl.files.Files.TransferState.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(5, rawValue);
+              } else {
+                bitField0_ |= 0x00000010;
+                state_ = value;
+              }
               break;
             }
           }
@@ -848,6 +989,30 @@ public final class Files {
         return this;
       }
       
+      // required .rsctrl.files.TransferState state = 5;
+      private rsctrl.files.Files.TransferState state_ = rsctrl.files.Files.TransferState.TRANSFER_FAILED;
+      public boolean hasState() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      public rsctrl.files.Files.TransferState getState() {
+        return state_;
+      }
+      public Builder setState(rsctrl.files.Files.TransferState value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000010;
+        state_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearState() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        state_ = rsctrl.files.Files.TransferState.TRANSFER_FAILED;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:rsctrl.files.FileTransfer)
     }
     
@@ -945,10 +1110,8 @@ public final class Files {
       return size;
     }
     
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
     
@@ -1353,10 +1516,8 @@ public final class Files {
       return size;
     }
     
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
     
@@ -2143,10 +2304,8 @@ public final class Files {
       return size;
     }
     
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
     
@@ -2631,10 +2790,8 @@ public final class Files {
       return size;
     }
     
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+    protected Object writeReplace() throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
     
@@ -2977,6 +3134,1565 @@ public final class Files {
     // @@protoc_insertion_point(class_scope:rsctrl.files.ResponseControlDownload)
   }
   
+  public interface RequestShareDirListOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required string ssl_id = 1;
+    boolean hasSslId();
+    String getSslId();
+    
+    // required string path = 2;
+    boolean hasPath();
+    String getPath();
+  }
+  public static final class RequestShareDirList extends
+      com.google.protobuf.GeneratedMessage
+      implements RequestShareDirListOrBuilder {
+    // Use RequestShareDirList.newBuilder() to construct.
+    private RequestShareDirList(Builder builder) {
+      super(builder);
+    }
+    private RequestShareDirList(boolean noInit) {}
+    
+    private static final RequestShareDirList defaultInstance;
+    public static RequestShareDirList getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RequestShareDirList getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.files.Files.internal_static_rsctrl_files_RequestShareDirList_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.files.Files.internal_static_rsctrl_files_RequestShareDirList_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // required string ssl_id = 1;
+    public static final int SSL_ID_FIELD_NUMBER = 1;
+    private Object sslId_;
+    public boolean hasSslId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public String getSslId() {
+      Object ref = sslId_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          sslId_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getSslIdBytes() {
+      Object ref = sslId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        sslId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required string path = 2;
+    public static final int PATH_FIELD_NUMBER = 2;
+    private Object path_;
+    public boolean hasPath() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getPath() {
+      Object ref = path_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          path_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getPathBytes() {
+      Object ref = path_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    private void initFields() {
+      sslId_ = "";
+      path_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasSslId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasPath()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getSslIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getPathBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getSslIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getPathBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    @java.lang.Override
+    protected Object writeReplace() throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.files.Files.RequestShareDirList parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.files.Files.RequestShareDirList prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.files.Files.RequestShareDirListOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.files.Files.internal_static_rsctrl_files_RequestShareDirList_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.files.Files.internal_static_rsctrl_files_RequestShareDirList_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.files.Files.RequestShareDirList.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        sslId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        path_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.files.Files.RequestShareDirList.getDescriptor();
+      }
+      
+      public rsctrl.files.Files.RequestShareDirList getDefaultInstanceForType() {
+        return rsctrl.files.Files.RequestShareDirList.getDefaultInstance();
+      }
+      
+      public rsctrl.files.Files.RequestShareDirList build() {
+        rsctrl.files.Files.RequestShareDirList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.files.Files.RequestShareDirList buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.files.Files.RequestShareDirList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.files.Files.RequestShareDirList buildPartial() {
+        rsctrl.files.Files.RequestShareDirList result = new rsctrl.files.Files.RequestShareDirList(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.sslId_ = sslId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.path_ = path_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.files.Files.RequestShareDirList) {
+          return mergeFrom((rsctrl.files.Files.RequestShareDirList)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.files.Files.RequestShareDirList other) {
+        if (other == rsctrl.files.Files.RequestShareDirList.getDefaultInstance()) return this;
+        if (other.hasSslId()) {
+          setSslId(other.getSslId());
+        }
+        if (other.hasPath()) {
+          setPath(other.getPath());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasSslId()) {
+          
+          return false;
+        }
+        if (!hasPath()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              sslId_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              path_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required string ssl_id = 1;
+      private Object sslId_ = "";
+      public boolean hasSslId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public String getSslId() {
+        Object ref = sslId_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          sslId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setSslId(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        sslId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearSslId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        sslId_ = getDefaultInstance().getSslId();
+        onChanged();
+        return this;
+      }
+      void setSslId(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000001;
+        sslId_ = value;
+        onChanged();
+      }
+      
+      // required string path = 2;
+      private Object path_ = "";
+      public boolean hasPath() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getPath() {
+        Object ref = path_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setPath(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        path_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPath() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        path_ = getDefaultInstance().getPath();
+        onChanged();
+        return this;
+      }
+      void setPath(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        path_ = value;
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.files.RequestShareDirList)
+    }
+    
+    static {
+      defaultInstance = new RequestShareDirList(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.files.RequestShareDirList)
+  }
+  
+  public interface ResponseShareDirListOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // required .rsctrl.core.Status status = 1;
+    boolean hasStatus();
+    rsctrl.core.Core.Status getStatus();
+    rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder();
+    
+    // required string ssl_id = 2;
+    boolean hasSslId();
+    String getSslId();
+    
+    // required string path = 3;
+    boolean hasPath();
+    String getPath();
+    
+    // required .rsctrl.files.ResponseShareDirList.ListType list_type = 4;
+    boolean hasListType();
+    rsctrl.files.Files.ResponseShareDirList.ListType getListType();
+    
+    // repeated .rsctrl.core.File files = 5;
+    java.util.List<rsctrl.core.Core.File> 
+        getFilesList();
+    rsctrl.core.Core.File getFiles(int index);
+    int getFilesCount();
+    java.util.List<? extends rsctrl.core.Core.FileOrBuilder> 
+        getFilesOrBuilderList();
+    rsctrl.core.Core.FileOrBuilder getFilesOrBuilder(
+        int index);
+  }
+  public static final class ResponseShareDirList extends
+      com.google.protobuf.GeneratedMessage
+      implements ResponseShareDirListOrBuilder {
+    // Use ResponseShareDirList.newBuilder() to construct.
+    private ResponseShareDirList(Builder builder) {
+      super(builder);
+    }
+    private ResponseShareDirList(boolean noInit) {}
+    
+    private static final ResponseShareDirList defaultInstance;
+    public static ResponseShareDirList getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public ResponseShareDirList getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return rsctrl.files.Files.internal_static_rsctrl_files_ResponseShareDirList_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return rsctrl.files.Files.internal_static_rsctrl_files_ResponseShareDirList_fieldAccessorTable;
+    }
+    
+    public enum ListType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      DIRQUERY_ROOT(0, 1),
+      DIRQUERY_PERSON(1, 2),
+      DIRQUERY_FILE(2, 3),
+      DIRQUERY_DIR(3, 4),
+      ;
+      
+      public static final int DIRQUERY_ROOT_VALUE = 1;
+      public static final int DIRQUERY_PERSON_VALUE = 2;
+      public static final int DIRQUERY_FILE_VALUE = 3;
+      public static final int DIRQUERY_DIR_VALUE = 4;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static ListType valueOf(int value) {
+        switch (value) {
+          case 1: return DIRQUERY_ROOT;
+          case 2: return DIRQUERY_PERSON;
+          case 3: return DIRQUERY_FILE;
+          case 4: return DIRQUERY_DIR;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<ListType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<ListType>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<ListType>() {
+              public ListType findValueByNumber(int number) {
+                return ListType.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return rsctrl.files.Files.ResponseShareDirList.getDescriptor().getEnumTypes().get(0);
+      }
+      
+      private static final ListType[] VALUES = {
+        DIRQUERY_ROOT, DIRQUERY_PERSON, DIRQUERY_FILE, DIRQUERY_DIR, 
+      };
+      
+      public static ListType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private ListType(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:rsctrl.files.ResponseShareDirList.ListType)
+    }
+    
+    private int bitField0_;
+    // required .rsctrl.core.Status status = 1;
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private rsctrl.core.Core.Status status_;
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public rsctrl.core.Core.Status getStatus() {
+      return status_;
+    }
+    public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+      return status_;
+    }
+    
+    // required string ssl_id = 2;
+    public static final int SSL_ID_FIELD_NUMBER = 2;
+    private Object sslId_;
+    public boolean hasSslId() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getSslId() {
+      Object ref = sslId_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          sslId_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getSslIdBytes() {
+      Object ref = sslId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        sslId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required string path = 3;
+    public static final int PATH_FIELD_NUMBER = 3;
+    private Object path_;
+    public boolean hasPath() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public String getPath() {
+      Object ref = path_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          path_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getPathBytes() {
+      Object ref = path_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required .rsctrl.files.ResponseShareDirList.ListType list_type = 4;
+    public static final int LIST_TYPE_FIELD_NUMBER = 4;
+    private rsctrl.files.Files.ResponseShareDirList.ListType listType_;
+    public boolean hasListType() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public rsctrl.files.Files.ResponseShareDirList.ListType getListType() {
+      return listType_;
+    }
+    
+    // repeated .rsctrl.core.File files = 5;
+    public static final int FILES_FIELD_NUMBER = 5;
+    private java.util.List<rsctrl.core.Core.File> files_;
+    public java.util.List<rsctrl.core.Core.File> getFilesList() {
+      return files_;
+    }
+    public java.util.List<? extends rsctrl.core.Core.FileOrBuilder> 
+        getFilesOrBuilderList() {
+      return files_;
+    }
+    public int getFilesCount() {
+      return files_.size();
+    }
+    public rsctrl.core.Core.File getFiles(int index) {
+      return files_.get(index);
+    }
+    public rsctrl.core.Core.FileOrBuilder getFilesOrBuilder(
+        int index) {
+      return files_.get(index);
+    }
+    
+    private void initFields() {
+      status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      sslId_ = "";
+      path_ = "";
+      listType_ = rsctrl.files.Files.ResponseShareDirList.ListType.DIRQUERY_ROOT;
+      files_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasStatus()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasSslId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasPath()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasListType()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getStatus().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      for (int i = 0; i < getFilesCount(); i++) {
+        if (!getFiles(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getSslIdBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getPathBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeEnum(4, listType_.getNumber());
+      }
+      for (int i = 0; i < files_.size(); i++) {
+        output.writeMessage(5, files_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getSslIdBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getPathBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, listType_.getNumber());
+      }
+      for (int i = 0; i < files_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, files_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    @java.lang.Override
+    protected Object writeReplace() throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static rsctrl.files.Files.ResponseShareDirList parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(rsctrl.files.Files.ResponseShareDirList prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements rsctrl.files.Files.ResponseShareDirListOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return rsctrl.files.Files.internal_static_rsctrl_files_ResponseShareDirList_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return rsctrl.files.Files.internal_static_rsctrl_files_ResponseShareDirList_fieldAccessorTable;
+      }
+      
+      // Construct using rsctrl.files.Files.ResponseShareDirList.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getStatusFieldBuilder();
+          getFilesFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        sslId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        path_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        listType_ = rsctrl.files.Files.ResponseShareDirList.ListType.DIRQUERY_ROOT;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        if (filesBuilder_ == null) {
+          files_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          filesBuilder_.clear();
+        }
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return rsctrl.files.Files.ResponseShareDirList.getDescriptor();
+      }
+      
+      public rsctrl.files.Files.ResponseShareDirList getDefaultInstanceForType() {
+        return rsctrl.files.Files.ResponseShareDirList.getDefaultInstance();
+      }
+      
+      public rsctrl.files.Files.ResponseShareDirList build() {
+        rsctrl.files.Files.ResponseShareDirList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private rsctrl.files.Files.ResponseShareDirList buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        rsctrl.files.Files.ResponseShareDirList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public rsctrl.files.Files.ResponseShareDirList buildPartial() {
+        rsctrl.files.Files.ResponseShareDirList result = new rsctrl.files.Files.ResponseShareDirList(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        if (statusBuilder_ == null) {
+          result.status_ = status_;
+        } else {
+          result.status_ = statusBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.sslId_ = sslId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.path_ = path_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.listType_ = listType_;
+        if (filesBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            files_ = java.util.Collections.unmodifiableList(files_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
+          result.files_ = files_;
+        } else {
+          result.files_ = filesBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof rsctrl.files.Files.ResponseShareDirList) {
+          return mergeFrom((rsctrl.files.Files.ResponseShareDirList)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(rsctrl.files.Files.ResponseShareDirList other) {
+        if (other == rsctrl.files.Files.ResponseShareDirList.getDefaultInstance()) return this;
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        if (other.hasSslId()) {
+          setSslId(other.getSslId());
+        }
+        if (other.hasPath()) {
+          setPath(other.getPath());
+        }
+        if (other.hasListType()) {
+          setListType(other.getListType());
+        }
+        if (filesBuilder_ == null) {
+          if (!other.files_.isEmpty()) {
+            if (files_.isEmpty()) {
+              files_ = other.files_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureFilesIsMutable();
+              files_.addAll(other.files_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.files_.isEmpty()) {
+            if (filesBuilder_.isEmpty()) {
+              filesBuilder_.dispose();
+              filesBuilder_ = null;
+              files_ = other.files_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              filesBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getFilesFieldBuilder() : null;
+            } else {
+              filesBuilder_.addAllMessages(other.files_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasStatus()) {
+          
+          return false;
+        }
+        if (!hasSslId()) {
+          
+          return false;
+        }
+        if (!hasPath()) {
+          
+          return false;
+        }
+        if (!hasListType()) {
+          
+          return false;
+        }
+        if (!getStatus().isInitialized()) {
+          
+          return false;
+        }
+        for (int i = 0; i < getFilesCount(); i++) {
+          if (!getFiles(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              rsctrl.core.Core.Status.Builder subBuilder = rsctrl.core.Core.Status.newBuilder();
+              if (hasStatus()) {
+                subBuilder.mergeFrom(getStatus());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setStatus(subBuilder.buildPartial());
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              sslId_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              path_ = input.readBytes();
+              break;
+            }
+            case 32: {
+              int rawValue = input.readEnum();
+              rsctrl.files.Files.ResponseShareDirList.ListType value = rsctrl.files.Files.ResponseShareDirList.ListType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(4, rawValue);
+              } else {
+                bitField0_ |= 0x00000008;
+                listType_ = value;
+              }
+              break;
+            }
+            case 42: {
+              rsctrl.core.Core.File.Builder subBuilder = rsctrl.core.Core.File.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addFiles(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .rsctrl.core.Status status = 1;
+      private rsctrl.core.Core.Status status_ = rsctrl.core.Core.Status.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> statusBuilder_;
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public rsctrl.core.Core.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      public Builder setStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder setStatus(
+          rsctrl.core.Core.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+          onChanged();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder mergeStatus(rsctrl.core.Core.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              status_ != rsctrl.core.Core.Status.getDefaultInstance()) {
+            status_ =
+              rsctrl.core.Core.Status.newBuilder(status_).mergeFrom(value).buildPartial();
+          } else {
+            status_ = value;
+          }
+          onChanged();
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      public Builder clearStatus() {
+        if (statusBuilder_ == null) {
+          status_ = rsctrl.core.Core.Status.getDefaultInstance();
+          onChanged();
+        } else {
+          statusBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      public rsctrl.core.Core.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getStatusFieldBuilder().getBuilder();
+      }
+      public rsctrl.core.Core.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder> 
+          getStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              rsctrl.core.Core.Status, rsctrl.core.Core.Status.Builder, rsctrl.core.Core.StatusOrBuilder>(
+                  status_,
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+      
+      // required string ssl_id = 2;
+      private Object sslId_ = "";
+      public boolean hasSslId() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getSslId() {
+        Object ref = sslId_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          sslId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setSslId(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        sslId_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearSslId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        sslId_ = getDefaultInstance().getSslId();
+        onChanged();
+        return this;
+      }
+      void setSslId(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        sslId_ = value;
+        onChanged();
+      }
+      
+      // required string path = 3;
+      private Object path_ = "";
+      public boolean hasPath() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public String getPath() {
+        Object ref = path_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setPath(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        path_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPath() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        path_ = getDefaultInstance().getPath();
+        onChanged();
+        return this;
+      }
+      void setPath(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000004;
+        path_ = value;
+        onChanged();
+      }
+      
+      // required .rsctrl.files.ResponseShareDirList.ListType list_type = 4;
+      private rsctrl.files.Files.ResponseShareDirList.ListType listType_ = rsctrl.files.Files.ResponseShareDirList.ListType.DIRQUERY_ROOT;
+      public boolean hasListType() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public rsctrl.files.Files.ResponseShareDirList.ListType getListType() {
+        return listType_;
+      }
+      public Builder setListType(rsctrl.files.Files.ResponseShareDirList.ListType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
+        listType_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearListType() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        listType_ = rsctrl.files.Files.ResponseShareDirList.ListType.DIRQUERY_ROOT;
+        onChanged();
+        return this;
+      }
+      
+      // repeated .rsctrl.core.File files = 5;
+      private java.util.List<rsctrl.core.Core.File> files_ =
+        java.util.Collections.emptyList();
+      private void ensureFilesIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          files_ = new java.util.ArrayList<rsctrl.core.Core.File>(files_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          rsctrl.core.Core.File, rsctrl.core.Core.File.Builder, rsctrl.core.Core.FileOrBuilder> filesBuilder_;
+      
+      public java.util.List<rsctrl.core.Core.File> getFilesList() {
+        if (filesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(files_);
+        } else {
+          return filesBuilder_.getMessageList();
+        }
+      }
+      public int getFilesCount() {
+        if (filesBuilder_ == null) {
+          return files_.size();
+        } else {
+          return filesBuilder_.getCount();
+        }
+      }
+      public rsctrl.core.Core.File getFiles(int index) {
+        if (filesBuilder_ == null) {
+          return files_.get(index);
+        } else {
+          return filesBuilder_.getMessage(index);
+        }
+      }
+      public Builder setFiles(
+          int index, rsctrl.core.Core.File value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.set(index, value);
+          onChanged();
+        } else {
+          filesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setFiles(
+          int index, rsctrl.core.Core.File.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addFiles(rsctrl.core.Core.File value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.add(value);
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addFiles(
+          int index, rsctrl.core.Core.File value) {
+        if (filesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFilesIsMutable();
+          files_.add(index, value);
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addFiles(
+          rsctrl.core.Core.File.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.add(builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addFiles(
+          int index, rsctrl.core.Core.File.Builder builderForValue) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          filesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllFiles(
+          java.lang.Iterable<? extends rsctrl.core.Core.File> values) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          super.addAll(values, files_);
+          onChanged();
+        } else {
+          filesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearFiles() {
+        if (filesBuilder_ == null) {
+          files_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+          onChanged();
+        } else {
+          filesBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removeFiles(int index) {
+        if (filesBuilder_ == null) {
+          ensureFilesIsMutable();
+          files_.remove(index);
+          onChanged();
+        } else {
+          filesBuilder_.remove(index);
+        }
+        return this;
+      }
+      public rsctrl.core.Core.File.Builder getFilesBuilder(
+          int index) {
+        return getFilesFieldBuilder().getBuilder(index);
+      }
+      public rsctrl.core.Core.FileOrBuilder getFilesOrBuilder(
+          int index) {
+        if (filesBuilder_ == null) {
+          return files_.get(index);  } else {
+          return filesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends rsctrl.core.Core.FileOrBuilder> 
+           getFilesOrBuilderList() {
+        if (filesBuilder_ != null) {
+          return filesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(files_);
+        }
+      }
+      public rsctrl.core.Core.File.Builder addFilesBuilder() {
+        return getFilesFieldBuilder().addBuilder(
+            rsctrl.core.Core.File.getDefaultInstance());
+      }
+      public rsctrl.core.Core.File.Builder addFilesBuilder(
+          int index) {
+        return getFilesFieldBuilder().addBuilder(
+            index, rsctrl.core.Core.File.getDefaultInstance());
+      }
+      public java.util.List<rsctrl.core.Core.File.Builder> 
+           getFilesBuilderList() {
+        return getFilesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          rsctrl.core.Core.File, rsctrl.core.Core.File.Builder, rsctrl.core.Core.FileOrBuilder> 
+          getFilesFieldBuilder() {
+        if (filesBuilder_ == null) {
+          filesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              rsctrl.core.Core.File, rsctrl.core.Core.File.Builder, rsctrl.core.Core.FileOrBuilder>(
+                  files_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  getParentForChildren(),
+                  isClean());
+          files_ = null;
+        }
+        return filesBuilder_;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:rsctrl.files.ResponseShareDirList)
+    }
+    
+    static {
+      defaultInstance = new ResponseShareDirList(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:rsctrl.files.ResponseShareDirList)
+  }
+  
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_rsctrl_files_FileTransfer_descriptor;
   private static
@@ -3002,6 +4718,16 @@ public final class Files {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_rsctrl_files_ResponseControlDownload_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_files_RequestShareDirList_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_files_RequestShareDirList_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_rsctrl_files_ResponseShareDirList_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_rsctrl_files_ResponseShareDirList_fieldAccessorTable;
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -3012,28 +4738,44 @@ public final class Files {
   static {
     java.lang.String[] descriptorData = {
       "\n\013files.proto\022\014rsctrl.files\032\ncore.proto\"" +
-      "\177\n\014FileTransfer\022\037\n\004file\030\001 \002(\0132\021.rsctrl.c" +
-      "ore.File\022*\n\tdirection\030\002 \002(\0162\027.rsctrl.fil" +
-      "es.Direction\022\020\n\010fraction\030\003 \002(\002\022\020\n\010rate_k" +
-      "Bs\030\004 \002(\002\"A\n\023RequestTransferList\022*\n\tdirec" +
-      "tion\030\001 \002(\0162\027.rsctrl.files.Direction\"j\n\024R" +
-      "esponseTransferList\022#\n\006status\030\001 \002(\0132\023.rs" +
-      "ctrl.core.Status\022-\n\ttransfers\030\002 \003(\0132\032.rs" +
-      "ctrl.files.FileTransfer\"\204\002\n\026RequestContr" +
-      "olDownload\022\037\n\004file\030\001 \002(\0132\021.rsctrl.core.F",
-      "ile\022;\n\006action\030\002 \002(\0162+.rsctrl.files.Reque" +
-      "stControlDownload.Action\"\213\001\n\006Action\022\020\n\014A" +
-      "CTION_START\020\001\022\023\n\017ACTION_CONTINUE\020\002\022\017\n\013AC" +
-      "TION_WAIT\020\003\022\020\n\014ACTION_PAUSE\020\004\022\022\n\016ACTION_" +
-      "RESTART\020\005\022\020\n\014ACTION_CHECK\020\006\022\021\n\rACTION_CA" +
-      "NCEL\020\007\">\n\027ResponseControlDownload\022#\n\006sta" +
-      "tus\030\001 \002(\0132\023.rsctrl.core.Status*P\n\rReques" +
-      "tMsgIds\022\035\n\031MsgId_RequestTransferList\020\001\022 " +
-      "\n\034MsgId_RequestControlDownload\020\002*S\n\016Resp" +
-      "onseMsgIds\022\036\n\032MsgId_ResponseTransferList",
-      "\020\001\022!\n\035MsgId_ResponseControlDownload\020\002*9\n" +
+      "\253\001\n\014FileTransfer\022\037\n\004file\030\001 \002(\0132\021.rsctrl." +
+      "core.File\022*\n\tdirection\030\002 \002(\0162\027.rsctrl.fi" +
+      "les.Direction\022\020\n\010fraction\030\003 \002(\002\022\020\n\010rate_" +
+      "kBs\030\004 \002(\002\022*\n\005state\030\005 \002(\0162\033.rsctrl.files." +
+      "TransferState\"A\n\023RequestTransferList\022*\n\t" +
+      "direction\030\001 \002(\0162\027.rsctrl.files.Direction" +
+      "\"j\n\024ResponseTransferList\022#\n\006status\030\001 \002(\013" +
+      "2\023.rsctrl.core.Status\022-\n\ttransfers\030\002 \003(\013" +
+      "2\032.rsctrl.files.FileTransfer\"\204\002\n\026Request",
+      "ControlDownload\022\037\n\004file\030\001 \002(\0132\021.rsctrl.c" +
+      "ore.File\022;\n\006action\030\002 \002(\0162+.rsctrl.files." +
+      "RequestControlDownload.Action\"\213\001\n\006Action" +
+      "\022\020\n\014ACTION_START\020\001\022\023\n\017ACTION_CONTINUE\020\002\022" +
+      "\017\n\013ACTION_WAIT\020\003\022\020\n\014ACTION_PAUSE\020\004\022\022\n\016AC" +
+      "TION_RESTART\020\005\022\020\n\014ACTION_CHECK\020\006\022\021\n\rACTI" +
+      "ON_CANCEL\020\007\">\n\027ResponseControlDownload\022#" +
+      "\n\006status\030\001 \002(\0132\023.rsctrl.core.Status\"3\n\023R" +
+      "equestShareDirList\022\016\n\006ssl_id\030\001 \002(\t\022\014\n\004pa" +
+      "th\030\002 \002(\t\"\224\002\n\024ResponseShareDirList\022#\n\006sta",
+      "tus\030\001 \002(\0132\023.rsctrl.core.Status\022\016\n\006ssl_id" +
+      "\030\002 \002(\t\022\014\n\004path\030\003 \002(\t\022>\n\tlist_type\030\004 \002(\0162" +
+      "+.rsctrl.files.ResponseShareDirList.List" +
+      "Type\022 \n\005files\030\005 \003(\0132\021.rsctrl.core.File\"W" +
+      "\n\010ListType\022\021\n\rDIRQUERY_ROOT\020\001\022\023\n\017DIRQUER" +
+      "Y_PERSON\020\002\022\021\n\rDIRQUERY_FILE\020\003\022\020\n\014DIRQUER" +
+      "Y_DIR\020\004*o\n\rRequestMsgIds\022\035\n\031MsgId_Reques" +
+      "tTransferList\020\001\022 \n\034MsgId_RequestControlD" +
+      "ownload\020\002\022\035\n\031MsgId_RequestShareDirList\020\003" +
+      "*s\n\016ResponseMsgIds\022\036\n\032MsgId_ResponseTran",
+      "sferList\020\001\022!\n\035MsgId_ResponseControlDownl" +
+      "oad\020\002\022\036\n\032MsgId_ResponseShareDirList\020\003*9\n" +
       "\tDirection\022\024\n\020DIRECTION_UPLOAD\020\001\022\026\n\022DIRE" +
-      "CTION_DOWNLOAD\020\002"
+      "CTION_DOWNLOAD\020\002*\304\001\n\rTransferState\022\023\n\017TR" +
+      "ANSFER_FAILED\020\001\022\021\n\rTRANSFER_OKAY\020\002\022\023\n\017TR" +
+      "ANSFER_PAUSED\020\003\022\023\n\017TRANSFER_QUEUED\020\004\022\024\n\020" +
+      "TRANSFER_WAITING\020\005\022\030\n\024TRANSFER_DOWNLOADI" +
+      "NG\020\006\022\032\n\026TRANSFER_CHECKING_HASH\020\007\022\025\n\021TRAN" +
+      "SFER_COMPLETE\020\010"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3045,7 +4787,7 @@ public final class Files {
           internal_static_rsctrl_files_FileTransfer_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_rsctrl_files_FileTransfer_descriptor,
-              new java.lang.String[] { "File", "Direction", "Fraction", "RateKBs", },
+              new java.lang.String[] { "File", "Direction", "Fraction", "RateKBs", "State", },
               rsctrl.files.Files.FileTransfer.class,
               rsctrl.files.Files.FileTransfer.Builder.class);
           internal_static_rsctrl_files_RequestTransferList_descriptor =
@@ -3080,6 +4822,22 @@ public final class Files {
               new java.lang.String[] { "Status", },
               rsctrl.files.Files.ResponseControlDownload.class,
               rsctrl.files.Files.ResponseControlDownload.Builder.class);
+          internal_static_rsctrl_files_RequestShareDirList_descriptor =
+            getDescriptor().getMessageTypes().get(5);
+          internal_static_rsctrl_files_RequestShareDirList_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_files_RequestShareDirList_descriptor,
+              new java.lang.String[] { "SslId", "Path", },
+              rsctrl.files.Files.RequestShareDirList.class,
+              rsctrl.files.Files.RequestShareDirList.Builder.class);
+          internal_static_rsctrl_files_ResponseShareDirList_descriptor =
+            getDescriptor().getMessageTypes().get(6);
+          internal_static_rsctrl_files_ResponseShareDirList_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_rsctrl_files_ResponseShareDirList_descriptor,
+              new java.lang.String[] { "Status", "SslId", "Path", "ListType", "Files", },
+              rsctrl.files.Files.ResponseShareDirList.class,
+              rsctrl.files.Files.ResponseShareDirList.Builder.class);
           return null;
         }
       };

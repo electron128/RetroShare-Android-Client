@@ -4,7 +4,7 @@ import rsctrl.core.Core;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestAddPeer;
 import rsctrl.peers.Peers.RequestAddPeer.AddCmd;
-import rsctrl.peers.Peers.ResponseAddPeer;
+//import rsctrl.peers.Peers.ResponseAddPeer;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
 
@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 public class AddFriendActivity extends ProxiedActivityBase
 {
+    // TODO completely review AddFriendActivity
 	
 	TextView tv;
 	Button button;
@@ -39,10 +40,10 @@ public class AddFriendActivity extends ProxiedActivityBase
     	Uri uri = getIntent().getData();
         String cert=getCertFromUri(uri);
         
-    	RequestAddPeer.Builder reqb=RequestAddPeer.newBuilder();
-    	reqb.setGpgId("");
-    	reqb.setCmd(AddCmd.EXAMINE);
-    	reqb.setCert(cert);
+    	RequestAddPeer.Builder reqb = RequestAddPeer.newBuilder();
+    	//reqb.setGpgId("");
+    	//reqb.setCmd(AddCmd.EXAMINE);
+    	//reqb.setCert(cert);
     	RsMessage msg=new RsMessage();
     	msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE;
     	msg.body=reqb.build().toByteArray();
@@ -54,13 +55,13 @@ public class AddFriendActivity extends ProxiedActivityBase
     	@Override
     	public void rsHandleMsg(RsMessage msg)
 		{
-    		// TODO: add check for msgid
-    		try
-			{
-				ResponseAddPeer resp=ResponseAddPeer.parseFrom(msg.body);
-				tv.setText(resp.toString());
-			}
-			catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+    		//// TODO: add check for msgid
+    		//try
+			//{
+			//	ResponseAddPeer resp=ResponseAddPeer.parseFrom(msg.body);
+			//	tv.setText(resp.toString());
+			//}
+			//catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
     	}
     }
     
