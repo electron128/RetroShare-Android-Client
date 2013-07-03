@@ -22,9 +22,9 @@ import org.retroshare.android.RsChatService.ChatServiceListener;
 import org.retroshare.android.RsPeersService.PeersServiceListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatType;
@@ -139,16 +139,12 @@ public class PeersActivity extends ProxiedActivityBase
 				isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
 
 				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-				RsCtrlService server = getConnectedServer();
-				if( server != null ) // TODO clean this porcata
+				RsChatService chatService = getConnectedServer().mRsChatService;
+				if ( chatService !=  null) // TODO clean this porcata
 				{
-					RsChatService chatService = server.mRsChatService;
-					if ( chatService !=  null)
-					{
-						if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
-					}
-					else Log.e(TAG(), "Il chatService e' nullo");
+					if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
 				}
+				else Log.wtf(TAG(), "chatService is null");
 			}
 			if(isOnline)
 			{
@@ -187,16 +183,19 @@ public class PeersActivity extends ProxiedActivityBase
 			//peersService.updateFriendsList(); // Enabling this will cause a loop of request without timer, TODO refresh peers periodically ( like MainActivity do )
 
 			personList.clear();
-			if(showAllPeers) personList.addAll(peersService.getPersons());
+			if(showAllPeers)
+			{
+				personList.addAll(peersService.getPersons());
+				Collections.sort(personList, new PersonByNameComparator());
+			}
 			else
 			{
 				List<Person.Relationship> r = new ArrayList<Person.Relationship>();
 				r.add(Person.Relationship.YOURSELF);
 				r.add(Person.Relationship.FRIEND);
 				personList.addAll(peersService.getPersonsByRelationship(r));
+				Collections.sort(personList, new PersonByStatusAndNameComparator() );
 			}
-
-			// TODO sort person list
 
 			for(DataSetObserver obs : observerList) { obs.onChanged(); }
 		}
@@ -225,4 +224,25 @@ public class PeersActivity extends ProxiedActivityBase
 	}
 
 	public void onAddFriendsButtonPressed(View v) { startActivity(AddFriendMethodChooserActivity.class); }
+
+	private class PersonByStatusAndNameComparator implements Comparator<Person>
+	{
+		@Override
+		public int compare( Person p1, Person p2)
+		{
+			boolean p1o = false;
+			boolean p2o = false;
+			for ( Location l : p1.getLocationsList() ) p1o |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
+			for ( Location l : p2.getLocationsList() ) p2o |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
+
+			if( p1o ^ p2o )
+			{
+				if ( p1o ) return -1;
+				else return 1;
+			}
+			else return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase());
+		}
+	}
+
+	private class PersonByNameComparator implements Comparator<Person> { @Override public int compare( Person p1, Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
 }

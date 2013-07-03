@@ -32,21 +32,17 @@ public class PeerDetailsActivity extends ProxiedActivityBase
 	{
 		Person p = getConnectedServer().mRsPeersService.getPersonByPgpId(pgpId);
 
-		if(p != null)
-		{
-			TextView nameTextView = (TextView) findViewById(R.id.peerNameTextView);
-			TextView pgpIdTextView = (TextView) findViewById(R.id.pgpIdTextView);
-			Button toggleFriendshipButton = (Button) findViewById(R.id.buttonToggleFriendship);
+		TextView nameTextView = (TextView) findViewById(R.id.peerNameTextView);
+		TextView pgpIdTextView = (TextView) findViewById(R.id.pgpIdTextView);
+		Button toggleFriendshipButton = (Button) findViewById(R.id.buttonToggleFriendship);
 
-			nameTextView.setText(p.getName());
-			pgpIdTextView.setText(pgpId);
+		nameTextView.setText(p.getName());
+		pgpIdTextView.setText(pgpId);
 
-			Person.Relationship r = p.getRelation();
-			if ( r.equals(Person.Relationship.YOURSELF) ) toggleFriendshipButton.setVisibility(View.GONE);
-			else if ( r.equals(Person.Relationship.FRIEND) ) toggleFriendshipButton.setText(R.string.block_friend);
-			else toggleFriendshipButton.setText(R.string.add_as_friend);
-		}
-		else Log.wtf(TAG(), "onServiceConnected() p with pgpId = " + pgpId + " is null this shouldn't happen!!");
+		Person.Relationship r = p.getRelation();
+		if ( r.equals(Person.Relationship.YOURSELF) ) toggleFriendshipButton.setVisibility(View.GONE);
+		else if ( r.equals(Person.Relationship.FRIEND) ) toggleFriendshipButton.setText(R.string.block_friend);
+		else toggleFriendshipButton.setText(R.string.add_as_friend);
 	}
 
 	public void onToggleFriendshipButtonPressed(View v)
