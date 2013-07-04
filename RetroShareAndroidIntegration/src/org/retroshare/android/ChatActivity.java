@@ -22,15 +22,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
-import com.google.protobuf.InvalidProtocolBufferException;
+
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener
 {
 	@Override public String TAG() { return "ChatActivity"; }
 
-	public final static String CHAT_ID_EXTRA = "org.retroshare.android.intent_extra_keys.ChatId";
+	public final static String PGP_ID_EXTRA = "org.retroshare.android.intent_extra_keys.PgpId";
+	private String pgpId;
 
-	ChatId chatInitId;
 	private Set<ChatId> privateChatIds = new HashSet<ChatId>();
 
 	@Override
@@ -41,8 +41,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		findViewById(R.id.buttonLeaveLobby).setVisibility(View.GONE);
 	    findViewById(R.id.chatMessageEditText).setOnKeyListener(new KeyListener());
 
-		try { chatInitId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_ID_EXTRA)); }
-		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
+		pgpId = getIntent().getStringExtra(PGP_ID_EXTRA);
 	}
 	
 	private class KeyListener implements OnKeyListener
@@ -66,10 +65,10 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		Log.d(TAG(), "onServiceConnected()");
 
 		RsCtrlService server = getConnectedServer();
-		Person person = server.mRsPeersService.getPersonBySslId(chatInitId.getChatId());
+		Person person = server.mRsPeersService.getPersonByPgpId(pgpId);
 		if(person == null)
 		{
-			util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + chatInitId.getChatId() + " is null??");
+			util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + pgpId + " is null??");
 			return;
 		}
 
@@ -78,14 +77,11 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		for ( Core.Location location : person.getLocationsList() )
 		{
 			ChatId newChatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(location.getSslId()).build();
-			Log.wtf(TAG(), "onServiceConnected() adding location ->" + location.getLocation() + "<- with sslid ->" + location.getSslId() + "<- that generated ChatId ->" + newChatId.toString() + "<-" );
 			privateChatIds.add(newChatId);
 		}
 
 		TextView tv = (TextView) findViewById(R.id.chatHeaderTextView);
-		String name = "Error: no Person found"; // TODO HARDCODED string
-		if( person != null ) name = person.getName();
-		tv.setText(name);
+		tv.setText(person.getName());
 
 		server.mRsChatService.disableNotificationForChats(privateChatIds);
 

@@ -110,9 +110,8 @@ public class PeersActivity extends ProxiedActivityBase
 
 			if ( p.getRelation().equals(Person.Relationship.FRIEND) || p.getRelation().equals(Person.Relationship.YOURSELF) )
 			{
-				String sslId = p.getLocations(0).getSslId();
 				Intent i = new Intent(PeersActivity.this, ChatActivity.class);
-				i.putExtra(ChatActivity.CHAT_ID_EXTRA, ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(sslId).build().toByteArray());
+				i.putExtra(ChatActivity.PGP_ID_EXTRA, p.getGpgId());
 				startActivity(ChatActivity.class, i);
 			}
     	}

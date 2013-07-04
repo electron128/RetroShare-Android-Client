@@ -6,7 +6,6 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
@@ -15,12 +14,13 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.RawContacts;
+import android.provider.ContactsContract.Data;
 import android.util.Log;
 
 import org.retroshare.android.R;
@@ -31,8 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
@@ -40,22 +38,17 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 {
 	public String TAG() { return "ContactsSyncAdapterService"; }
 
-	private static final String MIME = "vnd.retroshare.android.cursor.item/vnd.org.retroshare.android.sync.profile";
+	public static final String MIME = "vnd.retroshare.android.cursor.item/vnd.org.retroshare.android.sync.profile";
+	public static final String PGP_ID_COLUMN = RawContacts.SYNC1;
+	public static final String RS_NUMBER_PREFIX = "//rs/";
 
 	private static SyncAdapterImpl sSyncAdapter = null;
-	private static ContentResolver mContentResolver = null;
-	private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
-	private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC2;
 
     // TODO Check if we can to it smarter
     private static class SyncEntry
 	{
         public Long raw_id = 0L;
-        public Long photo_timestamp = null;
     }
-
-    // We should try to keep it updated every edit
-    HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 
 	private class SyncAdapterImpl extends AbstractThreadedSyncAdapter
 	{
@@ -75,14 +68,8 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		}
 	}
 
-
 	@Override
-	public IBinder onBind(Intent intent)
-	{
-		IBinder ret = null;
-		ret = getSyncAdapter().getSyncAdapterBinder();
-		return ret;
-	}
+	public IBinder onBind(Intent intent) { return getSyncAdapter().getSyncAdapterBinder(); }
 
 	private SyncAdapterImpl getSyncAdapter()
 	{
@@ -90,231 +77,122 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 		return sSyncAdapter;
 	}
 
-
-    private void updateContactList(Account account)
-	{
-		Uri rawContactUri = ContactsContract.RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type).build();
-        Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, UsernameColumn, PhotoTimestampColumn }, null, null, null);
-        while (c1.moveToNext())
-		{
-            SyncEntry entry = new SyncEntry();
-            entry.raw_id = c1.getLong(c1.getColumnIndex(BaseColumns._ID));
-            entry.photo_timestamp = c1.getLong(c1.getColumnIndex(PhotoTimestampColumn));
-            localContacts.put(c1.getString(1), entry);
-        }
-    }
-
 	private void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) throws OperationCanceledException
 	{
-		Log.i(TAG(), "performSync( .., " + account.toString() + ", .. )");
+		Log.d(TAG(), "performSync( .., " + account.toString() + ", .. )");
 
 		if(mBound)
 		{
-			mContentResolver = context.getContentResolver();
-            updateContactList(account);
-
+			/**
+			 * Get retroshare server
+			 * and ask refresh data inside RsPeersService probably this is not useful for this sync but for the next one ( maybe it would be nice to do this automatically on retroshare server connection so we already have some data for the first sync)
+			 */
 			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
-			peersService.updateFriendsList(); // Ask refresh data inside RsPeersService
+			peersService.updateFriendsList();
 
-			Collection<Person> peers = peersService.getPersons();
-			List<Location> locationList = new ArrayList<Location>();
-			Map<Location,Person> mapLocationToPerson = new HashMap<Location,Person>();
+			/** Get content resolver */
+			ContentResolver contentResolver = context.getContentResolver();
 
-            String name;
-            boolean online = false;
-            Location lfound = null;
-			for (Person peer:peers)
+			/**
+			 *  Create and populate a map PGP ID -> sync antryID
+			 *  to keep track of contacts that are already present on android contacts list
+ 			 */
+			HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
+			Uri rawContactUri = ContactsContract.RawContacts.CONTENT_URI.buildUpon()
+					.appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
+					.appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type)
+					.build();
+			Cursor c1 = contentResolver.query(rawContactUri, new String[] { BaseColumns._ID, PGP_ID_COLUMN }, null, null, null);
+			while (c1.moveToNext())
 			{
-                for(Location l:peer.getLocationsList())
-				{
-                    locationList.add(l);
-                    mapLocationToPerson.put(l, peer);
-                }
-
-                ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-                try
-				{
-                    // If the contact doesn't exist, create it. Otherwise, set a status message
-                    if (!_contactExist(account,peer))
-					{
-                        _addContact(account, peer);
-                        updateContactList(account);
-                    }
-					else
-					{
-                        name = peer.getName();
-                        online = false;
-                        for(Location l : locationList)
-						{
-                            Person p = mapLocationToPerson.get(l);
-                            if(p.equals(peer))
-							{
-                                if( (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE )
-								{
-									online = true;
-									lfound = l;
-									break;
-								}
-                                lfound = l;
-                            }
-                        }
-                        //if (localContacts.get(name).photo_timestamp == null || System.currentTimeMillis() > (localContacts.get(name).photo_timestamp + 604800000L)) {
-						// TODO update status only if changed or like in the commented if periodically
-                        if(true)
-						{
-                            //You would probably download an image file and just pass the bytes, but this sample doesn't use network so we'll decode and re-compress the icon resource to get the bytes
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                            Bitmap icon = null;
-                            if(online) icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2);
-                            else icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2_gray);
-                            icon.compress(CompressFormat.PNG, 0, stream);
-                            _updateContactPhoto(operationList, localContacts.get(name).raw_id, stream.toByteArray());
-                        }
-                        _updateContactStatus(operationList, localContacts.get(name).raw_id, "Test aggiornamento ("+ lfound.getLocation()+")");
-                    }
-                    if (operationList.size() > 0) mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
-                }
-				catch (Exception e1) { e1.printStackTrace(); } // TODO Auto-generated catch block
-
-				if( ! _contactExist(account,peer) ) _addContact(account, peer); // TODO why we do this another time ??
-            }
-		}
-	}
-
-    /**
-	 * @param peer Person to check if is already existend on android contact list
-	 * @param account Android Account to check if the peer is already added
-	 * @return true if this peer is already in contact list, false otherwise
-	 */
-    private boolean _contactExist(Account account, Person peer){ return localContacts.containsKey(peer.getName()); }
-
-    private static void _updateContactPhoto(ArrayList<ContentProviderOperation> operationList, long rawContactId, byte[] photo)
-	{
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI);
-        builder.withSelection( ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId + "' AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'", null);
-        operationList.add(builder.build());
-
-        try
-		{
-            if(photo != null)
-			{
-                builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-                builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
-                builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
-                builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, photo);
-                operationList.add(builder.build());
-
-                builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
-                builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
-                builder.withValue(PhotoTimestampColumn, String.valueOf(System.currentTimeMillis()));
-                operationList.add(builder.build());
-            }
-        }
-		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
-    }
-
-	private void _addContact(Account account, Person peer)
-	{
-		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-
-		String name = peer.getName();
-        List<Location> listl = peer.getLocationsList();
-        Location l = null;
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
-		builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
-		builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
-		builder.withValue(RawContacts.SYNC1, name);
-		operationList.add(builder.build());
-
-		//Create a Data record of common type 'StructuredName' for our RawContact
-		builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-		builder.withValueBackReference(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
-		builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
-		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
-		operationList.add(builder.build());
-
-		//TODO Take the right sslid, now sslid is not taken correctly so when you open the chat from android contacts you are talking with one location of that peer but probably not with the one you selected!!!
-		// @autoscatto this is what was making me crazy! :P
-        String locname = name;
-        if(!listl.isEmpty())
-		{
-			// TODO: for the actual retroshare multiple location logic we should display all location, and leave to the user the choice of what location message, this is crappy and i hope this will change in future version of RetroShare at moment we are displayng just the first location found online...
-			// instead of choose one location or make the user choose we will create chats handling all location so we send/receive messages to/from all location of the user
-			// this is different from the RetroShare actual logic but we hope can focus RetroShare developer attention on this iussue particularly important for mobile
-
-			for(Location ll:listl)
-			{
-				if( (ll.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE)
-				{
-					l = ll; // XXX: se ne trovo una connessa la prendo per buona
-					break;
-				}
-
+				SyncEntry entry = new SyncEntry();
+				entry.raw_id = c1.getLong(c1.getColumnIndex(BaseColumns._ID));
+				localContacts.put(c1.getString(1), entry);
 			}
 
-            if( l == null )
+			Collection<Person.Relationship> r = new ArrayList<Person.Relationship>();
+			r.add(Person.Relationship.FRIEND);
+			r.add(Person.Relationship.YOURSELF);
+			Collection<Person> peers = peersService.getPersonsByRelationship(r);
+
+			ContentProviderOperation.Builder builder;
+			String name;
+			String pgpId;
+			boolean isOnline;
+			ArrayList<ContentProviderOperation> operationList;
+			for (Person peer : peers)
 			{
-				l = listl.get(0); //XXX: non ce ne sono connesse, prendo la prima.}
-            	//TODO: trovare un metodo meno arbitrario per capire quale location ci interessa (capire magari la logica con cui si listano le location?)
-            	locname = l.getLocation();
-        	}
-        }
+				name = peer.getName();
+				pgpId = peer.getGpgId();
+				isOnline = false;
+                for(Location l : peer.getLocationsList()) isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
 
-        builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-        builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
-        builder.withValue(ContactsContract.Data.MIMETYPE, MIME);
-        builder.withValue(ContactsContract.Data.DATA1, locname);
-        builder.withValue(ContactsContract.Data.DATA2, l.getSslId());
-        builder.withValue(ContactsContract.Data.DATA3, "Send message"); //TODO HARDCODED string
-        operationList.add(builder.build());
+                operationList = new ArrayList<ContentProviderOperation>();
 
+				/**
+				 * Create contact if doesn't exists else just update it
+				 */
+				if ( ! localContacts.containsKey(pgpId) )
+				{
+					/**
+					 * Create a row for the contact ( ContactsContract.RawContacts )
+					 */
+					builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
+					builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
+					builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
+					builder.withValue(PGP_ID_COLUMN, pgpId);
+					operationList.add(builder.build());
 
+					/**
+					 * Create a row for the name associated with the contact ( ContactsContract.Data )
+					 */
+					builder = ContentProviderOperation.newInsert(Data.CONTENT_URI);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+					builder.withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, name);
+					operationList.add(builder.build());
 
-		try { mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList); }
-		catch (Exception e)
-		{
-			Log.e(TAG(), "Something went wrong during creation! " + e);
-			e.printStackTrace();
+					/**
+					 * Create a row for the PGP ID associated with the contact as a instant messaging contact ( ContactsContract.CommonDataKinds.Im )
+					 */
+					builder = ContentProviderOperation.newInsert(Data.CONTENT_URI);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValue(Data.MIMETYPE, CommonDataKinds.Im.CONTENT_ITEM_TYPE);
+					builder.withValue(CommonDataKinds.Im.TYPE, CommonDataKinds.Im.TYPE_CUSTOM);
+					builder.withValue(CommonDataKinds.Im.LABEL, getString(R.string.app_name));
+					builder.withValue(CommonDataKinds.Im.PROTOCOL, CommonDataKinds.Im.PROTOCOL_CUSTOM);
+					builder.withValue(CommonDataKinds.Im.CUSTOM_PROTOCOL, getString(R.string.retroshare_im_custom_proto));
+					builder.withValue(CommonDataKinds.Im.DATA, account.name + "/" + pgpId);
+					operationList.add(builder.build());
+
+					/**
+					 * Create a row for the avatar image ( CommonDataKinds.Photo.PHOTO )
+					 */
+					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					Bitmap icon;
+					if(isOnline) icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2);
+					else icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.retrosharelogo2_gray);
+					icon.compress(CompressFormat.PNG, 0, stream);
+
+					builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValue(Data.MIMETYPE, CommonDataKinds.Photo.MIMETYPE);
+					builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, stream.toByteArray());
+					operationList.add(builder.build());
+
+					/**
+					 * TODO Create a row for status message
+					 */
+				}
+				else {} //TODO update contacts
+
+				try { if ( operationList.size() > 0 ) contentResolver.applyBatch(ContactsContract.AUTHORITY, operationList); }
+				catch (Exception e)
+				{
+					Log.e(TAG(), "Something went wrong putting data into the database! " + e);
+					e.printStackTrace();
+				}
+            }
 		}
 	}
-
-    private static void _updateContactStatus(ArrayList<ContentProviderOperation> operationList, long rawContactId, String status)
-	{
-        Uri rawContactUri = ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI, rawContactId);
-        Uri entityUri = Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.Entity.CONTENT_DIRECTORY);
-        Cursor c = mContentResolver.query(entityUri, new String[] { ContactsContract.RawContacts.SOURCE_ID, ContactsContract.RawContacts.Entity.DATA_ID, ContactsContract.RawContacts.Entity.MIMETYPE, ContactsContract.RawContacts.Entity.DATA1 }, null, null, null);
-        try
-		{
-            while (c.moveToNext())
-			{
-                if (!c.isNull(1))
-				{
-                    String mimeType = c.getString(2);
-
-                    if (mimeType.equals(MIME)) // TODO Cannot we enforce this on the query ?
-					{
-                        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
-                        builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(1));
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS_RES_PACKAGE, "org.retroshare.android.sync"); //TODO HARDCODED string
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS_LABEL, R.string.app_name);
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS_ICON, R.drawable.retrosharelogo2);
-                        builder.withValue(ContactsContract.StatusUpdates.STATUS_TIMESTAMP, System.currentTimeMillis());
-                        operationList.add(builder.build());
-
-                        //Only change the text of our custom entry to the status message pre-Honeycomb, as the newer contacts app shows statuses elsewhere
-                        if(Build.VERSION.SDK_INT < 11)
-						{
-                            builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
-                            builder.withSelection(BaseColumns._ID + " = '" + c.getLong(1) + "'", null);
-                            builder.withValue(ContactsContract.Data.DATA3, status);
-                            operationList.add(builder.build());
-                        }
-                    }
-                }
-            }
-        }
-		finally { c.close(); }
-    }
 }

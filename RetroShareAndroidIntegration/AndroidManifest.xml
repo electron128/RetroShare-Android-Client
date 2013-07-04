@@ -45,14 +45,16 @@
 		</activity>
 		<activity android:name=".ChatLobbiesActivity" android:label="@string/chat_lobbies"></activity>
 		<activity android:name=".ChatLobbyActivity"></activity>
-		<activity android:name=".ChatActivity"></activity>
+		<activity android:name=".ChatActivity" />
 		<activity android:name=".AddFriendMethodChooserActivity">
+			<!-- TODO Move this to a new activity for adding certificates
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="retroshare" android:host="certificate"/>
 			</intent-filter>
+			  -->
 		</activity>
 		<activity android:name=".PeerDetailsActivity"></activity>
 		<activity android:name=".ShowQrCodeActivity"></activity>
@@ -107,19 +109,16 @@
 		</service>
 
 
-		<activity
-				android:name=".ChatActivityLauncher"
-				android:noHistory="true"
-				android:theme="@android:style/Theme.Dialog">
-			<!--
-				We use the INVITE intent to add a raw contact to an existing contact.
-				It always comes with a lookup URI.
-			-->
+		<activity android:name=".ContactMethodChooserActivity"
+				android:noHistory="true" >
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
+				<action android:name="android.intent.action.SENDTO" />
 				<category android:name="android.intent.category.DEFAULT" />
-				<data
-						android:mimeType="retroshare.android.cursor.item/org.retroshare.android.sync.profile" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="im" />
+				<data android:scheme="imto" />
+				<data android:host="@string/retroshare_im_custom_proto" />
 			</intent-filter>
 		</activity>
 

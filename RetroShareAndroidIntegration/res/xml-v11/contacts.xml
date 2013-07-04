@@ -19,7 +19,7 @@
 
 <ContactsAccountType
     xmlns:android="http://schemas.android.com/apk/res/android"
-    inviteContactActivity="org.retroshare.android.ChatActivityLauncher"
+    inviteContactActivity="org.retroshare.android.ContactMethodChooserActivity"
     inviteContactActionLabel="Invita gente">
 
     <ContactsDataKind

@@ -86,6 +86,7 @@
     <!-- Authenticator END -->
 
 	<!-- Contact Sync Provider BEGIN  -->
+	<string name="retroshare_im_custom_proto">retroshare</string>
 	<!-- Contact Sync Provider END  -->
 
 	<!-- RetroShare Android Proxy BEGIN-->
