@@ -96,6 +96,7 @@ public class AddServerActivity extends ProxiedActivityBase
 
 			if(resetSshSrvKey.isChecked()) sd.hostkey = null;
 
+			rsProxy.delServer(sd.name);
 			rsProxy.addServer(sd);
 			Toast.makeText(getApplicationContext(), "Server saved", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string
 			startActivity(MainActivity.class);
