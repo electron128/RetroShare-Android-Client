@@ -105,7 +105,6 @@
 				<action android:name="android.content.SyncAdapter" />
 			</intent-filter>
 			<meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_contacts" />
-			<meta-data android:name="android.provider.CONTACTS_STRUCTURE"  android:resource="@xml/contacts" />
 		</service>
 
 
@@ -121,8 +120,6 @@
 				<data android:host="@string/retroshare_im_custom_proto" />
 			</intent-filter>
 		</activity>
-
-		<!-- <meta-data android:name="android.provider.CONTACTS_STRUCTURE" android:resource="@xml/contacts" /> -->
 		<!-- Android Sync Provide END -->
 
 

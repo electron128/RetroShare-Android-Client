@@ -38,17 +38,12 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 {
 	public String TAG() { return "ContactsSyncAdapterService"; }
 
-	public static final String MIME = "vnd.retroshare.android.cursor.item/vnd.org.retroshare.android.sync.profile";
 	public static final String PGP_ID_COLUMN = RawContacts.SYNC1;
-	public static final String RS_NUMBER_PREFIX = "//rs/";
 
 	private static SyncAdapterImpl sSyncAdapter = null;
 
-    // TODO Check if we can to it smarter
-    private static class SyncEntry
-	{
-        public Long raw_id = 0L;
-    }
+	// Convenience class represents Android Contact in the map PGP_id -> Android_Contact
+	private static class SyncEntry { public Long raw_id = 0L; }
 
 	private class SyncAdapterImpl extends AbstractThreadedSyncAdapter
 	{
