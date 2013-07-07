@@ -112,27 +112,26 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
     	
     	private LayoutInflater mInflater;
     	
-    	public SearchResultAdapterListener(Context context) {
-    		 mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	}
+    	public SearchResultAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
     	
-    	public void setData(List<SearchHit> l){
+    	public void setData(List<SearchHit> l)
+		{
     		list.clear();
-    		list=l;
-    		for(DataSetObserver obs:observerList){
-    			obs.onChanged();
-    		}
+    		list = l;
+    		for(DataSetObserver obs:observerList) obs.onChanged();
     	}
     	
     	@Override
-    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
 	   		Intent i=new Intent(ShowSearchResultsActivity.this,AddDownloadActivity.class);
     		i.putExtra("File", list.get(position).getFile().toByteArray());
     		startActivity(i);
     	}
     	
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id) {
+		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
+		{
 			/*Location loc=locationList.get(position);
 			Person p=mapLocationToPerson.get(loc);
     		Intent i=new Intent(PeersActivity.this,PeerDetailsActivity.class);
@@ -143,62 +142,13 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 		}
 
 		@Override
-		public int getCount() {
-			return list.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return list.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			TextView tv=new TextView(parent.getContext());
-			SearchHit sh=list.get(position);
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			TextView tv = new TextView(parent.getContext());
+			SearchHit sh = list.get(position);
 			tv.setText(sh.getFile().getName()+" ("+Integer.toString(sh.getNoHits())+") "+Long.toString(sh.getFile().getSize()));
 	        return tv;
 		}
-
-		@Override
-		public int getViewTypeCount() {
-			return 1;
-		}
-
-		@Override
-		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return list.isEmpty();
-		}
-
-		@Override
-		public void registerDataSetObserver(DataSetObserver observer) {
-			observerList.add(observer);
-		}
-
-		@Override
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-			observerList.remove(observer);
-		}
-
-		@Override public boolean areAllItemsEnabled() {return true;}
-		@Override public boolean isEnabled(int position) {return true;}
 
 		@Override
 		public void update()
@@ -207,6 +157,17 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 			Log.v(TAG, "update: "+Integer.toString( server.mRsSearchService.getSearchResults(mId).size())+" items");
 			setData(server.mRsSearchService.getSearchResults(mId));
 		}
-    	
+
+		@Override public int getCount() { return list.size(); }
+		@Override public Object getItem(int position) { return list.get(position); }
+		@Override public long getItemId(int position) { return 0; } // TODO Auto-generated method stub
+		@Override public int getItemViewType(int position) { return 0; }
+		@Override public int getViewTypeCount() { return 1; }
+		@Override public boolean hasStableIds() { return false; } // TODO Auto-generated method stub
+		@Override public boolean isEmpty() { return list.isEmpty(); }
+		@Override public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
+		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
+		@Override public boolean areAllItemsEnabled() {return true;}
+		@Override public boolean isEnabled(int position) {return true;}
     }
 }
