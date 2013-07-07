@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import rsctrl.peers.Peers;
+
 /**
  * Platform independent RsCtrlService
  * @author till
@@ -195,7 +197,7 @@ public class RsCtrlService implements Runnable
 		// preload own Name, needed for Chat
 		mRsPeersService.getOwnPerson();
 		// preload peers list, needed for chat notification
-		mRsPeersService.updateFriendsList();
+		mRsPeersService.requestPersonsUpdate(Peers.RequestPeers.SetOption.ALL, Peers.RequestPeers.InfoOption.ALLINFO);
 		// preload chatobby list, because first request returns just an empty list
 		mRsChatService.updateChatLobbies();
 	}

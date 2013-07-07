@@ -46,7 +46,7 @@ public class RsPeersService implements RsServiceInterface
         @Override
         protected void rsHandleMsg(RsMessage msg)
         {
-            try { ownPerson = ResponsePeerList.parseFrom(msg.body).getPeersList().get(0); } catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+            try { ownPerson = ResponsePeerList.parseFrom(msg.body).getPeersList().get(0); } catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
         }
     }
 
@@ -60,8 +60,8 @@ public class RsPeersService implements RsServiceInterface
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners) { l.update(); }; }}); }	}
 
-	// TODO take more advantage of the fact we have peers in a map in PeersService clients
-	private Map<String, Person> mPersons = new HashMap<String, Person>();
+	// TODO check if we can take more advantage of the fact we have peers in a map in PeersService clients
+	private Map<String, Person> mPersons = new HashMap<String, Person>(); // <String:PGP_ID, Person>
 	public Person getPersonByPgpId(String pgpId) { return mPersons.get(pgpId); }
 	public List<Person> getPersonsByRelationship(Collection<Person.Relationship> relationships)
 	{
@@ -98,19 +98,18 @@ public class RsPeersService implements RsServiceInterface
 		return ownPerson;
 	}
 
-	public void updateFriendsList()
+	public void requestPersonsUpdate(RequestPeers.SetOption option, RequestPeers.InfoOption info)
 	{
 		RequestPeers.Builder reqb = RequestPeers.newBuilder();
-		//reqb.setSet(RequestPeers.SetOption.FRIENDS);
-        reqb.setSet(RequestPeers.SetOption.ALL);
-		reqb.setInfo(RequestPeers.InfoOption.ALLINFO);
+		reqb.setSet(option);
+		reqb.setInfo(info);
 		RequestPeers req = reqb.build();
 		byte[] b;
 		b = req.toByteArray();
-    	RsMessage msg = new RsMessage();
-    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
-    	msg.body = b;
-    	mRsCtrlService.sendMsg(msg);
+		RsMessage msg = new RsMessage();
+		msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
+		msg.body = b;
+		mRsCtrlService.sendMsg(msg);
 	}
 
 	@Override

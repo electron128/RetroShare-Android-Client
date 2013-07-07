@@ -34,6 +34,8 @@ import java.util.HashMap;
 
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
+import rsctrl.peers.Peers;
+
 public class ContactsSyncAdapterService extends ProxiedServiceBase
 {
 	public String TAG() { return "ContactsSyncAdapterService"; }
@@ -83,7 +85,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			 * and ask refresh data inside RsPeersService probably this is not useful for this sync but for the next one ( maybe it would be nice to do this automatically on retroshare server connection so we already have some data for the first sync)
 			 */
 			RsPeersService peersService = rsProxy.activateServer(account.name).mRsPeersService;
-			peersService.updateFriendsList();
+			peersService.requestPersonsUpdate(Peers.RequestPeers.SetOption.ALL, Peers.RequestPeers.InfoOption.ALLINFO);
 
 			/** Get content resolver */
 			ContentResolver contentResolver = context.getContentResolver();

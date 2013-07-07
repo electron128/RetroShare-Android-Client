@@ -4,16 +4,16 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-	<ListView android:id="@+id/peersList"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_above="@id/addFriendsButton" />
-
 	<Button android:id="@+id/addFriendsButton"
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:text="@string/add_friend"
 			android:layout_alignParentBottom="true"
 			android:onClick="onAddFriendsButtonPressed" />
+
+	<ListView android:id="@+id/peersList"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:layout_above="@id/addFriendsButton"/>
 
 </RelativeLayout>

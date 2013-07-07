@@ -32,6 +32,7 @@ import rsctrl.chat.Chat.ChatId;
 import rsctrl.chat.Chat.ChatType;
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
+import rsctrl.peers.Peers;
 
 public class PeersActivity extends ProxiedActivityBase
 {
@@ -46,6 +47,9 @@ public class PeersActivity extends ProxiedActivityBase
 	private boolean showAddFriendButton = false;
 	public static final String SHOW_ADD_FRIEND_BUTTON = "shoAddFriendButton";
 
+	private Peers.RequestPeers.SetOption updateSet = Peers.RequestPeers.SetOption.FRIENDS;
+	private Peers.RequestPeers.InfoOption updateInfo = Peers.RequestPeers.InfoOption.ALLINFO;
+
 	private PeersListAdapterListener adapter;
 	
     @Override
@@ -59,6 +63,7 @@ public class PeersActivity extends ProxiedActivityBase
 		ListView lv = (ListView) findViewById(R.id.peersList);
 		Button btn = (Button) findViewById(R.id.addFriendsButton);
 
+		if(showAllPeers) updateSet = Peers.RequestPeers.SetOption.ALL;
 		if(showAddFriendButton) btn.setVisibility(View.VISIBLE);
 		else btn.setVisibility(View.GONE);
 
@@ -81,7 +86,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
     	super.onResume();
 		_registerListeners();
-		if(isBound()) getConnectedServer().mRsPeersService.updateFriendsList();
+		if(isBound()) getConnectedServer().mRsPeersService.requestPersonsUpdate(updateSet, updateInfo);
     }
 
 	@Override
@@ -131,7 +136,8 @@ public class PeersActivity extends ProxiedActivityBase
 		{
 	        Person p = personList.get(position);
 	        
-	        View view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
+	        View view = convertView;
+			if (view == null) view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
 	        
 	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.newMessageImageView);
 	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
@@ -252,7 +258,12 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override
 		public void run()
 		{
-			if(isForeground()) getConnectedServer().mRsPeersService.updateFriendsList();
+			if(isForeground())
+			{
+				RsPeersService ps = getConnectedServer().mRsPeersService;
+				ps.requestPersonsUpdate(Peers.RequestPeers.SetOption.OWNID, updateInfo);
+				ps.requestPersonsUpdate(updateSet, updateInfo);
+			}
 			mHandler.postAtTime(new RequestPeersListUpdateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
 		}
 	}
