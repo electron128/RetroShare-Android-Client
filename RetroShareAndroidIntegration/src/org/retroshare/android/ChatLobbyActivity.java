@@ -202,7 +202,7 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 
 	private class JavaScriptInterface
 	{
-		public String TAG() { return "JavaScriptInterface"; }
+		public String TAG() { return "ChatLobbyActivity.JavaScriptInterface"; }
 
 		private int lastDisplayedMessageIndex = 0;
 		private ChatMessage actMessage;

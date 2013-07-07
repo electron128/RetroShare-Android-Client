@@ -110,7 +110,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 			RsCtrlService server = rsProxy.getActiveServers().get(serverName);
 			if (server != null && server.isOnline()) actualServerConnected = true;
         }
-        else Log.e(TAG,"Error: MainActivity.updateViews(): not bound");
+        else { Log.e(TAG,"Error: MainActivity.updateViews(): not bound"); }
 
         if (actualServerConnected)
         {

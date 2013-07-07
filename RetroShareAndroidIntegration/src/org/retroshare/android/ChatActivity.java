@@ -225,7 +225,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 			recentlySentMessage = true;
 		}
-		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
+		else { Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy"); }
 	}
 
 	@Override
@@ -262,7 +262,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 	private class JavaScriptInterface
 	{
-		public String TAG() { return "JavaScriptInterface"; }
+		public String TAG() { return "ChatActivity.JavaScriptInterface"; }
 
 		private _ChatMsg actMsg;
 
