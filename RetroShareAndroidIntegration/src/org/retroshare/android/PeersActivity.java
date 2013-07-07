@@ -100,7 +100,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
 		private final static String TAG = "PeersListAdapterListener";
 
-		private List<Person> personList = new ArrayList<Person>();
+		private List<_Person> personList = new ArrayList<_Person>();
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
@@ -111,7 +111,7 @@ public class PeersActivity extends ProxiedActivityBase
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
 			//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
-			Person p = personList.get(position);
+			_Person p = personList.get(position);
 
 			if ( p.getRelation().equals(Person.Relationship.FRIEND) || p.getRelation().equals(Person.Relationship.YOURSELF) )
 			{
@@ -124,7 +124,7 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
 		{
-			Person p = personList.get(position);
+			_Person p = personList.get(position);
     		Intent i = new Intent( PeersActivity.this, PeerDetailsActivity.class );
     		i.putExtra(PeerDetailsActivity.PGP_ID_EXTRA, p.getGpgId());
     		startActivity(i);
@@ -134,7 +134,7 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) // TODO For this method we should employ all optimization we can
 		{
-	        Person p = personList.get(position);
+	        _Person p = personList.get(position);
 	        
 	        View view = convertView;
 			if (view == null) view = mInflater.inflate(R.layout.activity_peers_person_item, parent, false);
@@ -143,18 +143,7 @@ public class PeersActivity extends ProxiedActivityBase
 	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
 	        TextView textView1 = (TextView) view.findViewById(R.id.PeerNameTextView);
 
-			boolean isOnline = false;
-			boolean hasMessage = false;
-			for ( Location l : p.getLocationsList())
-			{
-				isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
-
-				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-				RsChatService chatService = getConnectedServer().mRsChatService;
-				if ( chatService !=  null) if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
-				else { Log.wtf(TAG(), "getView(...) chatService is null"); }
-			}
-			if(isOnline)
+			if(p.isOnline())
 			{
 				imageViewUserState.setImageResource(R.drawable.ic_contact_color);
 				textView1.setTextColor(Color.BLUE);
@@ -164,7 +153,7 @@ public class PeersActivity extends ProxiedActivityBase
 				imageViewUserState.setImageResource(R.drawable.ic_contact_picture);
 				textView1.setTextColor(Color.GRAY);
 			}
-			if(hasMessage) imageViewMessage.setVisibility(View.VISIBLE);
+			if(p.hasNewMessage()) imageViewMessage.setVisibility(View.VISIBLE);
 			else imageViewMessage.setVisibility(View.GONE);
 
 	        textView1.setText(p.getName());
@@ -192,20 +181,67 @@ public class PeersActivity extends ProxiedActivityBase
 			personList.clear();
 			if(showAllPeers)
 			{
-				personList.addAll(peersService.getPersons());
-				Collections.sort(personList, new PersonByNameComparator());
+				for( Person p : peersService.getPersons()) personList.add(new _Person(p));
+				Collections.sort(personList, new _PersonByNameComparator());
 			}
 			else
 			{
 				List<Person.Relationship> r = new ArrayList<Person.Relationship>();
 				r.add(Person.Relationship.YOURSELF);
 				r.add(Person.Relationship.FRIEND);
-				personList.addAll(peersService.getPersonsByRelationship(r));
-				Collections.sort(personList, new PersonByStatusAndNameComparator() );
+				for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
+				Collections.sort(personList, new _PersonByStatusAndNameComparator() );
 			}
 
 			for(DataSetObserver obs : observerList) { obs.onChanged(); }
 		}
+
+		private final class _Person
+		{
+			private boolean isOnline = false;
+			private boolean hasNewMessage = false;
+			private Person person;
+
+			_Person(Person p)
+			{
+				person = p;
+
+				for ( Location l : p.getLocationsList())
+				{
+					isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
+
+					ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
+					RsChatService chatService = getConnectedServer().mRsChatService;
+					if ( chatService !=  null && chatService.getChatChanged().get(chatId) != null ) hasNewMessage = true ;
+					else { Log.wtf(TAG(), "getView(...) chatService is null"); }
+				}
+			}
+
+			public boolean isOnline() { return isOnline; }
+			public boolean hasNewMessage() { return hasNewMessage; }
+			public String getName() { return person.getName(); }
+			public Person.Relationship getRelation() { return person.getRelation(); }
+			public String getGpgId() { return person.getGpgId(); }
+		}
+
+		private class _PersonByStatusAndNameComparator implements Comparator<_Person>
+		{
+			@Override
+			public int compare( _Person p1, _Person p2)
+			{
+				boolean p1o = p1.isOnline();
+				boolean p2o = p2.isOnline();
+
+				if( p1o ^ p2o )
+				{
+					if ( p1o ) return -1;
+					else return 1;
+				}
+				else return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase());
+			}
+		}
+
+		private class _PersonByNameComparator implements Comparator<_Person> { @Override public int compare( _Person p1, _Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
     }
 
 	private void _registerListeners()
@@ -232,27 +268,6 @@ public class PeersActivity extends ProxiedActivityBase
 
 	public void onAddFriendsButtonPressed(View v) { startActivity(AddFriendMethodChooserActivity.class); }
 
-	private class PersonByStatusAndNameComparator implements Comparator<Person>
-	{
-		@Override
-		public int compare( Person p1, Person p2)
-		{
-			boolean p1o = false;
-			boolean p2o = false;
-			for ( Location l : p1.getLocationsList() ) p1o |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
-			for ( Location l : p2.getLocationsList() ) p2o |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
-
-			if( p1o ^ p2o )
-			{
-				if ( p1o ) return -1;
-				else return 1;
-			}
-			else return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase());
-		}
-	}
-
-	private class PersonByNameComparator implements Comparator<Person> { @Override public int compare( Person p1, Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
-
 	private class RequestPeersListUpdateRunnable implements Runnable
 	{
 		@Override
@@ -264,7 +279,9 @@ public class PeersActivity extends ProxiedActivityBase
 				ps.requestPersonsUpdate(Peers.RequestPeers.SetOption.OWNID, updateInfo);
 				ps.requestPersonsUpdate(updateSet, updateInfo);
 			}
-			mHandler.postAtTime(new RequestPeersListUpdateRunnable(), SystemClock.uptimeMillis()+ UPDATE_INTERVAL);
+			int updateInterval = UPDATE_INTERVAL;
+			if(showAllPeers) updateInterval *= 10;
+			mHandler.postAtTime(new RequestPeersListUpdateRunnable(), SystemClock.uptimeMillis()+ updateInterval);
 		}
 	}
 }
