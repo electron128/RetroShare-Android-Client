@@ -132,7 +132,7 @@ public class PeersActivity extends ProxiedActivityBase
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
+		public View getView(int position, View convertView, ViewGroup parent) // TODO For this method we should employ all optimization we can
 		{
 	        Person p = personList.get(position);
 	        
@@ -152,7 +152,7 @@ public class PeersActivity extends ProxiedActivityBase
 				ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
 				RsChatService chatService = getConnectedServer().mRsChatService;
 				if ( chatService !=  null) if ( chatService.getChatChanged().get(chatId) != null ) hasMessage = true ;
-				else Log.wtf(TAG(), "getView(...) chatService is null");
+				else { Log.wtf(TAG(), "getView(...) chatService is null"); }
 			}
 			if(isOnline)
 			{
