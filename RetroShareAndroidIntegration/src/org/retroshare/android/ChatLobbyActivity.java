@@ -16,6 +16,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.retroshare.android.RsChatService.ChatServiceListener;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import rsctrl.chat.Chat.ChatId;
@@ -28,13 +31,66 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 
 	public final static String CHAT_LOBBY_ID_EXTRA = "org.retroshare.android.intent_extra_keys.ChatId";
 	public final static String CHAT_LOBBY_INFO_EXTRA = "org.retroshare.android.intent_extra_keys.ChatLobbyInfo";
-	
+
+	private static final String htmlFileName = "chatWebView.html";
+	private static final String JAVASCRIPT_NAME = "javaInterface";
+
 	@Override
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
 	    setContentView(R.layout.activity_chatlobbychat);
 
 	    findViewById(R.id.chatMessageEditText).setOnKeyListener(new KeyListener());
+
+		InputStream htmlIn = getResources().openRawResource(R.raw.chatwebview);
+		boolean writeFile = false;
+
+		try
+		{
+			InputStream htmlOutRead = openFileInput(htmlFileName);
+
+			for(int i = 0; i < 1024; i++) // We are supposing that if file changed his firsts 1024 bytes changed too
+				if(htmlIn.read() != htmlOutRead.read())
+				{
+					writeFile = true;
+					break;
+				}
+
+			htmlOutRead.close();
+		}
+		catch (Exception e) { writeFile = true; }
+
+		if( writeFile )
+		{
+			try
+			{
+				htmlIn.reset();
+				FileOutputStream htmlOut = openFileOutput(htmlFileName, MODE_PRIVATE);
+
+				int read = htmlIn.available(); // We expect the html file is little so it can stay all in memory
+				byte[] buff = new byte[read];
+				htmlIn.read(buff, 0, read);
+				htmlOut.write(buff, 0, read);
+				htmlOut.close();
+			}
+			catch (Exception e) { e.printStackTrace(); }
+		}
+
+		try { htmlIn.close(); } catch (Exception e) { e.printStackTrace(); }
+
+		File htmlFile = new File(getFilesDir(), htmlFileName);
+		WebView messagesWebView = (WebView) findViewById(R.id.chatWebView);
+		messagesWebView.getSettings().setJavaScriptEnabled(true);
+//		messagesWebView.loadData(util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
+		messagesWebView.loadUrl("file://" + htmlFile.getAbsolutePath());
+		messagesWebView.addJavascriptInterface(new JavaScriptInterface(), JAVASCRIPT_NAME);
+
+		try
+		{
+			chatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_INFO_EXTRA));
+			chatLobbyId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_ID_EXTRA));
+		}
+		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
 	}
 	
 	private class KeyListener implements OnKeyListener
@@ -60,14 +116,6 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 		Log.d(TAG(), "onServiceConnected()");
 
 		RsCtrlService server = getConnectedServer();
-
-		try
-		{
-			chatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_INFO_EXTRA));
-			chatLobbyId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_ID_EXTRA));
-		}
-		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
-
 		server.mRsChatService.joinChatLobby(chatLobbyInfo);
 		TextView tv = (TextView) findViewById(R.id.chatHeaderTextView);
 		tv.setText(chatLobbyInfo.getLobbyName());
@@ -102,28 +150,17 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 
 		if(isBound())
 		{
-			List<ChatMessage> chatLobbyHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(chatLobbyId);
-
-			String historyString = "";
-			//ad meta to define encoding, needed to display
-			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />";
-
-			for(ChatMessage msg : chatLobbyHistory) historyString+="<span style=\"color:dodgerblue;\">" + msg.getPeerNickname() + ":</span> " + msg.getMsg() + "<br/>";
-			historyString += "<br/>";
-
-			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
-
-			WebView messageView = (WebView) findViewById(R.id.chatWebView);
-			messageView.loadData(base64, "text/html", "base64");
+			WebView messagesView = (WebView) findViewById(R.id.chatWebView);
+			messagesView.loadUrl("javascript:updateMessages();");
 
 			if(recentlySentMessage)
 			{
 				ScrollView scrollView = (ScrollView) findViewById(R.id.chatScrollView);
-				scrollView.scrollTo( 0, messageView.getBottom());
+				scrollView.scrollTo( 0, messagesView.getBottom());
 				recentlySentMessage = false;
 			}
 		}
-		else Log.e(TAG(), "updateViews() Why am I not bound?");
+		else { Log.e(TAG(), "updateViews() Why am I not bound?"); }
 	}
 	
 	public void sendChatMsg(View v)
@@ -161,6 +198,31 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 	public void update() // will be called by RsChatService
 	{
 		updateViews();
+	}
+
+	private class JavaScriptInterface
+	{
+		public String TAG() { return "JavaScriptInterface"; }
+
+		private int lastDisplayedMessageIndex = 0;
+		private ChatMessage actMessage;
+
+		public boolean goNextMessage()
+		{
+			Log.d(TAG(), "goNextMessage()");
+
+			List<ChatMessage> chatLobbyHistory = getConnectedServer().mRsChatService.getChatHistoryForChatId(chatLobbyId);
+			if(lastDisplayedMessageIndex < chatLobbyHistory.size())
+			{
+				actMessage = chatLobbyHistory.get(lastDisplayedMessageIndex);
+				++lastDisplayedMessageIndex;
+				return true;
+			}
+			return false;
+		}
+
+		public String getLastMessageNick() { return actMessage.getPeerNickname(); }
+		public String getLastMessageBody() { return actMessage.getMsg(); }
 	}
 }
 

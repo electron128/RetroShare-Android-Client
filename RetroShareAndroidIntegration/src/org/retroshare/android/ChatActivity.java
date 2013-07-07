@@ -192,7 +192,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 				recentlySentMessage = false;
 			}
 		}
-		else Log.e(TAG(), "updateViews() Why am I not bound?");
+		else { Log.e(TAG(), "updateViews() Why am I not bound?"); }
 	}
 	
 	public void sendChatMsg(View v)
@@ -260,7 +260,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		}
 	}
 
-	public class JavaScriptInterface
+	private class JavaScriptInterface
 	{
 		public String TAG() { return "JavaScriptInterface"; }
 
