@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/TableLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal" >
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+	<ImageView
+		android:id="@+id/imageViewUserState"
+		android:layout_width="32dp"
+		android:layout_height="32dp"
+		android:layout_margin="8dp"
+		android:src="@drawable/ic_contact_picture" />
 
-        <ImageView
-            android:id="@+id/imageViewUserState"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_margin="8dp"
-            android:src="@drawable/ic_contact_picture" />
+	<TextView
+		android:id="@+id/PeerNameTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:text="Large Text"
+		android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
-            android:id="@+id/PeerNameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Large Text"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+	<ImageView
+		android:id="@+id/newMessageImageView"
+		android:layout_width="32dp"
+		android:layout_height="32dp"
+		android:layout_margin="8dp"
+		android:src="@android:drawable/sym_action_chat" />
 
-        <ImageView
-            android:id="@+id/newMessageImageView"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_margin="8dp"
-            android:src="@android:drawable/sym_action_chat" />
-
-    </LinearLayout>
-
-</TableLayout>
+</LinearLayout>

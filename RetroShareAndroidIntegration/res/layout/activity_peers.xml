@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
-			  android:layout_width="match_parent"
-			  android:layout_height="match_parent">
 	<ListView android:id="@+id/peersList"
-			android:layout_height="match_parent"
 			android:layout_width="match_parent"
-			android:layout_weight="0.8"
-			/>
+			android:layout_height="wrap_content"
+			android:layout_above="@id/addFriendsButton" />
+
 	<Button android:id="@+id/addFriendsButton"
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:text="@string/add_friend"
-			android:layout_weight="0.1"
-			android:onClick="onAddFriendsButtonPressed"
-			/>
-</LinearLayout>
+			android:layout_alignParentBottom="true"
+			android:onClick="onAddFriendsButtonPressed" />
+
+</RelativeLayout>
