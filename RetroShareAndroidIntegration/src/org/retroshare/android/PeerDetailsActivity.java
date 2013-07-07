@@ -57,7 +57,7 @@ public class PeerDetailsActivity extends ProxiedActivityBase
 			msg.msgId = ( (Core.ExtensionId.CORE_VALUE << 24) | (Core.PackageId.FILES_VALUE << 8) | Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE );
 
 			if ( r.equals(Person.Relationship.FRIEND) ) msg.body = Msgs.RequestAddPeer.newBuilder().setCmd(Msgs.RequestAddPeer.AddCmd.ADD).setGpgId(pgpId).build().toByteArray();
-			else msg.body = Msgs.RequestAddPeer.newBuilder().setCmd(Msgs.RequestAddPeer.AddCmd.REMOVE).setGpgId(pgpId).build().toByteArray();
+			else { msg.body = Msgs.RequestAddPeer.newBuilder().setCmd(Msgs.RequestAddPeer.AddCmd.REMOVE).setGpgId(pgpId).build().toByteArray(); }
 
 			server.sendMsg( msg, null );
 

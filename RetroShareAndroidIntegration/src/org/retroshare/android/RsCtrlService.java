@@ -279,20 +279,11 @@ public class RsCtrlService implements Runnable
 			outMsgList.add(msg);
 			reqId = msg.reqId;
 		}
-		synchronized(msgHandlers)
-		{
-			msgHandlers.put(reqId, h);
-		}
+		if( h != null ) synchronized(msgHandlers) { msgHandlers.put(reqId, h); }
+
 		return reqId;
 	}
 	public int sendMsg(RsMessage msg){ return sendMsg(msg,null); }
-	
-	public void registerMsgHandler(int msgId,RsMessageHandler h)
-	{
-		synchronized(msgHandlersById){ msgHandlersById.put(msgId, h); }
-	}
-	
-	public RsMessageHandler getHandler(int msgId) { return msgHandlersById.get(msgId); }
 	
 	@Override
 	public void run()
