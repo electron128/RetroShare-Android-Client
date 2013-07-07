@@ -121,7 +121,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		try
 		{
 			Log.v(TAG, "trying to save Datapack, Datapack.serverDataMapt=" + mDatapack.serverDataMap);
-			ObjectOutputStream o = new ObjectOutputStream(openFileOutput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID), 0));
+			ObjectOutputStream o = new ObjectOutputStream(openFileOutput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID), MODE_PRIVATE));
 			o.writeObject(mDatapack);
 		}
 		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block

@@ -1,8 +1,8 @@
 package org.retroshare.android;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+//import android.graphics.Bitmap;
+//import android.graphics.Color;
 
 
 import android.net.Uri;
@@ -10,13 +10,13 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
-/*
-import com.google.zxing.WriterException;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.qrcode.encoder.ByteMatrix;
-import com.google.zxing.qrcode.encoder.Encoder;
-import com.google.zxing.qrcode.encoder.QRCode;
-*/
+
+//import com.google.zxing.WriterException;
+//import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+//import com.google.zxing.qrcode.encoder.ByteMatrix;
+//import com.google.zxing.qrcode.encoder.Encoder;
+//import com.google.zxing.qrcode.encoder.QRCode;
+
 public class util
 {
 	public static final String TAG() { return "util"; }

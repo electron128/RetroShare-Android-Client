@@ -26,7 +26,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
-//import org.retroshare.android.RsService.RsMessage;
 
 
 public class ChatLobbiesActivity extends ProxiedActivityBase

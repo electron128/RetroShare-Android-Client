@@ -1,7 +1,14 @@
 package org.retroshare.android;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -31,7 +38,14 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 	public final static String PGP_ID_EXTRA = "org.retroshare.android.intent_extra_keys.PgpId";
 	private String pgpId;
 
+	TreeSet<_ChatMsg> messages = new TreeSet<_ChatMsg>();
+	_ChatMsg lastShowedMessage;
+
 	private Set<ChatId> privateChatIds = new HashSet<ChatId>();
+	private Map<ChatId, Integer> lastLoadedMessageInex = new HashMap<ChatId, Integer>();
+
+	private static final String htmlFileName = "chatWebView.html";
+	private static final String JAVASCRIPT_NAME = "javaInterface";
 
 	@Override
 	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
@@ -40,6 +54,49 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 		findViewById(R.id.buttonLeaveLobby).setVisibility(View.GONE);
 	    findViewById(R.id.chatMessageEditText).setOnKeyListener(new KeyListener());
+
+		InputStream htmlIn = getResources().openRawResource(R.raw.chatwebview);
+		boolean writeFile = false;
+
+		try
+		{
+			InputStream htmlOutRead = openFileInput(htmlFileName);
+
+			for(int i = 0; i < 1024; i++) // We are supposing that if file changed his firsts 1024 bytes changed too
+				if(htmlIn.read() != htmlOutRead.read())
+				{
+					writeFile = true;
+					break;
+				}
+
+			htmlOutRead.close();
+		}
+		catch (Exception e) { writeFile = true; }
+
+		if( writeFile )
+		{
+			try
+			{
+				htmlIn.reset();
+				FileOutputStream htmlOut = openFileOutput(htmlFileName, MODE_PRIVATE);
+
+				int read = htmlIn.available(); // We expect the html file is little so it can stay all in memory
+				byte[] buff = new byte[read];
+				htmlIn.read(buff, 0, read);
+				htmlOut.write(buff, 0, read);
+				htmlOut.close();
+			}
+			catch (Exception e) { e.printStackTrace(); }
+		}
+
+		try { htmlIn.close(); } catch (Exception e) { e.printStackTrace(); }
+
+		File htmlFile = new File(getFilesDir(), htmlFileName);
+		WebView messagesWebView = (WebView) findViewById(R.id.chatWebView);
+		messagesWebView.getSettings().setJavaScriptEnabled(true);
+//		messagesWebView.loadData(util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
+		messagesWebView.loadUrl("file://" + htmlFile.getAbsolutePath());
+		messagesWebView.addJavascriptInterface(new JavaScriptInterface(), JAVASCRIPT_NAME);
 
 		pgpId = getIntent().getStringExtra(PGP_ID_EXTRA);
 	}
@@ -51,7 +108,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		{
 			if(( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER ))
 			{
-				Log.d(TAG(), "KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
+//				Log.d(TAG(), "KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
 				sendChatMsg(null);
 				return true;
 			}
@@ -73,11 +130,13 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		}
 
 		privateChatIds.clear();
+		lastLoadedMessageInex.clear();
 
 		for ( Core.Location location : person.getLocationsList() )
 		{
 			ChatId newChatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(location.getSslId()).build();
 			privateChatIds.add(newChatId);
+			lastLoadedMessageInex.put(newChatId, Integer.valueOf(-1));
 		}
 
 		TextView tv = (TextView) findViewById(R.id.chatHeaderTextView);
@@ -111,35 +170,25 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		if(isBound())
 		{
 			RsChatService cs = getConnectedServer().mRsChatService;
-			Set<_ChatMsg> messages = new TreeSet<_ChatMsg>();
-
 			for (ChatId lChat : privateChatIds)
 			{
-				List<ChatMessage> lChatMessages = cs.getChatHistoryForChatId(lChat);
-				for ( ChatMessage msg : lChatMessages )
+				List<ChatMessage> fullMsgList = cs.getChatHistoryForChatId(lChat);
+				Integer loadMsgIndex = lastLoadedMessageInex.get(lChat) + 1 ;
+				int fullListSize = fullMsgList.size();
+				for (; loadMsgIndex < fullListSize; loadMsgIndex++)
 				{
-					Log.d(TAG(), "updateViews() sendTime=" + String.valueOf(msg.getSendTime()) + " recvTime=" + String.valueOf(msg.getRecvTime()));
-					if (msg.getSendTime() == 0) messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getRecvTime()));
-					else messages.add(new _ChatMsg(msg.getPeerNickname(), msg.getMsg(), msg.getSendTime()));
+					messages.add(new _ChatMsg(fullMsgList.get(loadMsgIndex)));
+					lastLoadedMessageInex.put(lChat, loadMsgIndex);
 				}
 			}
 
-			String historyString = "";
-			//ad meta to define encoding, needed to display
-			historyString+="<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />";
-
-			for(_ChatMsg msg : messages) historyString += "<span style=\"color:dodgerblue;\">" + msg.getNick() + ":</span> " + msg.getBody() + "<br/>";
-			historyString += "<br/>";
-
-			String base64 = android.util.Base64.encodeToString(historyString.getBytes(), android.util.Base64.DEFAULT);
-
-			WebView messageView = (WebView) findViewById(R.id.chatWebView);
-			messageView.loadData(base64, "text/html", "base64");
+			WebView messagesView = (WebView) findViewById(R.id.chatWebView);
+			messagesView.loadUrl("javascript:updateMessages();");
 
 			if(recentlySentMessage)
 			{
 				ScrollView scrollView = (ScrollView) findViewById(R.id.chatScrollView);
-				scrollView.scrollTo( 0, messageView.getBottom());
+				scrollView.scrollTo( 0, messagesView.getBottom());
 				recentlySentMessage = false;
 			}
 		}
@@ -187,21 +236,17 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 
 	private class _ChatMsg implements Comparable
 	{
-		public _ChatMsg(String nick, String body, int time)
+		private ChatMessage msg;
+
+		public _ChatMsg(ChatMessage msg) { this.msg = msg; }
+
+		public String getNick() { return msg.getPeerNickname(); }
+		public String getBody() { return msg.getMsg(); }
+		public int getTime()
 		{
-			Log.d(TAG(), "_ChatMsg(" + nick +", " + body +", " + time +")");
-			this.nick = nick;
-			this.body = body;
-			this.time = time;
+			if (msg.getSendTime() == 0) return msg.getRecvTime();
+			return msg.getSendTime();
 		}
-
-		public String getNick() { return nick; }
-		public String getBody() { return body; }
-		public int getTime() { return time; }
-
-		private String nick;
-		private String body;
-		private int time;
 
 		@Override
 		public int compareTo(Object o)
@@ -213,6 +258,57 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 			if( thisTime != otherTime ) return thisTime - otherTime;
 			return this.getBody().compareTo(m.getBody());
 		}
+	}
+
+	public class JavaScriptInterface
+	{
+		public String TAG() { return "JavaScriptInterface"; }
+
+		private _ChatMsg actMsg;
+
+		public boolean goNextMessage()
+		{
+			Log.d(TAG(), "goNextMessage()");
+
+			if (messages.isEmpty()) return false;
+
+			if(lastShowedMessage == null)
+			{
+				actMsg = messages.first();
+				lastShowedMessage = actMsg;
+				return true;
+			}
+
+			TreeSet<_ChatMsg> tmpSet = new TreeSet<_ChatMsg>(messages.tailSet(lastShowedMessage));
+			tmpSet.remove(lastShowedMessage);
+
+			if( tmpSet.isEmpty() ) return false;
+
+			actMsg = tmpSet.first();
+			lastShowedMessage = actMsg;
+
+//			Log.d(TAG(), "unreaded messages:");
+//			while(!tmpSet.isEmpty())
+//			{
+//				_ChatMsg msg = tmpSet.first();
+//				printMsg(msg);
+//				tmpSet.remove(msg);
+//			}
+
+			return true;
+		}
+
+		public String getLastMessageNick()
+		{
+			return actMsg.getNick();
+		}
+
+		public String getLastMessageBody()
+		{
+			return actMsg.getBody();
+		}
+
+		private void printMsg(_ChatMsg msg) { Log.d(TAG(), String.valueOf(msg.getTime()) + " " + msg.getNick() + " " + msg.getBody()); }
 	}
 }
 
