@@ -49,17 +49,11 @@ public class PeerDetailsActivity extends ProxiedActivityBase
 	{
 		if(isBound())
 		{
-			RsCtrlService server = getConnectedServer();
-			Person p = server.mRsPeersService.getPersonByPgpId(pgpId);
-			Person.Relationship r = p.getRelation();
+			RsPeersService prs = getConnectedServer().mRsPeersService;
+			Person p = prs.getPersonByPgpId(pgpId);
 
-			RsCtrlService.RsMessage msg = new RsCtrlService.RsMessage();
-			msg.msgId = ( (Core.ExtensionId.CORE_VALUE << 24) | (Core.PackageId.FILES_VALUE << 8) | Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE );
-
-			if ( r.equals(Person.Relationship.FRIEND) ) msg.body = Msgs.RequestAddPeer.newBuilder().setCmd(Msgs.RequestAddPeer.AddCmd.ADD).setGpgId(pgpId).build().toByteArray();
-			else { msg.body = Msgs.RequestAddPeer.newBuilder().setCmd(Msgs.RequestAddPeer.AddCmd.REMOVE).setGpgId(pgpId).build().toByteArray(); }
-
-			server.sendMsg( msg, null );
+			prs.requestToggleFriendShip(p);
+			prs.requestPersonsUpdate(Peers.RequestPeers.SetOption.ALL, Peers.RequestPeers.InfoOption.ALLINFO);
 
 			finish();
 		}

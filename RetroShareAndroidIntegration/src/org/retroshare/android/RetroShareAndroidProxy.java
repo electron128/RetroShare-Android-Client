@@ -238,7 +238,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	public RsCtrlService activateServer(String serverName)
 	{
-		Log.d(TAG, "activateServer(" + serverName + ")");
+//		Log.d(TAG, "activateServer(" + serverName + ")");
 		_activateServer(serverName);
 		RsBund bund = serverBunds.get(serverName);
 		if(bund != null) return bund.server;
@@ -251,7 +251,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	 */
 	private void _activateServer(String serverName)
 	{
-		Log.d(TAG, "_activateServer(" + serverName + ")");
+//		Log.d(TAG, "_activateServer(" + serverName + ")");
 
 		RsServerData serverData = mDatapack.serverDataMap.get(serverName);
 
@@ -269,8 +269,6 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 			}
 
 			if( ! bund.server.isOnline() ) bund.server.connect();
-
-			Log.d(TAG, "_activateServer(String serverName) server activated");
 		}
 		// TODO else throw new Exception(TAG + " _activateServer(" + serverName + ") Tryed to activate non existent server ");
 	}

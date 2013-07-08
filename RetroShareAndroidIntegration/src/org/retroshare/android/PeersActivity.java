@@ -3,7 +3,10 @@ package org.retroshare.android;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -50,6 +53,9 @@ public class PeersActivity extends ProxiedActivityBase
 	private Peers.RequestPeers.SetOption updateSet = Peers.RequestPeers.SetOption.FRIENDS;
 	private Peers.RequestPeers.InfoOption updateInfo = Peers.RequestPeers.InfoOption.ALLINFO;
 
+	private Bitmap offLineImage;
+	private Bitmap onLineImage;
+
 	private PeersListAdapterListener adapter;
 	
     @Override
@@ -62,6 +68,9 @@ public class PeersActivity extends ProxiedActivityBase
 
 		ListView lv = (ListView) findViewById(R.id.peersList);
 		Button btn = (Button) findViewById(R.id.addFriendsButton);
+
+		offLineImage = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture);
+		onLineImage  = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_color);
 
 		if(showAllPeers) updateSet = Peers.RequestPeers.SetOption.ALL;
 		if(showAddFriendButton) btn.setVisibility(View.VISIBLE);
@@ -141,22 +150,16 @@ public class PeersActivity extends ProxiedActivityBase
 	        
 	        ImageView imageViewMessage   = (ImageView) view.findViewById(R.id.newMessageImageView);
 	        ImageView imageViewUserState = (ImageView) view.findViewById(R.id.imageViewUserState);
-	        TextView textView1 = (TextView) view.findViewById(R.id.PeerNameTextView);
+	        TextView nameTextView = (TextView) view.findViewById(R.id.PeerNameTextView);
 
-			if(p.isOnline())
-			{
-				imageViewUserState.setImageResource(R.drawable.ic_contact_color);
-				textView1.setTextColor(Color.BLUE);
-			}
-			else
-			{
-				imageViewUserState.setImageResource(R.drawable.ic_contact_picture);
-				textView1.setTextColor(Color.GRAY);
-			}
+			nameTextView.setText(p.getName());
+			if(p.isOnline()) nameTextView.setTextColor(Color.BLUE);
+			else { nameTextView.setTextColor(Color.GRAY); }
+
 			if(p.hasNewMessage()) imageViewMessage.setVisibility(View.VISIBLE);
 			else imageViewMessage.setVisibility(View.GONE);
 
-	        textView1.setText(p.getName());
+			imageViewUserState.setImageBitmap(p.getImage());
 
 	        return view;
 		}
@@ -201,6 +204,7 @@ public class PeersActivity extends ProxiedActivityBase
 			private boolean isOnline = false;
 			private boolean hasNewMessage = false;
 			private Person person;
+			private Bitmap image;
 
 			_Person(Person p)
 			{
@@ -215,6 +219,9 @@ public class PeersActivity extends ProxiedActivityBase
 					if ( chatService !=  null && chatService.getChatChanged().get(chatId) != null ) hasNewMessage = true ;
 					else { Log.wtf(TAG(), "getView(...) chatService is null"); }
 				}
+
+				if(isOnline) image = onLineImage;
+				else { image = offLineImage;}
 			}
 
 			public boolean isOnline() { return isOnline; }
@@ -222,6 +229,7 @@ public class PeersActivity extends ProxiedActivityBase
 			public String getName() { return person.getName(); }
 			public Person.Relationship getRelation() { return person.getRelation(); }
 			public String getGpgId() { return person.getGpgId(); }
+			public Bitmap getImage() { return image; }
 		}
 
 		private class _PersonByStatusAndNameComparator implements Comparator<_Person>

@@ -13,6 +13,7 @@ import java.util.Set;
 import rsctrl.core.Core;
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
+import rsctrl.msgs.Msgs;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
@@ -41,19 +42,8 @@ public class RsPeersService implements RsServiceInterface
         mOwnIdReceivedHandlerThread.start();
 	}
 
-    private class OwnIdReceivedHandler extends RsMessageHandler
-    {
-        @Override
-        protected void rsHandleMsg(RsMessage msg)
-        {
-            try { ownPerson = ResponsePeerList.parseFrom(msg.body).getPeersList().get(0); } catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
-        }
-    }
-
-	public static interface PeersServiceListener
-	{
-		public void update();
-	}
+    private class OwnIdReceivedHandler extends RsMessageHandler { @Override protected void rsHandleMsg(RsMessage msg) { try { ownPerson = ResponsePeerList.parseFrom(msg.body).getPeersList().get(0); } catch (InvalidProtocolBufferException e) { e.printStackTrace(); } } }
+	public static interface PeersServiceListener { public void update(); }
 	
 	private Set<PeersServiceListener> mListeners = new HashSet<PeersServiceListener>();
 	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
@@ -107,15 +97,30 @@ public class RsPeersService implements RsServiceInterface
 		byte[] b;
 		b = req.toByteArray();
 		RsMessage msg = new RsMessage();
-		msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.PEERS_VALUE<<8)|Peers.RequestMsgIds.MsgId_RequestPeers_VALUE;
+		msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.PEERS_VALUE, Peers.RequestMsgIds.MsgId_RequestPeers_VALUE, false);
 		msg.body = b;
 		mRsCtrlService.sendMsg(msg);
+	}
+
+	public void requestToggleFriendShip(Person p)
+	{
+
+		int messageIg = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.PEERS_VALUE, Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE, false);
+
+		Peers.RequestAddPeer.Builder messageBody = Peers.RequestAddPeer.newBuilder();
+		messageBody.setPgpId(p.getGpgId());
+		if(p.getRelation().equals(Person.Relationship.FRIEND)) messageBody.setCmd(Peers.RequestAddPeer.AddCmd.REMOVE);
+		else { messageBody.setCmd(Peers.RequestAddPeer.AddCmd.ADD); }
+
+		RsMessage reqMsg = new RsMessage( messageIg, messageBody.build().toByteArray() );
+
+		mRsCtrlService.sendMsg(reqMsg);
 	}
 
 	@Override
 	public void handleMessage(RsMessage msg)
 	{
-		if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.PEERS_VALUE<<8) | Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE ) )
+		if( msg.msgId == ( RsCtrlService.RESPONSE | (Core.PackageId.PEERS_VALUE << 8) | Peers.ResponseMsgIds.MsgId_ResponsePeerList_VALUE ) )
 		{
 			try
 			{

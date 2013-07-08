@@ -1,5 +1,7 @@
 package org.retroshare.android;
 
+import android.util.Log;
+
 import net.lag.jaramiko.AuthenticationFailedException;
 import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
@@ -29,16 +31,25 @@ import rsctrl.peers.Peers;
 
 public class RsCtrlService implements Runnable
 {
-	private static final boolean DEBUG=true;
+	public String TAG() { return "RsCtrlService"; }
+
+	private static final boolean DEBUG = true;
 
 	public static final int MAGIC_CODE = 0x137f0001;
-	public static final int RESPONSE=(0x01<<24);
+	public static final int RESPONSE = (0x01<<24);
 
 	public static class RsMessage
 	{
 		public int msgId;
 		public int reqId;
 		public byte[] body;
+
+		public RsMessage() {};
+		public RsMessage(int messageId, byte[] msgBody)
+		{
+			msgId = messageId;
+			body = msgBody;
+		}
 	}
 
 	public enum ConnectionEventKind { SERVER_DATA_CHANGED, ERROR_WHILE_CONNECTING, CONNECTED,ERROR_DISCONNECTED }
@@ -244,14 +255,8 @@ public class RsCtrlService implements Runnable
 		
 		synchronized(mConnectAction){ mConnectAction = ConnectAction.DISCONNECT; }
 	}
-	
-	/**
-	 * @return True if we are connecter to RetroShare server, false otherwise
-	 */
-	public boolean isOnline()
-	{
-		synchronized(mConnectState){ return (mConnectState == ConnectState.ONLINE); }
-	}
+
+	public boolean isOnline() { synchronized(mConnectState){ return (mConnectState == ConnectState.ONLINE); } } /** @return True if we are connected to RetroShare server, false otherwise */
 	
 	// use with synchronized()
 	private ArrayList<RsMessage> outMsgList = new ArrayList<RsMessage>();
@@ -482,13 +487,14 @@ public class RsCtrlService implements Runnable
 	{
 		//allocate memory
 		// 16 byte header + body
-		ByteBuffer bb=ByteBuffer.allocate(16+msg.body.length);
+		ByteBuffer bb = ByteBuffer.allocate( 16 + msg.body.length );
 		bb.putInt(MAGIC_CODE);
 		bb.putInt(msg.msgId);
 		bb.putInt(msg.reqId);
 		bb.putInt(msg.body.length);
 		bb.put(msg.body);
-		try {
+		try
+		{
 			if(DEBUG){System.err.println("RsCtrlService: _sendMsg() ...");}
 			mOutputStream.write(bb.array());
 			
@@ -496,12 +502,13 @@ public class RsCtrlService implements Runnable
 			//System.out.println(util.byteArrayToHexString(bb.array()));
 				
 			if(DEBUG){System.err.println("RsCtrlService: _sendMsg(): success");}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+		catch (IOException e)
+		{
 			if(DEBUG){System.err.println(e);}
-			mLastConnectionError= ConnectionError.SEND_ERROR;
-			synchronized(mConnectState){mConnectState = ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction = ConnectAction.NONE;}
+			mLastConnectionError = ConnectionError.SEND_ERROR;
+			synchronized(mConnectState){ mConnectState = ConnectState.OFFLINE; }
+			synchronized(mConnectAction){ mConnectAction = ConnectAction.NONE; }
 			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
 		}
 	}
@@ -528,7 +535,8 @@ public class RsCtrlService implements Runnable
 	// Update:is blocking, because now I have switched to bulk read
 	private int _recvMsg()
 	{
-		try {
+		try
+		{
 			switch(inputState){
 				case BEGIN:
 					while(mInputStream.available()>0 && inbuf.position()<4)
@@ -543,9 +551,7 @@ public class RsCtrlService implements Runnable
 							inputState= InputState.HAVE_MAGIC_CODE;
 							System.out.println("received MAGIC_CODE");
 						}
-						else{
-							System.out.println("Error: no MAGIC_CODE");
-						}
+						else { System.out.println("Error: no MAGIC_CODE"); }
 					}
 					break;
 				case HAVE_MAGIC_CODE :
@@ -599,9 +605,7 @@ public class RsCtrlService implements Runnable
 				case HAVE_BODY_SIZE:
 					// not blocking and fast
 					int nobytestoread=mInputStream.available();
-					if(nobytestoread>(curBodySize-inbuf.position())){
-						nobytestoread=curBodySize-inbuf.position();
-					}
+					if(nobytestoread>(curBodySize-inbuf.position())) nobytestoread=curBodySize-inbuf.position();
 					byte[] newbytes=new byte[nobytestoread];
 					int nobytesread=mInputStream.read(newbytes,0,nobytestoread);
 					inbuf.put(newbytes, 0, nobytesread);
@@ -629,11 +633,8 @@ public class RsCtrlService implements Runnable
 						curBody=inbuf.array();
 						inbuf=ByteBuffer.allocate(4);
 						inputState= InputState.BEGIN;
-						if(curBodySize<1000){
-							System.out.println("received complete Body:\n"+util.byteArrayToHexString(curBody));
-						}else{
-							System.out.println("received complete Body: bigger than 1000Bytes");
-						}
+						if( curBodySize < 1000 ) System.out.println("received complete Body:\n"+util.byteArrayToHexString(curBody));
+						else { System.out.println("received complete Body: bigger than 1000Bytes"); }
 						return curMsgId;
 					}
 					break;
@@ -641,15 +642,55 @@ public class RsCtrlService implements Runnable
 					break;
 				
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+		catch (IOException e)
+		{
 			if(DEBUG){System.err.println(e);}
-			mLastConnectionError= ConnectionError.RECEIVE_ERROR;
-			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
-			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}
+			mLastConnectionError = ConnectionError.RECEIVE_ERROR;
+			synchronized(mConnectState) { mConnectState= ConnectState.OFFLINE; }
+			synchronized(mConnectAction){ mConnectAction= ConnectAction.NONE; }
 			_notifyListeners(new ConnectionEvent(ConnectionEventKind.ERROR_DISCONNECTED));
 		}
 		return -1;
 	}
-	
+
+	/**
+	 * Build proper message id for RsMessage
+	 * @param extId extension id for example Core.ExtensionId.CORE_VALUE
+	 * @param serviceId id of RetroShare service exposed vie RPC for example Core.PackageId.PEERS_VALUE
+	 * @param subMsg id of service subMessage like Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE
+	 * @param isResponse true if we are sending a response false otherwise
+	 * @return the message id we need
+	 */
+	public static final int constructMsgId(int extId, int serviceId, int subMsg, boolean isResponse)
+	{
+		/**
+		 * Enforce bit size.
+		 */
+		extId &= 0xFF;
+		serviceId &= 0xFFFF;
+		subMsg &= 0xFF;
+
+		int ret = 0;
+
+		/**
+		 * Generate bits ret[0-7] from extension id and isResponse
+		 */
+		ret += extId;
+		if (isResponse) ret |= 0x01; /** Set Bottom Bit. */
+		else { ret &= 0xFE; } /** Clear Bottom Bit. */
+		ret <<= 24 ;
+
+		/**
+		 * Generate bits ret[8-23] from service id
+		 */
+		ret += serviceId << 8 ;
+
+		/**
+		 * Generate bits ret[24-31] from subMsg
+		 */
+		ret += subMsg;
+
+		return ret;
+	}
 }
