@@ -81,7 +81,7 @@ public class RsSearchService implements RsServiceInterface
 				searchTermsList.put(resp.getSearchId(0), term);
 				handler.onSearchResponseReceived(resp.getSearchId(0));
 				_notifyListeners();
-			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 		}
 	}
 	
@@ -97,7 +97,6 @@ public class RsSearchService implements RsServiceInterface
 				ResponseSearchIds resp=ResponseSearchIds.parseFrom(msg.body);
 				
 			} catch (InvalidProtocolBufferException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -108,8 +107,8 @@ public class RsSearchService implements RsServiceInterface
 	public void updateSearchResults(int id)
 	{
 		RsMessage msg=new RsMessage();
-		msg.msgId=msg.msgId=(Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.SEARCH_VALUE<<8)|Search.RequestMsgIds.MsgId_RequestSearchResults_VALUE;
-		msg.body=RequestSearchResults.newBuilder()/*.addSearchIds(id)*/.build().toByteArray();
+		msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.SEARCH_VALUE, Search.RequestMsgIds.MsgId_RequestSearchResults_VALUE, false);
+		msg.body = RequestSearchResults.newBuilder()/*.addSearchIds(id)*/.build().toByteArray();
 		mRsCtrlService.sendMsg(msg,new RequestSearchResultsHandler(id));
 	}
 	
@@ -166,7 +165,7 @@ public class RsSearchService implements RsServiceInterface
 				System.out.println("RequestSearchResultsHandler: completed");
 
 				_notifyListeners();
-			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 		}
 	}
 }

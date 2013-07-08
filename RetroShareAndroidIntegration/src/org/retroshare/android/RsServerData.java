@@ -88,7 +88,7 @@ public class RsServerData implements Serializable, Cloneable
 
 
 		}
-		catch (IOException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+		catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	private void readObject(ObjectInputStream in) throws NotActiveException, IOException, ClassNotFoundException
@@ -115,25 +115,18 @@ public class RsServerData implements Serializable, Cloneable
 		if(DEBUG) System.err.println("RsServerData::readObject end: "+this);
 	}
 	
-	protected RsServerData clone(){
-		RsServerData d=new RsServerData();
-		d.name=name;
-		d.user=user;
-		d.password=password;
-		d.savePassword=savePassword;
-		d.hostname=hostname;
-		d.dhtKey=dhtKey;
-		d.port=port;
-		if(hostkey!=null){
-			try {
-				d.hostkey=PKey.createFromData(hostkey.toByteArray());
-			} catch (SSHException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else{
-			d.hostkey=null;
-		}
+	protected RsServerData clone()
+	{
+		RsServerData d = new RsServerData();
+		d.name = name;
+		d.user = user;
+		d.password = password;
+		d.savePassword = savePassword;
+		d.hostname = hostname;
+		d.dhtKey = dhtKey;
+		d.port = port;
+		if(hostkey != null) { try { d.hostkey = PKey.createFromData(hostkey.toByteArray()); } catch (SSHException e) { e.printStackTrace(); } }
+		else{ d.hostkey = null; }
 		return d;
 	}
 }

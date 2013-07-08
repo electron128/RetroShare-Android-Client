@@ -73,7 +73,7 @@ public class AddServerActivity extends ProxiedActivityBase
 
 			if(!util.hasContent(editTextPort) || !util.hasContent(editTextName) || !util.hasContent(editTextHostname) || !util.hasContent(editTextUser))
 			{
-				Toast.makeText(getApplicationContext(), "Please fill in all fields.", Toast.LENGTH_LONG).show(); // TODO HARDCODED string
+				Toast.makeText(getApplicationContext(), getText(R.string.missing_input), Toast.LENGTH_LONG).show();
 				return;
 			}
 
@@ -98,7 +98,7 @@ public class AddServerActivity extends ProxiedActivityBase
 
 			rsProxy.delServer(sd.name);
 			rsProxy.addServer(sd);
-			Toast.makeText(getApplicationContext(), "Server saved", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string
+			Toast.makeText(getApplicationContext(), getText(R.string.server_saved), Toast.LENGTH_SHORT).show();
 			startActivity(MainActivity.class);
 		}
 	}
@@ -130,7 +130,7 @@ public class AddServerActivity extends ProxiedActivityBase
 		if(isBound())
 		{
 			rsProxy.delServer(serverName);
-			Toast.makeText(getApplicationContext(), "Server deleted", Toast.LENGTH_SHORT).show(); // TODO HARDCODED string
+			Toast.makeText(getApplicationContext(), getText(R.string.server_deleted), Toast.LENGTH_SHORT).show();
 			startActivity(MainActivity.class);
 		}
 	}

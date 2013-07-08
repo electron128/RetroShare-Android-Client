@@ -27,6 +27,7 @@
 	<string name="server_key_not_available">server key not available</string>
     <string name="password">password</string>
     <string name="error">error</string>
+	<string name="unknown_error">Unknown Error</string>
     <string name="err_unknown_host">could not get ip for  this hostname</string>
     <string name="err_no_route_to_host">could not contact server. maybe you are not connected to a network.</string>
     <string name="err_connection_refused">host refused connection: ip or port wrong or server not running</string>
@@ -91,6 +92,11 @@
 
 	<!-- RetroShare Android Proxy BEGIN-->
 	<string name="add_server">Add Server</string>
+	<string name="server_saved">Server saved</string>
+	<string name="server_deleted">Server deleted</string>
+	<string name="missing_input">Please fill in all fields.</string>
+	<string name="login">Login</string>
+	<string name="connecting_to">Connecting to</string>
 	<!-- RetroShare Android Proxy END-->
     
 </resources>

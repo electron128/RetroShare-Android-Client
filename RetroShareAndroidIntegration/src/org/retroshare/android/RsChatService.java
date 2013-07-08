@@ -154,7 +154,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 					
 					_notifyListeners();
 				}
-				catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+				catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 			}
 		}
 		
@@ -186,13 +186,12 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 			    	lastPrivateChatMessage = m;
 		    	}
 		    	
-				_addChatMessageToHistory(m);
-				//_addChatMessageToHistory() will notify Listeners
+				_addChatMessageToHistory(m); // This will notify Listeners too
 				
 				System.err.println(resp.getMsg());
 				
 			}
-			catch (InvalidProtocolBufferException e) { e.printStackTrace(); } // TODO Auto-generated catch block
+			catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 		}
 	}
 	

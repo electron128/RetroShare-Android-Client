@@ -124,7 +124,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 			ObjectOutputStream o = new ObjectOutputStream(openFileOutput( DataPackBaseFileName + Long.toString(Datapack.serialVersionUID), MODE_PRIVATE));
 			o.writeObject(mDatapack);
 		}
-		catch (Exception e) { e.printStackTrace(); } // TODO Auto-generated catch block
+		catch (Exception e) { e.printStackTrace(); }
 	}
 
 	public class RsProxyBinder extends Binder { RetroShareAndroidProxy getService() { return RetroShareAndroidProxy.this; } }
@@ -261,7 +261,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 			if( bund == null)
 			{
 				Log.d(TAG, "_activateServer(String serverName) activating server");
-				RsCtrlService server = new RsCtrlService(mUiThreadHandler); // TODO This crash when called by a service...
+				RsCtrlService server = new RsCtrlService(mUiThreadHandler);
 				server.setServerData(serverData);
 				server.registerListener(this);
 				bund = new RsBund(server, new NotifyService(server.mRsChatService, this, serverName));

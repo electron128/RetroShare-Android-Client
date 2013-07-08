@@ -90,7 +90,7 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 			chatLobbyInfo = ChatLobbyInfo.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_INFO_EXTRA));
 			chatLobbyId = ChatId.parseFrom(getIntent().getByteArrayExtra(CHAT_LOBBY_ID_EXTRA));
 		}
-		catch (InvalidProtocolBufferException e) { e.printStackTrace();} // TODO Auto-generated catch block
+		catch (InvalidProtocolBufferException e) { e.printStackTrace();}
 	}
 	
 	private class KeyListener implements OnKeyListener

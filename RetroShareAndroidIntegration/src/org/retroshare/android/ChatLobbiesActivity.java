@@ -100,7 +100,7 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
 		public Object getItem(int position) { return LobbyList.get(position); }
 
 		@Override
-		public long getItemId(int position) { return 0; } // TODO Auto-generated method stub
+		public long getItemId(int position) { return 0; }
 
 		@Override
 		public int getItemViewType(int position) { return 0; }
@@ -136,7 +136,7 @@ public class ChatLobbiesActivity extends ProxiedActivityBase
 		}
 
 		@Override public int getViewTypeCount() { return 1; }
-		@Override public boolean hasStableIds() { return false; } // TODO Auto-generated method stub
+		@Override public boolean hasStableIds() { return false; }
 		@Override public boolean isEmpty() { return LobbyList.isEmpty(); }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { ObserverList.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { ObserverList.remove(observer); }

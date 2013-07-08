@@ -141,7 +141,7 @@ public class PeersActivity extends ProxiedActivityBase
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) // TODO For this method we should employ all optimization we can
+		public View getView(int position, View convertView, ViewGroup parent) // For this method we should employ all optimization we can
 		{
 	        _Person p = personList.get(position);
 	        

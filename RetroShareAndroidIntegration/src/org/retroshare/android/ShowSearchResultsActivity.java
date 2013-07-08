@@ -160,10 +160,10 @@ public class ShowSearchResultsActivity extends ProxiedActivityBase
 
 		@Override public int getCount() { return list.size(); }
 		@Override public Object getItem(int position) { return list.get(position); }
-		@Override public long getItemId(int position) { return 0; } // TODO Auto-generated method stub
+		@Override public long getItemId(int position) { return 0; }
 		@Override public int getItemViewType(int position) { return 0; }
 		@Override public int getViewTypeCount() { return 1; }
-		@Override public boolean hasStableIds() { return false; } // TODO Auto-generated method stub
+		@Override public boolean hasStableIds() { return false; }
 		@Override public boolean isEmpty() { return list.isEmpty(); }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }

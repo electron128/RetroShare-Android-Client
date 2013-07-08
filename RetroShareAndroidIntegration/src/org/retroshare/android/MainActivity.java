@@ -87,7 +87,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
 		ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, rsAvailableServers);
 		Spinner serverSpinner = (Spinner) findViewById(R.id.serverSpinner);
-		serverSpinner.setAdapter(spinnerAdapter); //TODO WTF makes you crash ??
+		serverSpinner.setAdapter(spinnerAdapter);
 
     	updateViews();
     }
@@ -149,7 +149,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
     {
-        // TODO lock for a better place for this code if there is one... ////////
+        // TODO look for a better place for this code if there is one... ////////
         if(connectButtonRecentlyPressed)
         {
             if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED)
@@ -262,7 +262,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
                 builder.setView(view)
                         .setTitle(R.string.enter_ssh_password)
                         .setPositiveButton(
-                                "login",//TODO HARDCODED string
+                                getText(R.string.login),
                                 new DialogInterface.OnClickListener()
                                 {
                                     @Override public void onClick(DialogInterface dialog, int which)
@@ -282,7 +282,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
             case DIALOG_CONNECT:
                 ProgressDialog pd = new ProgressDialog(MainActivity.this);
-                pd.setMessage("connecting to "+serverData.hostname+":"+serverData.port); // TODO HARDCODED string
+                pd.setMessage( getText(R.string.connecting_to) + serverData.hostname + ":" + serverData.port);
                 return pd;
 
             case DIALOG_CONNECT_ERROR:
@@ -318,11 +318,8 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
             v.setVisibility(View.GONE);
         }
-        else
-        {
-            EditText text = (EditText) findViewById(R.id.chatMessageEditText);
-            text.setText("Error: not bound"); // TODO HARDCODED string
-        }
+        else { Log.e(TAG(), "onConnectButtonPressed(View v) why i am not bound?"); }
+
         updateViews();
     }
 
@@ -373,7 +370,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 					textViewConnectionState.setText(getResources().getText(R.string.error)+": "+getResources().getText(R.string.err_unknown_host));
 					break;
 				case UNKNOWN:
-					textViewConnectionState.setText(getResources().getText(R.string.error)+ "Unknown Error"); //TODO HARDCODED string
+					textViewConnectionState.setText(getResources().getText(R.string.error)+ ": "+ getResources().getText(R.string.unknown_error));
 					break;
 				default:
 					textViewConnectionState.setText("default reached, this should not happen");

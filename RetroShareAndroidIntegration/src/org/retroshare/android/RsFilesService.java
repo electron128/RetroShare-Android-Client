@@ -79,11 +79,7 @@ public class RsFilesService implements RsServiceInterface
 					_notifyListeners();
 				}
 			}
-			catch (InvalidProtocolBufferException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 		}
 	}
 	
