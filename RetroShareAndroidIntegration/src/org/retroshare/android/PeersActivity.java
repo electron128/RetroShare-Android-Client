@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -113,8 +114,13 @@ public class PeersActivity extends ProxiedActivityBase
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
+        private UpdateListDataAsyncTask mUpdateListDataAsyncTask;
     	
-    	public PeersListAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
+    	public PeersListAdapterListener(Context context)
+        {
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mUpdateListDataAsyncTask = new UpdateListDataAsyncTask();
+        }
     	
     	@Override
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -175,29 +181,7 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() // called by RsChatService and RsPeersService
-		{
-			Log.d(TAG, "update()");
-
-			RsPeersService peersService = getConnectedServer().mRsPeersService;
-
-			personList.clear();
-			if(showAllPeers)
-			{
-				for( Person p : peersService.getPersons()) personList.add(new _Person(p));
-				Collections.sort(personList, new _PersonByNameComparator());
-			}
-			else
-			{
-				List<Person.Relationship> r = new ArrayList<Person.Relationship>();
-				r.add(Person.Relationship.YOURSELF);
-				r.add(Person.Relationship.FRIEND);
-				for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
-				Collections.sort(personList, new _PersonByStatusAndNameComparator() );
-			}
-
-			for(DataSetObserver obs : observerList) { obs.onChanged(); }
-		}
+		@Override public void update() { mUpdateListDataAsyncTask.execute(null, null, null); } // called by RsChatService and RsPeersService
 
 		private final class _Person
 		{
@@ -250,6 +234,34 @@ public class PeersActivity extends ProxiedActivityBase
 		}
 
 		private class _PersonByNameComparator implements Comparator<_Person> { @Override public int compare( _Person p1, _Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
+
+        private class UpdateListDataAsyncTask extends AsyncTask<Void, Void, Void>
+        {
+            @Override
+            protected Void doInBackground(Void... voids)
+            {
+                RsPeersService peersService = getConnectedServer().mRsPeersService;
+
+                personList.clear();
+                if(showAllPeers)
+                {
+                    for( Person p : peersService.getPersons()) personList.add(new _Person(p));
+                    Collections.sort(personList, new _PersonByNameComparator());
+                }
+                else
+                {
+                    List<Person.Relationship> r = new ArrayList<Person.Relationship>();
+                    r.add(Person.Relationship.YOURSELF);
+                    r.add(Person.Relationship.FRIEND);
+                    for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
+                    Collections.sort(personList, new _PersonByStatusAndNameComparator() );
+                }
+
+                return null;
+            }
+
+            @Override protected void onPostExecute(Void vs) { for(DataSetObserver obs : observerList) { obs.onChanged(); }; }
+        }
     }
 
 	private void _registerListeners()
