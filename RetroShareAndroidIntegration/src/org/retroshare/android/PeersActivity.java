@@ -6,7 +6,6 @@ import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,7 +48,7 @@ public class PeersActivity extends ProxiedActivityBase
 	public static final String SHOW_ALL_PEER_EXTRA = "showAllPeers";
 
 	private boolean showAddFriendButton = false;
-	public static final String SHOW_ADD_FRIEND_BUTTON = "shoAddFriendButton";
+	public static final String SHOW_ADD_FRIEND_BUTTON_EXTRA = "showAddFriendButton";
 
 	private Peers.RequestPeers.SetOption updateSet = Peers.RequestPeers.SetOption.FRIENDS;
 	private Peers.RequestPeers.InfoOption updateInfo = Peers.RequestPeers.InfoOption.ALLINFO;
@@ -63,7 +62,7 @@ public class PeersActivity extends ProxiedActivityBase
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
 		showAllPeers = getIntent().getBooleanExtra(SHOW_ALL_PEER_EXTRA, false);
-		showAddFriendButton = getIntent().getBooleanExtra(SHOW_ADD_FRIEND_BUTTON, false);
+		showAddFriendButton = getIntent().getBooleanExtra(SHOW_ADD_FRIEND_BUTTON_EXTRA, false);
 
 		setContentView(R.layout.activity_peers);
 
