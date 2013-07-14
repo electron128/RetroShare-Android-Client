@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
@@ -363,10 +364,23 @@ public class RsCtrlService implements Runnable
 				
 				boolean newHostKey = false;
 				if( mServerData.hostkey == null ){ newHostKey = true; }
-				
+
+				// RetroShare RPC ssh server is listening only on ipv4 at moment, so resolve hostname only in ipv4 to avoid connection error in dual stack configuration
+				Inet4Address inet4Address = null;
+				for(InetAddress addr : InetAddress.getAllByName(mServerData.hostname))
+				{
+					if ( addr instanceof Inet4Address )
+					{
+						inet4Address = (Inet4Address) addr;
+						break;
+					}
+				}
+
+				if(inet4Address == null) throw new UnknownHostException();
+
 				mSocket = new Socket();
 				//TODO Avoid hardcoding timeout, moreover same value is used multiple times in the code
-				mSocket.connect(new InetSocketAddress(Inet4Address.getByName(mServerData.hostname), mServerData.port), 2000); // RetroShare RPC ssh server is listening only on ipv4 at moment, so resolve hostname only in ipv4 to avoid connection error in dual stack configuration, remove Inet4Address for ipv6 future support
+				mSocket.connect(new InetSocketAddress(inet4Address, mServerData.port), 2000);
 				// TODO try to find when crai in jaramiko is constructed
 				// error here
 				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
