@@ -41,7 +41,7 @@ public class PeersActivity extends ProxiedActivityBase
 {
 	public String TAG() { return "PeersActivity"; }
 
-	private static final int UPDATE_INTERVAL = 1000;
+	private static final int UPDATE_INTERVAL = 2000;
 	Handler mHandler;
 
 	private boolean showAllPeers = false;
@@ -107,19 +107,16 @@ public class PeersActivity extends ProxiedActivityBase
     
     private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener, PeersServiceListener, ChatServiceListener
 	{
-		private final static String TAG = "PeersListAdapterListener";
+		public String TAG() { return "PeersListAdapterListener"; }
 
-		private List<_Person> personList = new ArrayList<_Person>();
+		private List<_Person> personList = Collections.synchronizedList(new ArrayList<_Person>()); // We know there is only one reader so we use syncronized ( Mutex like )
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
-        private UpdateListDataAsyncTask mUpdateListDataAsyncTask;
+
+		private boolean firstUpdate = true;
     	
-    	public PeersListAdapterListener(Context context)
-        {
-            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mUpdateListDataAsyncTask = new UpdateListDataAsyncTask();
-        }
+    	public PeersListAdapterListener(Context context) { mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE); }
     	
     	@Override
     	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -146,7 +143,7 @@ public class PeersActivity extends ProxiedActivityBase
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) // For this method we should employ all optimization we can
+		public View getView(int position, View convertView, ViewGroup parent) // We should reduce as much as possible the work done on this method
 		{
 	        _Person p = personList.get(position);
 	        
@@ -162,7 +159,7 @@ public class PeersActivity extends ProxiedActivityBase
 			else { nameTextView.setTextColor(Color.GRAY); }
 
 			if(p.hasNewMessage()) imageViewMessage.setVisibility(View.VISIBLE);
-			else imageViewMessage.setVisibility(View.GONE);
+			else { imageViewMessage.setVisibility(View.GONE); }
 
 			imageViewUserState.setImageBitmap(p.getImage());
 
@@ -180,8 +177,51 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() { mUpdateListDataAsyncTask.execute(null, null, null); } // called by RsChatService and RsPeersService
+		@Override public void update() // called by RsChatService and RsPeersService
+		{
+			if(firstUpdate)
+			{
+				updateData();
+				notifyObservers();
+				firstUpdate = false;
+			}
+			else { new UpdateListDataAsyncTask().execute(null, null, null); }
+		}
 
+		/**
+		 * Update data used to build the ListView
+		 */
+		public void updateData()
+		{
+			RsPeersService peersService = getConnectedServer().mRsPeersService;
+
+			synchronized (personList)
+			{
+				personList.clear();
+				if(showAllPeers)
+				{
+					for( Person p : peersService.getPersons()) personList.add(new _Person(p));
+					Collections.sort(personList, new _PersonByNameComparator());
+				}
+				else
+				{
+					List<Person.Relationship> r = new ArrayList<Person.Relationship>();
+					r.add(Person.Relationship.YOURSELF);
+					r.add(Person.Relationship.FRIEND);
+					for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
+					Collections.sort(personList, new _PersonByStatusAndNameComparator() );
+				}
+			}
+		}
+
+		/**
+		 * Notify data observer that fresh data are available
+		 */
+		public void notifyObservers() { for(DataSetObserver obs : observerList) { obs.onChanged(); }; }
+
+		/**
+		 * This class is a local representation of a Person to have all information we need available with few method call
+		 */
 		private final class _Person
 		{
 			private boolean isOnline = false;
@@ -200,7 +240,7 @@ public class PeersActivity extends ProxiedActivityBase
 					ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
 					RsChatService chatService = getConnectedServer().mRsChatService;
 					if ( chatService !=  null && chatService.getChatChanged().get(chatId) != null ) hasNewMessage = true ;
-					else { Log.wtf(TAG(), "getView(...) chatService is null"); }
+					else { Log.e(TAG(), "getView(...) chatService is null"); }
 				}
 
 				if(isOnline) image = onLineImage;
@@ -239,27 +279,11 @@ public class PeersActivity extends ProxiedActivityBase
             @Override
             protected Void doInBackground(Void... voids)
             {
-                RsPeersService peersService = getConnectedServer().mRsPeersService;
-
-                personList.clear();
-                if(showAllPeers)
-                {
-                    for( Person p : peersService.getPersons()) personList.add(new _Person(p));
-                    Collections.sort(personList, new _PersonByNameComparator());
-                }
-                else
-                {
-                    List<Person.Relationship> r = new ArrayList<Person.Relationship>();
-                    r.add(Person.Relationship.YOURSELF);
-                    r.add(Person.Relationship.FRIEND);
-                    for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
-                    Collections.sort(personList, new _PersonByStatusAndNameComparator() );
-                }
-
+				updateData();
                 return null;
             }
 
-            @Override protected void onPostExecute(Void vs) { for(DataSetObserver obs : observerList) { obs.onChanged(); }; }
+            @Override protected void onPostExecute(Void vs) { notifyObservers(); }
         }
     }
 
@@ -299,7 +323,7 @@ public class PeersActivity extends ProxiedActivityBase
 				ps.requestPersonsUpdate(updateSet, updateInfo);
 			}
 			int updateInterval = UPDATE_INTERVAL;
-			if(showAllPeers) updateInterval *= 10;
+			if(showAllPeers) updateInterval *= 5;
 			mHandler.postAtTime(new RequestPeersListUpdateRunnable(), SystemClock.uptimeMillis()+ updateInterval);
 		}
 	}
