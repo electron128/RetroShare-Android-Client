@@ -1,7 +1,5 @@
 package org.retroshare.android;
 
-import android.util.Log;
-
 import net.lag.jaramiko.AuthenticationFailedException;
 import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
@@ -14,6 +12,7 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -367,7 +366,7 @@ public class RsCtrlService implements Runnable
 				
 				mSocket = new Socket();
 				//TODO Avoid hardcoding timeout, moreover same value is used multiple times in the code
-				mSocket.connect(new InetSocketAddress(mServerData.hostname, mServerData.port), 2000);
+				mSocket.connect(new InetSocketAddress(Inet4Address.getByName(mServerData.hostname), mServerData.port), 2000); // RetroShare RPC ssh server is listening only on ipv4 at moment, so resolve hostname only in ipv4 to avoid connection error in dual stack configuration, remove Inet4Address for ipv6 future support
 				// TODO try to find when crai in jaramiko is constructed
 				// error here
 				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
