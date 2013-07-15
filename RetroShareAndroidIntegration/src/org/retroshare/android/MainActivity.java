@@ -26,6 +26,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -147,6 +148,13 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     }
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		showDialog(DIALOG_TERMINATE_APP);
+		return true;
+	}
+
+	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
     {
         // TODO look for a better place for this code if there is one... ////////
@@ -235,6 +243,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     private static final int DIALOG_PASSWORD=0;
     private static final int DIALOG_CONNECT=1;
     private static final int DIALOG_CONNECT_ERROR=2;
+	private static final int DIALOG_TERMINATE_APP=3;
     @Override
     protected Dialog onCreateDialog(int id)
     {
@@ -288,10 +297,26 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
             case DIALOG_CONNECT_ERROR:
                 AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
                 builder2.setTitle(R.string.connection_error)
-                        // TODO solve the connection error thing
                         .setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())
                         .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} });
                 return builder2.create();
+
+			case DIALOG_TERMINATE_APP:
+				AlertDialog.Builder termDialog = new AlertDialog.Builder(this);
+				termDialog.setTitle(R.string.are_you_sure)
+						.setMessage(R.string.terminate_really)
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+						{
+							@Override public void onClick(DialogInterface dialogInterface, int i)
+							{
+								_unBindRsService();
+								Intent intent = new Intent(MainActivity.this, RetroShareAndroidProxy.class);
+								stopService(intent);
+								finish();
+							}
+						})
+						.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener(){@Override public void onClick(DialogInterface dialogInterface, int i){}});
+				return termDialog.create();
         }
 
         return null;

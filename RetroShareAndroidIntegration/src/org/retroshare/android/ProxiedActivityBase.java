@@ -102,7 +102,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		super.onDestroy();
 	}
 
-	private void _bindRsService()
+	protected void _bindRsService()
 	{
 		Log.d(TAG(), "_bindRsService()");
 
@@ -113,7 +113,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		bindService(intent, this, 0);
 	}
 
-	private void _unBindRsService()
+	protected void _unBindRsService()
 	{
 		Log.d(TAG(), "_unBindRsService()");
 
