@@ -345,8 +345,7 @@ public class RsCtrlService implements Runnable
 							}
 							else { if(DEBUG){System.err.println("RsCtrlService: run(): Error: msgHandler not found");}}
 						}
-						
-						// TODO it seams to me that we write code similar to this more than 1 time, check if it is generalizable and find a solution to avoid rewriting same code
+
 						// tell every service about the message
 						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(RsServiceInterface service:Services) { service.handleMessage(msg); }}});
 					}
@@ -446,7 +445,7 @@ public class RsCtrlService implements Runnable
 		}
 		catch (AuthenticationFailedException e)
 		{
-			mLastConnectionErrorString="wrong password or username";
+			mLastConnectionErrorString = "wrong password or username"; // We don't have context here to get string from resources
 			mLastConnectionError= ConnectionError.AuthenticationFailedException;
 			synchronized(mConnectState){mConnectState= ConnectState.OFFLINE;}
 			synchronized(mConnectAction){mConnectAction= ConnectAction.NONE;}

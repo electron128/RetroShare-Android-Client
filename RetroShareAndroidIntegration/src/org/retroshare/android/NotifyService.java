@@ -20,9 +20,9 @@ import org.retroshare.android.RsChatService.ChatServiceListener;
  */
 public class NotifyService implements ChatServiceListener
 {
-    //TODO Probably this server should inherith ProxiedServiceBase too
+    //TODO Probably this service should inherits ProxiedServiceBase too
 
-	private final static String TAG="NotifyService";
+	private final static String TAG = "NotifyService";
 
     private String serverName;
 	
