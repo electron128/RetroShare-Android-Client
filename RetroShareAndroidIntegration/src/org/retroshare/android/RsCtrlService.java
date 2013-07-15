@@ -38,6 +38,8 @@ public class RsCtrlService implements Runnable
 	public static final int MAGIC_CODE = 0x137f0001;
 	public static final int RESPONSE = (0x01<<24);
 
+	private static final int CONNECTION_TIMEOUT_ms = 3000;
+
 	public static class RsMessage
 	{
 		public int msgId;
@@ -379,23 +381,22 @@ public class RsCtrlService implements Runnable
 				if(inet4Address == null) throw new UnknownHostException();
 
 				mSocket = new Socket();
-				//TODO Avoid hardcoding timeout, moreover same value is used multiple times in the code
-				mSocket.connect(new InetSocketAddress(inet4Address, mServerData.port), 2000);
+				mSocket.connect(new InetSocketAddress(inet4Address, mServerData.port), CONNECTION_TIMEOUT_ms);
 				// TODO try to find when crai in jaramiko is constructed
 				// error here
 				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport = new ClientTransport(mSocket);
 				// no more error here
 				System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
-				mTransport.start(mServerData.hostkey, 2000);
+				mTransport.start(mServerData.hostkey, CONNECTION_TIMEOUT_ms);
 				if(newHostKey)
 				{
 					mServerData.hostkey = mTransport.getRemoteServerKey();
 					_notifyListeners(new ConnectionEvent(ConnectionEventKind.SERVER_DATA_CHANGED));
 				}
-				mTransport.authPassword(mServerData.user, mServerData.password, 2000);
-				mChannel = mTransport.openSession(2000);
-				mChannel.invokeShell(2000);
+				mTransport.authPassword(mServerData.user, mServerData.password, CONNECTION_TIMEOUT_ms);
+				mChannel = mTransport.openSession(CONNECTION_TIMEOUT_ms);
+				mChannel.invokeShell(CONNECTION_TIMEOUT_ms);
 				mInputStream = mChannel.getInputStream();
 				mOutputStream = mChannel.getOutputStream();
 				
