@@ -270,7 +270,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 
 			if( ! bund.server.isOnline() ) bund.server.connect();
 		}
-		// TODO else throw new Exception(TAG + " _activateServer(" + serverName + ") Tryed to activate non existent server ");
+		else { throw new RuntimeException(TAG + " _activateServer(" + serverName + ") called with for non existent server "); }
 	}
 
 	/**
