@@ -20,7 +20,7 @@
 	<Button
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:onClick="onFromQrCodeButtonPressed"
+			android:onClick="onShowQrCodeButtonPressed"
 			android:text="@string/from_qr_code" />
 
 </LinearLayout>

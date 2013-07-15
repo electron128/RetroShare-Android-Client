@@ -21,8 +21,5 @@ public class AddFriendMethodChooserActivity extends ProxiedActivityBase
 		startActivity(PeersActivity.class, i);
 	}
 
-	public void onFromQrCodeButtonPressed(View v)
-	{
-		Toast.makeText(getApplicationContext(), R.string.not_implemented_yet, Toast.LENGTH_LONG).show();
-	}
+	public void onShowQrCodeButtonPressed(View v) { startActivity(ShowQrCodeActivity.class); }
 }

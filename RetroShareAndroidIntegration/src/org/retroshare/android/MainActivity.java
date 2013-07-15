@@ -135,7 +135,6 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		startActivity(PeersActivity.class, i);
 	};
     public void showChatLobbies(View v) { startActivity(ChatLobbiesActivity.class); }
-    public void onShowQrCode(View v) { Intent intent = new Intent(); intent.putExtra("Description", "just a test"); intent.putExtra("Data", "just a test"); startActivity(ShowQrCodeActivity.class, intent ); }
     public void showFilesActivity(View v) { startActivity(FilesActivity.class); }
     public void showSearchActivity(View v) { startActivity(ListSearchesActivity.class); }
 	private void showAddServerActivity() { startActivity(AddServerActivity.class); }
@@ -236,10 +235,10 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	}
 	@Override public void onNothingSelected(AdapterView<?> adapterView) {}
 
-    private static final int DIALOG_PASSWORD=0;
-    private static final int DIALOG_CONNECT=1;
-    private static final int DIALOG_CONNECT_ERROR=2;
-	private static final int DIALOG_TERMINATE_APP=3;
+    private static final int DIALOG_PASSWORD = 0;
+    private static final int DIALOG_CONNECT = 1;
+    private static final int DIALOG_CONNECT_ERROR = 2;
+	private static final int DIALOG_TERMINATE_APP = 3;
     @Override
     protected Dialog onCreateDialog(int id)
     {

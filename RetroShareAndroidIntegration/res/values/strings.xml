@@ -20,7 +20,7 @@
     <string name="add_friend">Add Friends</string>
 	<string name="add_as_friend">Add as Friend</string>
 	<string name="from_known_peers">From Known Peers</string>
-	<string name="from_qr_code">From QR Code</string>
+	<string name="from_qr_code">Show QR Code</string>
     <string name="hostname">hostname</string>
     <string name="port">port</string>
     <string name="user">user</string>
