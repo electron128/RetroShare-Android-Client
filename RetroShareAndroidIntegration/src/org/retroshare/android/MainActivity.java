@@ -156,24 +156,20 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
 	@Override
 	public void onConnectionStateChanged(RsCtrlService.ConnectionEvent ce)
-    {
-        // TODO look for a better place for this code if there is one... ////////
-        if(connectButtonRecentlyPressed)
-        {
-            if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED)
-            {
-                dismissDialog(DIALOG_CONNECT);
-            }
-            if(ce.kind == RsCtrlService.ConnectionEventKind.ERROR_WHILE_CONNECTING)
-            {
-                dismissDialog(DIALOG_CONNECT);
-                showDialog(DIALOG_CONNECT_ERROR);
-            }
-        }
-        ////////////////////////////////////////////////////////////////////////
+	{
+		if(connectButtonRecentlyPressed)
+		{
+			if(ce.kind == RsCtrlService.ConnectionEventKind.CONNECTED) dismissDialog(DIALOG_CONNECT);
 
-        updateViews();
-    }
+			if(ce.kind == RsCtrlService.ConnectionEventKind.ERROR_WHILE_CONNECTING)
+			{
+				dismissDialog(DIALOG_CONNECT);
+				showDialog(DIALOG_CONNECT_ERROR);
+			}
+		}
+
+		updateViews();
+	}
 	
 	private void requestSystemStatus()
 	{
