@@ -100,5 +100,11 @@
 	<string name="login">Login</string>
 	<string name="connecting_to">Connecting to</string>
 	<!-- RetroShare Android Proxy END-->
-    
+
+	<!-- RetroShare QR Code BEGIN -->
+	<string name="retroshare_uri_scheme">retroshare</string>
+	<string name="person_uri_authority">person</string>
+	<string name="hash_uri_query_param">hash</string>
+	<string name="name_uri_query_param">name</string>
+	<!-- RetroShare QR Code END -->
 </resources>

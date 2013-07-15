@@ -1,6 +1,7 @@
 package org.retroshare.android;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,7 +32,14 @@ public class ShowQrCodeActivity extends ProxiedActivityBase
         try
 		{
 			// using format like retroshare://person?name=Just%20Relay%20It&hash=AA3BFD5CEEE7EC17
-			String data = "retroshare://person?name=" + URLEncoder.encode(name, "UTF-8") + "&hash=" + me.getGpgId();
+			Uri.Builder uriBuilder = new Uri.Builder();
+			String data = uriBuilder
+					.scheme(getString(R.string.retroshare_uri_scheme))
+					.authority(getString(R.string.person_uri_authority))
+					.appendQueryParameter(getString(R.string.name_uri_query_param), name)
+					.appendQueryParameter(getString(R.string.hash_uri_query_param),me.getGpgId())
+					.build()
+					.toString();
 
 			Bitmap bm = util.encodeQrCode(data);
 

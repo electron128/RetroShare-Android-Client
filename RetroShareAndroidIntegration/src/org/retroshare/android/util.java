@@ -15,6 +15,9 @@ import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class util
 {
 	public static final String TAG() { return "util"; }

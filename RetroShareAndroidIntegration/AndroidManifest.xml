@@ -47,17 +47,15 @@
 		<activity android:name=".ChatLobbiesActivity" android:label="@string/chat_lobbies"></activity>
 		<activity android:name=".ChatLobbyActivity"></activity>
 		<activity android:name=".ChatActivity" />
-		<activity android:name=".AddFriendMethodChooserActivity">
-			<!-- TODO Move this to a new activity for adding certificates
+		<activity android:name=".AddFriendMethodChooserActivity" />
+		<activity android:name=".PeerDetailsActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
-				<data android:scheme="retroshare" android:host="certificate"/>
+				<data android:scheme="retroshare" android:host="person"/>
 			</intent-filter>
-			  -->
 		</activity>
-		<activity android:name=".PeerDetailsActivity"></activity>
 		<activity android:name=".ShowQrCodeActivity"></activity>
 		<activity android:name=".FilesActivity" android:label="@string/files"></activity>
 		<activity android:name=".AddDownloadActivity">
