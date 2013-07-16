@@ -102,15 +102,14 @@ public class RsPeersService implements RsServiceInterface
 		mRsCtrlService.sendMsg(msg);
 	}
 
-	public void requestToggleFriendShip(Person p)
+	public void requestSetFriend(Person p, boolean makeFriend)
 	{
-
 		int messageIg = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.PEERS_VALUE, Peers.RequestMsgIds.MsgId_RequestAddPeer_VALUE, false);
 
 		Peers.RequestAddPeer.Builder messageBody = Peers.RequestAddPeer.newBuilder();
 		messageBody.setPgpId(p.getGpgId());
-		if(p.getRelation().equals(Person.Relationship.FRIEND)) messageBody.setCmd(Peers.RequestAddPeer.AddCmd.REMOVE);
-		else { messageBody.setCmd(Peers.RequestAddPeer.AddCmd.ADD); }
+		if(makeFriend) messageBody.setCmd(Peers.RequestAddPeer.AddCmd.ADD);
+		else messageBody.setCmd( Peers.RequestAddPeer.AddCmd.REMOVE);
 
 		RsMessage reqMsg = new RsMessage( messageIg, messageBody.build().toByteArray() );
 
