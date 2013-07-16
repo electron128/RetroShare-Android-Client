@@ -307,7 +307,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 								_unBindRsService();
 								Intent intent = new Intent(MainActivity.this, RetroShareAndroidProxy.class);
 								stopService(intent);
-								finish();
+								MainActivity.this.finish();
 							}
 						})
 						.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener(){@Override public void onClick(DialogInterface dialogInterface, int i){}});
