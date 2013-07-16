@@ -12,8 +12,7 @@ import android.widget.Toast;
 
 public class AddServerActivity extends ProxiedActivityBase
 {
-	private static final String TAG = "AddServerActivity";
-
+	public final static String EDIT_SERVER_EXTRA = "editServer";
 	boolean editServer = false;
 	
     @Override
@@ -21,7 +20,7 @@ public class AddServerActivity extends ProxiedActivityBase
     {
         setContentView(R.layout.activity_add_server);
 
-		editServer = getIntent().getBooleanExtra(getString(R.string.editServer), false);
+		editServer = getIntent().getBooleanExtra(EDIT_SERVER_EXTRA, false);
 
 		View deleteBtn = findViewById(R.id.deleteServerButton);
 		if(editServer)

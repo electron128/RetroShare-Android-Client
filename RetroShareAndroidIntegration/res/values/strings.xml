@@ -10,7 +10,6 @@
     <string name="edit">Edit</string>
 	<string name="save">Save</string>
 	<string name="delete">Delete</string>
-	<string name="editServer">editServer</string>
     <string name="leave_lobby">leave lobby</string>
     <string name="send_chat">send chat</string>
     <string name="insert_message_here">insert message here</string>

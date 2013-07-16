@@ -347,7 +347,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     public void onEditButtonPressed(View v)
 	{
 		Intent intent = new Intent();
-		intent.putExtra(getString(R.string.editServer), true);
+		intent.putExtra(AddServerActivity.EDIT_SERVER_EXTRA, true);
 		startActivity(AddServerActivity.class, intent);
 	}
 }

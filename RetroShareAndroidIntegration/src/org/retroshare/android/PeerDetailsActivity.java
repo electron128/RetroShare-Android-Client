@@ -22,6 +22,14 @@ public class PeerDetailsActivity extends ProxiedActivityBase
     @Override
     public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
 	{
+		if (serverName == null)
+		{
+			Intent i = new Intent(this, ServerChooserActivity.class);
+			startActivityForResult(i, 0);
+		}
+
+		setContentView(R.layout.activity_peerdetails);
+
 		Intent i = getIntent();
 		if( i.hasExtra(PGP_ID_EXTRA) ) pgpId = i.getStringExtra(PGP_ID_EXTRA);
 		else
@@ -30,9 +38,10 @@ public class PeerDetailsActivity extends ProxiedActivityBase
 			pgpId = uri.getQueryParameter(getString(R.string.hash_uri_query_param));
 			name = uri.getQueryParameter(getString(R.string.name_uri_query_param));
 		}
-
-		setContentView(R.layout.activity_peerdetails);
     }
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) { if (resultCode == RESULT_OK) serverName = data.getStringExtra(SERVER_NAME_EXTRA); }
 
 	@Override
 	public void onServiceConnected()

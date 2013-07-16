@@ -56,8 +56,8 @@
 				<data android:scheme="retroshare" android:host="person"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".ShowQrCodeActivity"></activity>
-		<activity android:name=".FilesActivity" android:label="@string/files"></activity>
+		<activity android:name=".ShowQrCodeActivity" />
+		<activity android:name=".FilesActivity" android:label="@string/files" />
 		<activity android:name=".AddDownloadActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -66,9 +66,10 @@
 				<data android:scheme="retroshare" android:host="file"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".ShowSearchResultsActivity"></activity>
-		<activity android:name=".ListSearchesActivity"></activity>
-		<activity android:name=".AddServerActivity"></activity>
+		<activity android:name=".ShowSearchResultsActivity" />
+		<activity android:name=".ListSearchesActivity" />
+		<activity android:name=".AddServerActivity" />
+		<activity android:name=".ServerChooserActivity" />
 
 		<!-- Android RetroShare Proxy BEGIN -->
 		<service android:name=".RetroShareAndroidProxy" />
