@@ -1,106 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+	android:layout_height="match_parent"
     android:orientation="vertical" >
 
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/new_retroshare_nogui_server"
-        android:background="@android:color/darker_gray"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-    <EditText
-        android:id="@+id/editTextName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/arbitrary_name" >
-
-        <requestFocus />
-
-    </EditText>
-
-    <EditText
-        android:id="@+id/editTextHostname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/hostname"
-        android:inputType="text" >
-
-    </EditText>
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/new_retroshare_nogui_server"
+			android:background="@android:color/darker_gray"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
 
 
-    <EditText
-        android:id="@+id/editTextPort"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/ssh_port"
-        android:inputType="number" >
-
-    </EditText>
-
-
-    <EditText
-        android:id="@+id/editTextUser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/ssh_username"
-        android:inputType="text" />
-
-	<EditText
-			android:id="@+id/editTextSshKey"
+		<EditText
+			android:id="@+id/editTextName"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:enabled="false"
 			android:ems="10"
-			android:hint="@string/server_key_not_available"
+			android:hint="@string/arbitrary_name" >
+			<requestFocus />
+		</EditText>
+
+		<EditText
+			android:id="@+id/editTextHostname"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:hint="@string/hostname"
+			android:inputType="text" >
+
+		</EditText>
+
+
+		<EditText
+			android:id="@+id/editTextPort"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:hint="@string/ssh_port"
+			android:inputType="number" >
+
+		</EditText>
+
+
+		<EditText
+			android:id="@+id/editTextUser"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:hint="@string/ssh_username"
 			android:inputType="text" />
 
-	<CheckBox
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/reset_ssh_key"
-			android:id="@+id/resetSshServerKeyCheckBox"
-			/>
-
-	<CheckBox
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/reset_password"
-			android:id="@+id/resetPasswordCheckBox"
-			/>
-
-	<FrameLayout
-            android:layout_width="fill_parent" android:layout_height="fill_parent"
-            android:layout_weight="1">
-    </FrameLayout>
-
-    <!-- content fixated to the bottom of the screen -->
-    <LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:layout_gravity="center_horizontal"
-			android:layout_alignParentBottom="true">
-
-		<Button android:id="@+id/saveServerButton"
-				android:layout_width="wrap_content"
+		<EditText
+				android:id="@+id/editTextSshKey"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:onClick="onSaveButtonPressed"
-				android:text="@string/save"  />
+				android:enabled="false"
+				android:ems="10"
+				android:hint="@string/server_key_not_available"
+				android:inputType="text" />
 
-		<Button android:id="@+id/deleteServerButton"
-				android:layout_width="wrap_content"
+		<CheckBox
+				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:onClick="onDeleteButtonPressed"
-				android:text="@string/delete"  />
+				android:text="@string/reset_ssh_key"
+				android:id="@+id/resetSshServerKeyCheckBox"
+				/>
 
+		<CheckBox
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/reset_password"
+				android:id="@+id/resetPasswordCheckBox"
+				/>
+
+		<FrameLayout
+				android:layout_width="fill_parent" android:layout_height="fill_parent"
+				android:layout_weight="1">
+		</FrameLayout>
+
+		<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_gravity="center_horizontal"
+				android:layout_alignParentBottom="true">
+
+			<Button android:id="@+id/saveServerButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:onClick="onSaveButtonPressed"
+					android:text="@string/save"  />
+
+			<Button android:id="@+id/deleteServerButton"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:onClick="onDeleteButtonPressed"
+					android:text="@string/delete"  />
+
+		</LinearLayout>
 	</LinearLayout>
-</LinearLayout>
+</ScrollView>
