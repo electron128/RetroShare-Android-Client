@@ -1,52 +1,58 @@
 package org.retroshare.android;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.net.URLEncoder;
 
-import rsctrl.core.Core.Person;
-
-
-public class ShowQrCodeActivity extends ProxiedActivityBase
+public class ShowQrCodeActivity extends Activity
 {
-	private static final String TAG = "ShowQrCodeActivity";
+	public String TAG() { return "ShowQrCodeActivity"; }
+
+	public static final String PGP_ID_EXTRA = "pgpId";
+	public static final String NAME_EXTRA = "name";
 
     @Override
-    public void onCreateBeforeConnectionInit(Bundle savedInstanceState) { setContentView(R.layout.activity_show_qrcode); }
-
-    @Override
-    protected void onServiceConnected()
+    public void onCreate(Bundle savedInstanceState)
 	{
-		RsPeersService ps = getConnectedServer().mRsPeersService;
+		super.onCreate(savedInstanceState);
 
-		Person me = ps.getOwnPerson();
-		String name = me.getName();
-
-		TextView tv = (TextView) findViewById(R.id.textViewTitleQrCode);
-		tv.setText(name);
-
-        try
+		Intent i = getIntent();
+		if(i.hasExtra(PGP_ID_EXTRA) && i.hasExtra(NAME_EXTRA))
 		{
-			// using format like retroshare://person?name=Just%20Relay%20It&hash=AA3BFD5CEEE7EC17
-			Uri.Builder uriBuilder = new Uri.Builder();
-			String data = uriBuilder
-					.scheme(getString(R.string.retroshare_uri_scheme))
-					.authority(getString(R.string.person_uri_authority))
-					.appendQueryParameter(getString(R.string.name_uri_query_param), name)
-					.appendQueryParameter(getString(R.string.hash_uri_query_param),me.getGpgId())
-					.build()
-					.toString();
+			setContentView(R.layout.activity_show_qrcode);
 
-			Bitmap bm = util.encodeQrCode(data);
+			String name = i.getStringExtra(NAME_EXTRA);
+			String pgpId = i.getStringExtra(PGP_ID_EXTRA);
 
-			ImageView mImageView = (ImageView) findViewById(R.id.imageViewQrCode);
-			mImageView.setImageBitmap(bm);
-        }
-		catch (Exception e) {}
+			((TextView) findViewById(R.id.textViewTitleQrCode)).setText(name + " (" + pgpId + ")");
+
+			try
+			{
+				// using format like retroshare://person?name=Just%20Relay%20It&hash=AA3BFD5CEEE7EC17
+				Uri.Builder uriBuilder = new Uri.Builder();
+				String data = uriBuilder
+						.scheme(getString(R.string.retroshare_uri_scheme))
+						.authority(getString(R.string.person_uri_authority))
+						.appendQueryParameter(getString(R.string.name_uri_query_param), name)
+						.appendQueryParameter(getString(R.string.hash_uri_query_param), pgpId)
+						.build()
+						.toString();
+
+				Bitmap bm = util.encodeQrCode(data);
+
+				ImageView mImageView = (ImageView) findViewById(R.id.imageViewQrCode);
+				mImageView.setImageBitmap(bm);
+			}
+			catch (Exception e) {}
+
+		}
+		else Log.wtf(TAG(), "onCreate() how we get here without data required data in the intent?");
 	}
 }
 

@@ -108,4 +108,18 @@ public class PeerDetailsActivity extends ProxiedActivityBase implements RsPeersS
 	{
 		updateViews();
 	}
+
+	public void onShowPeerQrCodeButtonPressed(View v)
+	{
+		RsPeersService prs = getConnectedServer().mRsPeersService;
+
+		Person p;
+		if(fromExtIntent) p = Person.newBuilder().setGpgId(pgpId).setName(name).setRelation(Person.Relationship.UNKNOWN).build();
+		else p = prs.getPersonByPgpId(pgpId);
+
+		Intent i = new Intent();
+		i.putExtra(ShowQrCodeActivity.PGP_ID_EXTRA, p.getGpgId());
+		i.putExtra(ShowQrCodeActivity.NAME_EXTRA, p.getName());
+		startActivity(ShowQrCodeActivity.class, i);
+	}
 }

@@ -39,11 +39,16 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/buttonToggleFriendship"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-		android:onClick="onToggleFriendshipButtonPressed"
-        android:text="@string/block_friend" />
+    <Button android:id="@+id/buttonToggleFriendship"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:onClick="onToggleFriendshipButtonPressed"
+			android:text="@string/block_friend" />
+
+	<Button android:id="@+id/buttonShowPeerQrCode"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:onClick="onShowPeerQrCodeButtonPressed"
+			android:text="@string/from_qr_code" />
 
 </LinearLayout>
