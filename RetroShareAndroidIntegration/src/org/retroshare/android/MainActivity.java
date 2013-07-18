@@ -197,26 +197,33 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 	
 	private class SystemStatusHandler extends RsMessageHandler
 	{
+		public String TAG() { return "SystemStatusHandler"; }
+
+		private String serverName;
+
+		public SystemStatusHandler() { this.serverName = MainActivity.this.serverName; }
+
 		@Override
 		protected void rsHandleMsg(RsMessage msg)
 		{
-			// TODO make this multi server aware, at moment handle all message the same...
-
-			ResponseSystemStatus resp;
-			try
+			if(MainActivity.this.serverName.equals(this.serverName))
 			{
-				resp = ResponseSystemStatus.parseFrom(msg.body);
+				try
+				{
+					ResponseSystemStatus resp = ResponseSystemStatus.parseFrom(msg.body);
 
-				TextView textViewNetStatus = (TextView) findViewById(R.id.textViewNetStatus);
-				TextView textViewBandwidth = (TextView) findViewById(R.id.textViewBandwidth);
-				TextView peersTextView     = (TextView) findViewById(R.id.peersTextView);
+					TextView textViewNetStatus = (TextView) findViewById(R.id.textViewNetStatus);
+					TextView textViewBandwidth = (TextView) findViewById(R.id.textViewBandwidth);
+					TextView peersTextView     = (TextView) findViewById(R.id.peersTextView);
 
-
-		    	textViewNetStatus.setText( getResources().getText(R.string.network_status) + ": " + resp.getNetStatus().toString() );
-				peersTextView.setText( getResources().getText(R.string.peers) + " (" + Integer.toString(resp.getNoConnected())+ "/" +Integer.toString(resp.getNoPeers()) + ")" );
-		    	DecimalFormat df = new DecimalFormat("#.##");
-		    	textViewBandwidth.setText(getResources().getText( R.string.bandwidth_up_down) + ": " + df.format(resp.getBwTotal().getUp()) + "/" + df.format(resp.getBwTotal().getDown()) + " (kB/s)");
-			} catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
+					textViewNetStatus.setText( getResources().getText(R.string.network_status) + ": " + resp.getNetStatus().toString() );
+					peersTextView.setText( getResources().getText(R.string.peers) + " (" + Integer.toString(resp.getNoConnected())+ "/" +Integer.toString(resp.getNoPeers()) + ")" );
+					DecimalFormat df = new DecimalFormat("#.##");
+					textViewBandwidth.setText(getResources().getText( R.string.bandwidth_up_down) + ": " + df.format(resp.getBwTotal().getUp()) + "/" + df.format(resp.getBwTotal().getDown()) + " (kB/s)");
+				}
+				catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
+			}
+			else Log.d(TAG(), "rsHandleMsg: ignoring system status message update, user is looking at another server");
 		}
 	}
 
