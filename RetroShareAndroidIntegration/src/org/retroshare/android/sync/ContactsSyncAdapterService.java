@@ -31,6 +31,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
@@ -76,10 +78,15 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 
 	private void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) throws OperationCanceledException
 	{
-		Log.d(TAG(), "performSync( .., " + account.toString() + ", .. )");
+		Log.d(TAG(), "performSync( .., " + account.name + ", .. )");
 
 		if(mBound)
 		{
+			/**
+			 * Return doing nothing if the server is not usable without user interaction
+			 */
+			if ( ! rsProxy.getActivableWithoutUiServers().contains(account.name) ) return;
+
 			/**
 			 * Get retroshare server
 			 * and ask refresh data inside RsPeersService probably this is not useful for this sync but for the next one ( maybe it would be nice to do this automatically on retroshare server connection so we already have some data for the first sync)
@@ -91,7 +98,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			ContentResolver contentResolver = context.getContentResolver();
 
 			/**
-			 *  Create and populate a map PGP ID -> sync antryID
+			 *  Create and populate a map PGP ID -> sync entryID
 			 *  to keep track of contacts that are already present on android contacts list
  			 */
 			HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
@@ -110,50 +117,55 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 			Collection<Person.Relationship> r = new ArrayList<Person.Relationship>();
 			r.add(Person.Relationship.FRIEND);
 			r.add(Person.Relationship.YOURSELF);
-			Collection<Person> peers = peersService.getPersonsByRelationship(r);
+			Collection<Person> peers = new HashSet<Person>(peersService.getPersonsByRelationship(r));
 
-			ContentProviderOperation.Builder builder;
-			String name;
-			String pgpId;
-			boolean isOnline;
-			ArrayList<ContentProviderOperation> operationList;
+			/**
+			 * Contact operation list
+			 */
+			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+			int actualContactBackReferenceNumber = 0;
+
+			/**
+			 * Add insert of new RetroShare friends to android contacts to operation list
+			 */
 			for (Person peer : peers)
 			{
-				name = peer.getName();
-				pgpId = peer.getGpgId();
-				isOnline = false;
-                for(Location l : peer.getLocationsList()) isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
-
-                operationList = new ArrayList<ContentProviderOperation>();
+				String pgpId = peer.getGpgId();
 
 				/**
-				 * Create contact if doesn't exists else just update it
+				 * Create contact if doesn't exists already
 				 */
 				if ( ! localContacts.containsKey(pgpId) )
 				{
+					ContentProviderOperation.Builder builder;
+					String name = peer.getName();
+					boolean isOnline = false;
+					for(Location l : peer.getLocationsList()) isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
+
 					/**
-					 * Create a row for the contact ( ContactsContract.RawContacts )
+					 * Append an operation for the contact ( ContactsContract.RawContacts )
 					 */
 					builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
 					builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 					builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
 					builder.withValue(PGP_ID_COLUMN, pgpId);
 					operationList.add(builder.build());
+					actualContactBackReferenceNumber = operationList.size() - 1;
 
 					/**
-					 * Create a row for the name associated with the contact ( ContactsContract.Data )
+					 * Append an operation for the name associated with the contact ( ContactsContract.Data )
 					 */
 					builder = ContentProviderOperation.newInsert(Data.CONTENT_URI);
-					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, actualContactBackReferenceNumber);
 					builder.withValue(Data.MIMETYPE, CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
 					builder.withValue(CommonDataKinds.StructuredName.DISPLAY_NAME, name);
 					operationList.add(builder.build());
 
 					/**
-					 * Create a row for the PGP ID associated with the contact as a instant messaging contact ( ContactsContract.CommonDataKinds.Im )
+					 * Append an operation for the PGP ID associated with the contact as a instant messaging contact ( ContactsContract.CommonDataKinds.Im )
 					 */
 					builder = ContentProviderOperation.newInsert(Data.CONTENT_URI);
-					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, actualContactBackReferenceNumber);
 					builder.withValue(Data.MIMETYPE, CommonDataKinds.Im.CONTENT_ITEM_TYPE);
 					builder.withValue(CommonDataKinds.Im.TYPE, CommonDataKinds.Im.TYPE_CUSTOM);
 					builder.withValue(CommonDataKinds.Im.LABEL, getString(R.string.app_name));
@@ -163,7 +175,7 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 					operationList.add(builder.build());
 
 					/**
-					 * Create a row for the avatar image ( CommonDataKinds.Photo.PHOTO )
+					 * Append an operation for the avatar image ( CommonDataKinds.Photo.PHOTO )
 					 */
 					ByteArrayOutputStream stream = new ByteArrayOutputStream();
 					Bitmap icon;
@@ -172,24 +184,57 @@ public class ContactsSyncAdapterService extends ProxiedServiceBase
 					icon.compress(CompressFormat.PNG, 0, stream);
 
 					builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+					builder.withValueBackReference(CommonDataKinds.StructuredName.RAW_CONTACT_ID, actualContactBackReferenceNumber);
 					builder.withValue(Data.MIMETYPE, CommonDataKinds.Photo.MIMETYPE);
 					builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, stream.toByteArray());
 					operationList.add(builder.build());
-
-					/**
-					 * TODO Create a row for status message
-					 */
-				}
-				else {} //TODO update contacts
-
-				try { if ( operationList.size() > 0 ) contentResolver.applyBatch(ContactsContract.AUTHORITY, operationList); }
-				catch (Exception e)
-				{
-					Log.e(TAG(), "Something went wrong putting data into the database! " + e);
-					e.printStackTrace();
 				}
             }
+
+
+			/**
+			 * Delete contacts that are no more friends on RetroShare
+			 * TODO: contact deletion is not working ( already tried everything i found online... )
+			 */
+			if(peers.size() > 1) // Check if we have a populated list or an incomplete one before deleting contact
+			{
+				for( String pgpId : localContacts.keySet() )
+				{
+					/**
+					 * Delete contact only if is not in friends set
+					 */
+					if( ! peers.contains(peersService.getPersonByPgpId(pgpId)) )
+					{
+						/**
+						 * add delete the contact to operation list, android/sqlite will delete all related data too
+						 * must specify on the URI that we are sync provider otherwise the contact will be flagged as deleted and not really deleted
+						 */
+
+						// Batched version ( better performance )
+						ContentProviderOperation.Builder builder;
+						builder = ContentProviderOperation.newDelete(RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build());
+						builder.withSelection(RawContacts._ID + "=?", new String[]{String.valueOf(localContacts.get(pgpId))});
+						operationList.add(builder.build());
+
+						// Not batched version ( just for testing )
+//						contentResolver.delete(
+//								RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build(),
+//								RawContacts._ID + "=?",
+//								new String[]{String.valueOf(localContacts.get(pgpId))});
+					}
+				}
+			}
+
+			if ( operationList.size() > 0 )
+			{
+				try { contentResolver.applyBatch(ContactsContract.AUTHORITY, operationList); }
+				catch (Exception e)
+				{
+					Log.e(TAG(), "Something went wrong editing friends into the database! " + e);
+					e.printStackTrace();
+				}
+			}
+
 		}
 	}
 }

@@ -26,9 +26,7 @@ public class ServerChooserActivity extends ProxiedActivityBase implements Adapte
 	@Override
 	protected void onServiceConnected()
 	{
-		Set<String> rsAvailableServers = new HashSet<String>();
-		for ( RsCtrlService rscs : rsProxy.getActiveServers().values() ) if (rscs.isOnline()) rsAvailableServers.add(rscs.getServerData().name);
-		for ( RsServerData rsd : rsProxy.getSavedServers().values() ) if (rsd.password != null) rsAvailableServers.add(rsd.name);
+		Set<String> rsAvailableServers = rsProxy.getActivableWithoutUiServers();
 
 		if (rsAvailableServers.size() < 1) startActivity(MainActivity.class);
 		else

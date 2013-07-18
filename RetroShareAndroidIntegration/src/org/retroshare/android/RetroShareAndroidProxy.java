@@ -40,7 +40,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -230,6 +232,18 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		for(RsBund bund : serverBunds.values()) servers.put(bund.server.getServerData().name, bund.server);
 		return servers;
 	};
+
+	/**
+	 * This methods return the list of server name, usable without user interaction
+	 */
+	public Set<String> getActivableWithoutUiServers()
+	{
+		Set<String> rsAvailableServers = new HashSet<String>();
+		for ( RsCtrlService rscs : getActiveServers().values() ) if (rscs.isOnline()) rsAvailableServers.add(rscs.getServerData().name);
+		for ( RsServerData rsd : getSavedServers().values() ) if (rsd.password != null) rsAvailableServers.add(rsd.name);
+
+		return  rsAvailableServers;
+	}
 
 	/**
 	 * Return the requested server and start it if not running but exists in DataPack
