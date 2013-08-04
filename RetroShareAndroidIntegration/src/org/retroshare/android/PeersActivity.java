@@ -194,24 +194,23 @@ public class PeersActivity extends ProxiedActivityBase
 		public void updateData()
 		{
 			RsPeersService peersService = getConnectedServer().mRsPeersService;
+			List<_Person> pL = Collections.synchronizedList(new ArrayList<_Person>());
 
-			synchronized (personList)
+			if(showAllPeers)
 			{
-				personList.clear();
-				if(showAllPeers)
-				{
-					for( Person p : peersService.getPersons()) personList.add(new _Person(p));
-					Collections.sort(personList, new _PersonByNameComparator());
-				}
-				else
-				{
-					List<Person.Relationship> r = new ArrayList<Person.Relationship>();
-					r.add(Person.Relationship.YOURSELF);
-					r.add(Person.Relationship.FRIEND);
-					for ( Person p : peersService.getPersonsByRelationship(r) )personList.add(new _Person(p));
-					Collections.sort(personList, new _PersonByStatusAndNameComparator() );
-				}
+				for( Person p : peersService.getPersons()) pL.add(new _Person(p));
+				Collections.sort(pL, new _PersonByNameComparator());
 			}
+			else
+			{
+				List<Person.Relationship> r = new ArrayList<Person.Relationship>();
+				r.add(Person.Relationship.YOURSELF);
+				r.add(Person.Relationship.FRIEND);
+				for ( Person p : peersService.getPersonsByRelationship(r) ) pL.add(new _Person(p));
+				Collections.sort(pL, new _PersonByStatusAndNameComparator() );
+			}
+
+			synchronized (personList) { personList = pL; }
 		}
 
 		/**
