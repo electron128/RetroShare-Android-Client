@@ -109,7 +109,7 @@ public class PeersActivity extends ProxiedActivityBase
 	{
 		public String TAG() { return "PeersListAdapterListener"; }
 
-		private List<_Person> personList = Collections.synchronizedList(new ArrayList<_Person>()); // We know there is only one reader so we use syncronized ( Mutex like )
+		private List<_Person> personList = new ArrayList<_Person>();
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
     	private LayoutInflater mInflater;
@@ -181,7 +181,7 @@ public class PeersActivity extends ProxiedActivityBase
 		{
 			if(firstUpdate)
 			{
-				updateData();
+				personList = getUpdatedData();
 				notifyObservers();
 				firstUpdate = false;
 			}
@@ -191,10 +191,10 @@ public class PeersActivity extends ProxiedActivityBase
 		/**
 		 * Update data used to build the ListView
 		 */
-		public void updateData()
+		public List<_Person> getUpdatedData()
 		{
 			RsPeersService peersService = getConnectedServer().mRsPeersService;
-			List<_Person> pL = Collections.synchronizedList(new ArrayList<_Person>());
+			List<_Person> pL = new ArrayList<_Person>();
 
 			if(showAllPeers)
 			{
@@ -210,7 +210,7 @@ public class PeersActivity extends ProxiedActivityBase
 				Collections.sort(pL, new _PersonByStatusAndNameComparator() );
 			}
 
-			synchronized (personList) { personList = pL; }
+			return pL;
 		}
 
 		/**
@@ -273,16 +273,16 @@ public class PeersActivity extends ProxiedActivityBase
 
 		private class _PersonByNameComparator implements Comparator<_Person> { @Override public int compare( _Person p1, _Person p2){ return p1.getName().toLowerCase().compareTo(p2.getName().toLowerCase()); } }
 
-        private class UpdateListDataAsyncTask extends AsyncTask<Void, Void, Void>
+        private class UpdateListDataAsyncTask extends AsyncTask<Void, Void, List<_Person>>
         {
             @Override
-            protected Void doInBackground(Void... voids)
-            {
-				updateData();
-                return null;
-            }
+            protected List<_Person> doInBackground(Void... voids) { return getUpdatedData(); }
 
-            @Override protected void onPostExecute(Void vs) { notifyObservers(); }
+            @Override protected void onPostExecute(List<_Person> pl)
+			{
+				personList = pl;
+				notifyObservers();
+			}
         }
     }
 
