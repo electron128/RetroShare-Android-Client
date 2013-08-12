@@ -41,4 +41,3 @@ Now you should be ready to contribute to the project editing the source and tunn
 
 [RetroShare](http://retroshare.sourceforge.net) is a secure friend-2-friend social network.
 
-https://github.com/drbob/pyrs
