@@ -22,17 +22,15 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 {
 	public String TAG() { return "ProxiedFragmentBase"; }
 
+	private ProxiedInterface pxIf;
+
 	@Override
 	public void onAttach(Activity a)
 	{
 		super.onAttach(a);
 
-		try { ProxiedInterface pf = ((ProxiedInterface) getActivity()); }
-		catch (ClassCastException e)
-		{
-			ClassCastException e1 = new ClassCastException("Trying to use " + TAG() + " inside a non ProxiedFragmentActivityBase" );
-			throw e1;
-		}
+		try { pxIf = ((ProxiedInterface) getActivity()); }
+		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ProxiedInterface"); }
 	}
 
 	/**
@@ -41,7 +39,7 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	protected void onServiceConnected()
 	{}
 
-	@Override public boolean isBound() { return ((ProxiedInterface) getActivity()).isBound(); }
-	@Override public RetroShareAndroidProxy getRsProxy() { return ((ProxiedInterface) getActivity()).getRsProxy();}
-	@Override public RsCtrlService getConnectedServer() { return ((ProxiedInterface) getActivity()).getConnectedServer(); }
+	@Override public boolean isBound() { return pxIf.isBound(); }
+	@Override public RetroShareAndroidProxy getRsProxy() { return pxIf.getRsProxy();}
+	@Override public RsCtrlService getConnectedServer() { return pxIf.getConnectedServer(); }
 }
