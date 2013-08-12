@@ -2,7 +2,6 @@ package org.retroshare.android;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.view.View;
