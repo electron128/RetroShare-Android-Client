@@ -1,7 +1,6 @@
 package org.retroshare.android;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,6 +36,13 @@ public class TestActivity extends Activity
 
 		i.setData(uri);
 
+		startActivity(i);
+	}
+
+	public void onButtonTestFragmentChatActivityPressed(View v)
+	{
+		Intent i = new Intent(this, ConversationFragmentActivity.class);
+		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
 		startActivity(i);
 	}
 }

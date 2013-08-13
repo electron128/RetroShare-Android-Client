@@ -18,13 +18,13 @@ import java.util.List;
 
 /**
  * @author G10h4ck
- * This class is aimed to be inherited by Activityes that needs to communicate with RsService
+ * This class is aimed to be inherited by FragmentActivityes that needs to communicate with RsService
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
 public abstract class ProxiedFragmentActivityBase extends FragmentActivity implements ServiceConnection, ProxiedInterface
 {
-    public String TAG() { return "ProxiedActivityBase"; }
+    public String TAG() { return "ProxiedFragmentActivityBase"; }
 
     private RetroShareAndroidProxy rsProxy;
 	@Override public RetroShareAndroidProxy getRsProxy() { return rsProxy; }
