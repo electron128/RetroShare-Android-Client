@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,12 +33,14 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	private ChatFragmentContainer cfc;
 
 	private ChatMsgAdapter adapter = new ChatMsgAdapter();
+	private ListView chatMessageList;
 	private LayoutInflater mInflater;
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View fv = inflater.inflate(R.layout.chat_fragment, container);
-		((ListView)fv.findViewById(R.id.chatMessageList)).setAdapter(adapter);
+		chatMessageList = (ListView)fv.findViewById(R.id.chatMessageList);
+		chatMessageList.setAdapter(adapter);
 		fv.findViewById(R.id.chatFragmentMessageEditText).setOnKeyListener(this);
 		return fv;
 	}
@@ -51,11 +56,21 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	@Override public void onResume()
 	{
 		super.onResume();
-		if(isBound()) getConnectedServer().mRsChatService.registerListener(adapter);
+		if(isBound())
+		{
+			RsChatService rsc = getConnectedServer().mRsChatService;
+			rsc.disableNotificationForChat(cfc.getChatId());
+			rsc.registerListener(adapter);
+		}
 	}
 	@Override public void onPause()
 	{
-		if(isBound()) getConnectedServer().mRsChatService.unregisterListener(adapter);
+		if(isBound())
+		{
+			RsChatService rsc = getConnectedServer().mRsChatService;
+			rsc.unregisterListener(adapter);
+			rsc.enableNotificationForChat(cfc.getChatId());
+		}
 		super.onPause();
 	}
 	@Override public void onServiceConnected() { if(isVisible()) getConnectedServer().mRsChatService.registerListener(adapter); }
@@ -74,8 +89,9 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			_ChatMessage msg = messageList.get(position);
 			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageTextView);
 			msgBodyView.setText(msg.getBody());
+			Linkify.addLinks(msgBodyView, Linkify.ALL);
 			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green);
-			//else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
+			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
 
 			return view;
 		}
@@ -85,17 +101,20 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			@Override
 			protected List<_ChatMessage> doInBackground(Void... voids)
 			{
-				ArrayList fmsg = new ArrayList<_ChatMessage>();
-				for ( Chat.ChatMessage msg : getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId()) )
-					fmsg.add(new _ChatMessage(msg));
+				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
+
+				List<Chat.ChatMessage> msgs = getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId());
+				for ( int i = messageList.size(); i < msgs.size(); ++i )
+					fmsg.add(new _ChatMessage(msgs.get(i)));
 
 				return fmsg;
 			}
 
 			@Override protected void onPostExecute(List<_ChatMessage> ml)
 			{
-				messageList = ml;
+				messageList.addAll(ml);
 				notifyObservers();
+				if(recentlySentMessage) chatMessageList.smoothScrollToPosition(messageList.size()-1);
 			}
 		}
 
@@ -121,6 +140,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	private class _ChatMessage
 	{
 		private Chat.ChatMessage msg;
+		private Spanned msgBody;
 		private boolean isMine;
 		private int time;
 
@@ -132,6 +152,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		{
 			this.msg = msg;
 
+			msgBody = Html.fromHtml(msg.getMsg());
+
 			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(msg.getPeerNickname());
 
 			time = msg.getSendTime();
@@ -142,7 +164,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		 * Those methods are called in the UI thread so should be faster as possible
 		 */
 		public String getNick() { return msg.getPeerNickname(); }
-		public String getBody() { return msg.getMsg(); }
+		public Spanned getBody() { return msgBody; }
 		public boolean isMine() { return isMine; }
 		public int getTime() { return time; }
 	}
@@ -160,6 +182,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		return false;
 	}
 
+	private boolean recentlySentMessage = false;
 	public void sendChatMsg(View v)
 	{
 		Log.d(TAG(), "sendChatMsg(View v)");
@@ -184,6 +207,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			chatService.sendChatMessage(msgBuilder.build());
 
 			et.setText("");
+
+			recentlySentMessage = true;
 		}
 		else { Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy"); }
 	}
