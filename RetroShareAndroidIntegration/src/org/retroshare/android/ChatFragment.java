@@ -4,9 +4,13 @@ package org.retroshare.android;
 import android.app.Activity;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +26,30 @@ public class ChatFragment extends ProxiedFragmentBase
 	interface ChatFragmentContainer { Chat.ChatId getChatId(); }
 	private ChatFragmentContainer cfc;
 
-	@Override
-	public void onAttach(Activity a)
+	private ChatMsgAdapter adapter = new ChatMsgAdapter();
+
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		View fv = inflater.inflate(R.layout.chat_fragment, container);
+		((ListView)fv.findViewById(R.id.chatMessageList)).setAdapter(adapter);
+		return fv;
+	}
+	@Override public void onAttach(Activity a)
 	{
 		super.onAttach(a);
 
 		try { cfc = (ChatFragmentContainer) a; }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ChatFragmentContainer"); }
+	}
+	@Override public void onResume()
+	{
+		super.onResume();
+		getConnectedServer().mRsChatService.registerListener(adapter);
+	}
+	@Override public void onPause()
+	{
+		getConnectedServer().mRsChatService.unregisterListener(adapter);
+		super.onPause();
 	}
 
 	private class ChatMsgAdapter implements ListAdapter, RsChatService.ChatServiceListener
@@ -36,10 +57,21 @@ public class ChatFragment extends ProxiedFragmentBase
 		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
+		private LayoutInflater mInflater = getActivity().getLayoutInflater();
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			return null;
+			View view = convertView;
+			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
+
+			_ChatMessage msg = messageList.get(position);
+			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageTextView);
+			msgBodyView.setText(msg.getBody());
+			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green);
+			//else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
+
+			return view;
 		}
 
 		private class UpdateMessagesAsyncTask extends AsyncTask<Void, Void, List<_ChatMessage>>
@@ -83,16 +115,29 @@ public class ChatFragment extends ProxiedFragmentBase
 	private class _ChatMessage
 	{
 		private Chat.ChatMessage msg;
+		private boolean isMine;
+		private int time;
 
-		public _ChatMessage(Chat.ChatMessage msg) { this.msg = msg; }
+		/**
+		 * This is executed in the AsyncTask thread so we can do work here
+		 * @param msg
+		 */
+		public _ChatMessage(Chat.ChatMessage msg)
+		{
+			this.msg = msg;
 
+			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(msg.getPeerNickname());
+
+			time = msg.getSendTime();
+			if ( time == 0) time = msg.getRecvTime();
+		}
+
+		/**
+		 * Those methods are called in the UI thread so should be faster as possible
+		 */
 		public String getNick() { return msg.getPeerNickname(); }
 		public String getBody() { return msg.getMsg(); }
-		public boolean isMine() { return getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(msg.getPeerNickname()); }
-		public int getTime()
-		{
-			if (msg.getSendTime() == 0) return msg.getRecvTime();
-			return msg.getSendTime();
-		}
+		public boolean isMine() { return isMine; }
+		public int getTime() { return time; }
 	}
 }
