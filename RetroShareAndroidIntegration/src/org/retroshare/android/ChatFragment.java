@@ -27,6 +27,7 @@ public class ChatFragment extends ProxiedFragmentBase
 	private ChatFragmentContainer cfc;
 
 	private ChatMsgAdapter adapter = new ChatMsgAdapter();
+	private LayoutInflater mInflater;
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -40,15 +41,17 @@ public class ChatFragment extends ProxiedFragmentBase
 
 		try { cfc = (ChatFragmentContainer) a; }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ChatFragmentContainer"); }
+
+		mInflater = a.getLayoutInflater();
 	}
 	@Override public void onResume()
 	{
 		super.onResume();
-		getConnectedServer().mRsChatService.registerListener(adapter);
+		if(isBound()) getConnectedServer().mRsChatService.registerListener(adapter);
 	}
 	@Override public void onPause()
 	{
-		getConnectedServer().mRsChatService.unregisterListener(adapter);
+		if(isBound()) getConnectedServer().mRsChatService.unregisterListener(adapter);
 		super.onPause();
 	}
 
@@ -56,8 +59,6 @@ public class ChatFragment extends ProxiedFragmentBase
 	{
 		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
-
-		private LayoutInflater mInflater = getActivity().getLayoutInflater();
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
@@ -140,4 +141,6 @@ public class ChatFragment extends ProxiedFragmentBase
 		public boolean isMine() { return isMine; }
 		public int getTime() { return time; }
 	}
+
+	public ChatFragment() { super(); }
 }

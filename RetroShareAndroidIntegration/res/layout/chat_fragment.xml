@@ -5,12 +5,6 @@
 				android:layout_height="match_parent"
 				android:orientation="vertical">
 
-	<ListView android:id="@+id/chatMessageList"
-			  android:layout_width="match_parent"
-			  android:layout_height="wrap_content"
-			  android:layout_above="@id/inputLayout"
-			  android:layout_alignParentTop="true" />
-
 	<RelativeLayout
 			android:id="@+id/inputLayout"
 			android:layout_width="fill_parent"
@@ -28,5 +22,11 @@
 				android:ems="10"
 				android:inputType="text" />
 	</RelativeLayout>
+
+	<ListView android:id="@+id/chatMessageList"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:layout_above="@id/inputLayout"
+			  android:layout_alignParentTop="true" />
 
 </RelativeLayout>

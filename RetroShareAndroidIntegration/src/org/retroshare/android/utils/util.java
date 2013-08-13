@@ -1,4 +1,4 @@
-package org.retroshare.android;
+package org.retroshare.android.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

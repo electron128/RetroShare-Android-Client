@@ -1,10 +1,8 @@
 package org.retroshare.android;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +27,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
+import org.retroshare.android.utils.util;
 
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener

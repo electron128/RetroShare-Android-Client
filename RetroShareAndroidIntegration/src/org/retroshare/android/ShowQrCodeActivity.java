@@ -9,6 +9,8 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.retroshare.android.utils.util;
+
 
 public class ShowQrCodeActivity extends Activity
 {

@@ -5,6 +5,8 @@ import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
 import net.lag.jaramiko.ClientTransport;
 
+import org.retroshare.android.utils.util;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -646,7 +648,7 @@ public class RsCtrlService implements Runnable
 						curBody=inbuf.array();
 						inbuf=ByteBuffer.allocate(4);
 						inputState= InputState.BEGIN;
-						if( curBodySize < 1000 ) System.out.println("received complete Body:\n"+util.byteArrayToHexString(curBody));
+						if( curBodySize < 1000 ) System.out.println("received complete Body:\n"+ util.byteArrayToHexString(curBody));
 						else { System.out.println("received complete Body: bigger than 1000Bytes"); }
 						return curMsgId;
 					}
