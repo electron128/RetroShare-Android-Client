@@ -26,6 +26,7 @@ import rsctrl.core.Core;
 import rsctrl.core.Core.Person;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.android.utils.WeakHashSet;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -48,7 +49,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 		public void update();
 	}
 	
-	private Set<ChatServiceListener> mListeners = new HashSet<ChatServiceListener>();
+	private Set<ChatServiceListener> mListeners = new WeakHashSet<ChatServiceListener>();
 	public void registerListener(ChatServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(ChatServiceListener l){ mListeners.remove(l); }
 	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }

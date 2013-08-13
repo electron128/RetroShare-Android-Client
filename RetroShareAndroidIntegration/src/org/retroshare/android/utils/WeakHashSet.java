@@ -1,5 +1,3 @@
-package org.retroshare.android.utils;
-
 /*
  * Copyright 2005 The Apache Software Foundation.
  *
@@ -16,21 +14,35 @@ package org.retroshare.android.utils;
  * limitations under the License.
  */
 
+package org.retroshare.android.utils;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.AbstractSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A weak HashSet. An element stored in the WeakHashSet might be
  * garbage collected, if there is no strong reference to this element.
  */
-public class WeakHashSet extends HashSet
+public class WeakHashSet<T> extends AbstractSet<T> implements Set<T>
 {
+	/**
+	 * Stores WeakReferences
+	 */
+	private Set<WeakReference<T>> mSet = new HashSet<WeakReference<T>>();
+
 	/**
 	 * Helps to detect garbage collected values.
 	 */
-	ReferenceQueue queue = new ReferenceQueue();
+	private ReferenceQueue queue = new ReferenceQueue();
+
+	/**
+	 * @return Set size
+	 */
+	@Override public int size() { return mSet.size(); }
 
 	/**
 	 * Returns an iterator over the elements in this set.  The elements
@@ -38,12 +50,13 @@ public class WeakHashSet extends HashSet
 	 *
 	 * @return an Iterator over the elements in this set.
 	 */
+	@Override
 	public Iterator iterator()
 	{
 		// remove garbage collected elements
 		processQueue();
 		// get an iterator of the superclass WeakHashSet
-		final Iterator i = super.iterator();
+		final Iterator i = mSet.iterator();
 		return new Iterator()
 		{
 			public boolean hasNext() { return i.hasNext(); }
@@ -66,20 +79,22 @@ public class WeakHashSet extends HashSet
 	 * @param o element whose presence in this set is to be tested.
 	 * @return <code>true</code> if this set contains the specified element.
 	 */
+	@Override
 	public boolean contains(Object o) { return super.contains(WeakElement.create(o)); }
 
 	/**
 	 * Adds the specified element to this set if it is not already
 	 * present.
 	 *
-	 * @param o element to be added to this set.
+	 * @param e element to be added to this set.
 	 * @return <code>true</code> if the set did not already contain the specified
 	 * element.
 	 */
-	public boolean add(Object o)
+	@Override
+	public boolean add(T e)
 	{
 		processQueue();
-		return super.add(WeakElement.create(o, this.queue));
+		return mSet.add(WeakElement.create(e, this.queue));
 	}
 
 	/**
@@ -88,6 +103,7 @@ public class WeakHashSet extends HashSet
 	 * @param o object to be removed from this set, if present.
 	 * @return <code>true</code> if the set contained the specified element.
 	 */
+	@Override
 	public boolean remove(Object o)
 	{
 		boolean ret = super.remove(WeakElement.create(o));

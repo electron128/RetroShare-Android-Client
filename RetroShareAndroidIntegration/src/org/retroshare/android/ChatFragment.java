@@ -54,6 +54,11 @@ public class ChatFragment extends ProxiedFragmentBase
 		if(isBound()) getConnectedServer().mRsChatService.unregisterListener(adapter);
 		super.onPause();
 	}
+	@Override public void onServiceConnected()
+	{
+		if(isVisible()) getConnectedServer().mRsChatService.registerListener(adapter);
+		else getConnectedServer().mRsChatService.unregisterListener(adapter);
+	}
 
 	private class ChatMsgAdapter implements ListAdapter, RsChatService.ChatServiceListener
 	{

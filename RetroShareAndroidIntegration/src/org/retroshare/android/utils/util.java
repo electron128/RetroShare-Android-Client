@@ -15,9 +15,6 @@ import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class util
 {
 	public static final String TAG() { return "util"; }
@@ -35,7 +32,7 @@ public class util
 		return sb.toString().toUpperCase();
 	}
 
-    static boolean hasContent(EditText et) { return (et.getText().toString().trim().length() > 0); }
+	public static boolean hasContent(EditText et) { return (et.getText().toString().trim().length() > 0); }
 
 	private static Long dCounter = 0L;
 	public static void uDebug(Context c, String tag, String msg)
@@ -47,7 +44,7 @@ public class util
 	}
 
 
-    static Bitmap encodeQrCode(String contents) throws WriterException
+	public static Bitmap encodeQrCode(String contents) throws WriterException
 	{
 		QRCode qrCode = new QRCode();
 		Encoder.encode(contents, ErrorCorrectionLevel.L, qrCode); // commented momentanuesly because raises ErrorCorrectionLevel cannot find symbol ( no time to understand what zxing related library is missing... )
