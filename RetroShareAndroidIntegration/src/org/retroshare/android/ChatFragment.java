@@ -102,17 +102,14 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			protected List<_ChatMessage> doInBackground(Void... voids)
 			{
 				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
-
-				List<Chat.ChatMessage> msgs = getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId());
-				for ( int i = messageList.size(); i < msgs.size(); ++i )
-					fmsg.add(new _ChatMessage(msgs.get(i)));
-
+				List<Chat.ChatMessage> msgs = new ArrayList<Chat.ChatMessage>(getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId()));
+				for ( Chat.ChatMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
 				return fmsg;
 			}
 
 			@Override protected void onPostExecute(List<_ChatMessage> ml)
 			{
-				messageList.addAll(ml);
+				messageList = ml;
 				notifyObservers();
 				if(recentlySentMessage) chatMessageList.smoothScrollToPosition(messageList.size()-1);
 			}
