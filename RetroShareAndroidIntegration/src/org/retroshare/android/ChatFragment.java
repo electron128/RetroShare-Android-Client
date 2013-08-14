@@ -1,3 +1,23 @@
+/**
+ * @license
+ *
+ * Copyright (c) 2013 Gioacchino Mazzurco <gio@eigenlab.org>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package org.retroshare.android;
 
 
@@ -20,9 +40,11 @@ import android.widget.TextView;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.retroshare.android.utils.HtmlBase64ImageGetter;
+import org.retroshare.android.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import rsctrl.chat.Chat;
 
@@ -99,7 +121,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
 
 			msgBodyView.setText(msg.getBody());
-			Linkify.addLinks(msgBodyView, Linkify.ALL);
+			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), "");
 
 			return view;
 		}

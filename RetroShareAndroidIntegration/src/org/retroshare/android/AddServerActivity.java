@@ -9,7 +9,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.retroshare.android.utils.util;
+import org.retroshare.android.utils.Util;
 
 public class AddServerActivity extends ProxiedActivityBase
 {
@@ -71,7 +71,7 @@ public class AddServerActivity extends ProxiedActivityBase
 			CheckBox resetPwdChkb     = (CheckBox) findViewById(R.id.resetPasswordCheckBox);
 			CheckBox resetSshSrvKey  = (CheckBox) findViewById(R.id.resetSshServerKeyCheckBox);
 
-			if(!util.hasContent(editTextPort) || !util.hasContent(editTextName) || !util.hasContent(editTextHostname) || !util.hasContent(editTextUser))
+			if(!Util.hasContent(editTextPort) || !Util.hasContent(editTextName) || !Util.hasContent(editTextHostname) || !Util.hasContent(editTextUser))
 			{
 				Toast.makeText(getApplicationContext(), getText(R.string.missing_input), Toast.LENGTH_LONG).show();
 				return;
@@ -84,7 +84,7 @@ public class AddServerActivity extends ProxiedActivityBase
 			sd.name = editTextName.getText().toString();
 			sd.hostname = editTextHostname.getText().toString();
 
-			if(util.hasContent(editTextPort)) sd.port = Integer.parseInt(editTextPort.getText().toString());
+			if(Util.hasContent(editTextPort)) sd.port = Integer.parseInt(editTextPort.getText().toString());
 
 			sd.user = editTextUser.getText().toString();
 

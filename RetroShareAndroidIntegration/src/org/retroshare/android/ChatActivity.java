@@ -27,7 +27,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.retroshare.android.RsChatService.ChatServiceListener;
-import org.retroshare.android.utils.util;
+import org.retroshare.android.utils.Util;
 
 
 public class ChatActivity extends ProxiedActivityBase implements ChatServiceListener
@@ -93,7 +93,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		File htmlFile = new File(getFilesDir(), htmlFileName);
 		WebView messagesWebView = (WebView) findViewById(R.id.chatWebView);
 		messagesWebView.getSettings().setJavaScriptEnabled(true);
-//		messagesWebView.loadData(util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
+//		messagesWebView.loadData(Util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
 		messagesWebView.loadUrl("file://" + htmlFile.getAbsolutePath());
 		messagesWebView.addJavascriptInterface(new JavaScriptInterface(), JAVASCRIPT_NAME);
 
@@ -124,7 +124,7 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 		Person person = server.mRsPeersService.getPersonByPgpId(pgpId);
 		if(person == null)
 		{
-			util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + pgpId + " is null??");
+			Util.uDebug(this, TAG(), "onServiceConnected() how can it be that person for " + pgpId + " is null??");
 			return;
 		}
 

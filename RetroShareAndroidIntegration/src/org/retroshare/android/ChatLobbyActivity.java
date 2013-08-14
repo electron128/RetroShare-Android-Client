@@ -81,7 +81,7 @@ public class ChatLobbyActivity extends ProxiedActivityBase implements ChatServic
 		File htmlFile = new File(getFilesDir(), htmlFileName);
 		WebView messagesWebView = (WebView) findViewById(R.id.chatWebView);
 		messagesWebView.getSettings().setJavaScriptEnabled(true);
-//		messagesWebView.loadData(util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
+//		messagesWebView.loadData(Util.readTextFromResource(this, R.raw.chatwebview), "text/html", "utf-8"); // loading data and not url make javascript not working :(
 		messagesWebView.loadUrl("file://" + htmlFile.getAbsolutePath());
 		messagesWebView.addJavascriptInterface(new JavaScriptInterface(), JAVASCRIPT_NAME);
 

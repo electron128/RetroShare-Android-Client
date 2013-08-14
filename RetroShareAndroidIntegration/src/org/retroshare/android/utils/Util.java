@@ -19,9 +19,11 @@ import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.io.ByteArrayOutputStream;
 
-public class util
+public class Util
 {
-	public static final String TAG() { return "util"; }
+	public static final String URI_REG_EXP = "([a-z]+[0-9a-z\\.\\-\\+]*:\\/\\/)(\\S)+"; // Probably too permissive, but I never saw a false positive in many tests
+
+	public static String TAG() { return "util"; }
 	
 	// stolen from the internet
 	public static String byteArrayToHexString(byte[] b)

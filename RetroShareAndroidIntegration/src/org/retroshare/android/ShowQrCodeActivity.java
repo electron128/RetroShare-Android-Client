@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.retroshare.android.utils.util;
+import org.retroshare.android.utils.Util;
 
 
 public class ShowQrCodeActivity extends Activity
@@ -46,7 +46,7 @@ public class ShowQrCodeActivity extends Activity
 						.build()
 						.toString();
 
-				Bitmap bm = util.encodeQrCode(data);
+				Bitmap bm = Util.encodeQrCode(data);
 
 				ImageView mImageView = (ImageView) findViewById(R.id.imageViewQrCode);
 				mImageView.setImageBitmap(bm);

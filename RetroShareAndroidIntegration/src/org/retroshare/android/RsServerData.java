@@ -48,7 +48,7 @@ public class RsServerData implements Serializable, Cloneable
 
 		String s = hostkey.getSSHName()+" "+Integer.toString(hostkey.getBits())+" ";
 
-		// TODO isn't this the same as util.byteArrayToHexString(byte[] b) ?
+		// TODO isn't this the same as Util.byteArrayToHexString(byte[] b) ?
 		boolean firstbyte = true;
 		for(byte b : hostkey.getFingerprint())
 		{
