@@ -78,6 +78,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	private class ChatMsgAdapter implements ListAdapter, RsChatService.ChatServiceListener
 	{
 		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
+		private int lastShowedPosition = 0;
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
 		@Override
@@ -111,7 +112,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			{
 				messageList = ml;
 				notifyObservers();
-				if(recentlySentMessage) chatMessageList.smoothScrollToPosition(messageList.size()-1);
+				if(recentlySentMessage) lastShowedPosition = messageList.size()-1;
+				chatMessageList.smoothScrollToPosition(lastShowedPosition);
 			}
 		}
 
