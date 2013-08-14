@@ -18,23 +18,27 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.retroshare.android.utils.HtmlBase64ImageGetter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import rsctrl.chat.Chat;
 
 /**
- * Created by G10h4ck on 8/12/13.
- * Will supersede ChatActivity
+ * @author G10h4ck
  */
 public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListener
 {
-	interface ChatFragmentContainer { Chat.ChatId getChatId(); }
+	interface ChatFragmentContainer { Chat.ChatId getChatId(ChatFragment f); }
 	private ChatFragmentContainer cfc;
 
 	private ChatMsgAdapter adapter = new ChatMsgAdapter();
 	private ListView chatMessageList;
 	private LayoutInflater mInflater;
+
+	private HtmlBase64ImageGetter chatImageGetter;
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -51,6 +55,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		try { cfc = (ChatFragmentContainer) a; }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ChatFragmentContainer"); }
 
+		chatImageGetter = new HtmlBase64ImageGetter(getResources());
 		mInflater = a.getLayoutInflater();
 	}
 	@Override public void onResume()
@@ -59,7 +64,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		if(isBound())
 		{
 			RsChatService rsc = getConnectedServer().mRsChatService;
-			rsc.disableNotificationForChat(cfc.getChatId());
+			rsc.disableNotificationForChat(cfc.getChatId(this));
 			rsc.registerListener(adapter);
 		}
 	}
@@ -69,7 +74,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		{
 			RsChatService rsc = getConnectedServer().mRsChatService;
 			rsc.unregisterListener(adapter);
-			rsc.enableNotificationForChat(cfc.getChatId());
+			rsc.enableNotificationForChat(cfc.getChatId(this));
 		}
 		super.onPause();
 	}
@@ -80,19 +85,21 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 		private int lastShowedPosition = 0;
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
-
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
 			View view = convertView;
 			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
 
-			_ChatMessage msg = messageList.get(position);
 			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageTextView);
-			msgBodyView.setText(msg.getBody());
-			Linkify.addLinks(msgBodyView, Linkify.ALL);
+			_ChatMessage msg = messageList.get(position);
+
 			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green);
 			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
+
+			msgBodyView.setText(msg.getBody());
+			Linkify.addLinks(msgBodyView, Linkify.ALL);
 
 			return view;
 		}
@@ -103,7 +110,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			protected List<_ChatMessage> doInBackground(Void... voids)
 			{
 				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
-				List<Chat.ChatMessage> msgs = new ArrayList<Chat.ChatMessage>(getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId()));
+				List<Chat.ChatMessage> msgs = new ArrayList<Chat.ChatMessage>(getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId(ChatFragment.this)));
 				for ( Chat.ChatMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
 				return fmsg;
 			}
@@ -151,7 +158,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		{
 			this.msg = msg;
 
-			msgBody = Html.fromHtml(msg.getMsg());
+			Spanned spn = Html.fromHtml(msg.getMsg(), chatImageGetter, null);
+			msgBody = spn;
 
 			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(msg.getPeerNickname());
 
@@ -173,7 +181,6 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	{
 		if(( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER ))
 		{
-//				Log.d(TAG(), "KeyListener.onKey() event.getKeyCode() == KeyEvent.KEYCODE_ENTER");
 			sendChatMsg(null);
 			return true;
 		}
@@ -189,27 +196,33 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		if(isBound())
 		{
 			EditText et = (EditText) getActivity().findViewById(R.id.chatFragmentMessageEditText);
-			String msgText = et.getText().toString();
-			RsChatService chatService = getConnectedServer().mRsChatService;
+			String inputText = et.getText().toString();
 
-			//                                                                     TODO ask drBob to put long instead of int
-			Chat.ChatMessage.Builder msgBuilder = Chat.ChatMessage.newBuilder().setSendTime( (int)(System.currentTimeMillis()/1000L) );
-
-			if( msgText.equals("a") ) // Easter egg
+			if(inputText.length() > 0)
 			{
-				String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
-				msgBuilder.setMsg(android);
+				String msgText = StringEscapeUtils.escapeHtml(inputText);
+
+				RsChatService chatService = getConnectedServer().mRsChatService;
+
+				//                                                                     TODO ask drBob to put long instead of int
+				Chat.ChatMessage.Builder msgBuilder = Chat.ChatMessage.newBuilder().setSendTime( (int)(System.currentTimeMillis()/1000L) );
+
+				if( msgText.equals("a") ) // Easter egg
+				{
+					String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
+					msgBuilder.setMsg(android);
+				}
+				else msgBuilder.setMsg(msgText);
+
+				msgBuilder.setId(cfc.getChatId(this));
+				chatService.sendChatMessage(msgBuilder.build());
+
+				et.setText("");
+
+				recentlySentMessage = true;
 			}
-			else msgBuilder.setMsg(msgText);
-
-			msgBuilder.setId(cfc.getChatId());
-			chatService.sendChatMessage(msgBuilder.build());
-
-			et.setText("");
-
-			recentlySentMessage = true;
 		}
-		else { Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy"); }
+		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
 
 	public ChatFragment() { super(); }

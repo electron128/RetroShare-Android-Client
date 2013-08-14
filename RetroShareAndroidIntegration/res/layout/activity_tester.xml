@@ -9,14 +9,16 @@
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:text="Test Qr Code Reading"
-			android:id="@+id/buttonTestQrRead"
 			android:onClick="onButtonTestQrReadPressed"/>
-
 	<Button
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:text="Test Chat Fragment Activity"
-			android:id="@+id/buttonTestChatFragmentActivity"
 			android:onClick="onButtonTestFragmentChatActivityPressed"/>
-	
+	<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Test HtmlBase64ImageGetter"
+			android:onClick="onButtonTestHtmlBase64ImageGetterPressed"/>
+
 </LinearLayout>

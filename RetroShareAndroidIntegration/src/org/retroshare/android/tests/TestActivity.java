@@ -1,4 +1,4 @@
-package org.retroshare.android;
+package org.retroshare.android.tests;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,10 +6,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
+import org.retroshare.android.ConversationFragmentActivity;
 import org.retroshare.android.R;
 
 /**
- * Created by G10h4ck on 7/16/13.
+ * @author G10h4ck
  */
 public class TestActivity extends Activity
 {
@@ -43,6 +44,12 @@ public class TestActivity extends Activity
 	{
 		Intent i = new Intent(this, ConversationFragmentActivity.class);
 		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
+		startActivity(i);
+	}
+
+	public void onButtonTestHtmlBase64ImageGetterPressed(View v)
+	{
+		Intent i = new Intent(this, HtmlBase64ImageGetterTestActivity.class);
 		startActivity(i);
 	}
 }

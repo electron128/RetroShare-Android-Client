@@ -2,8 +2,10 @@ package org.retroshare.android.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,6 +16,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
+
+import java.io.ByteArrayOutputStream;
 
 public class util
 {
@@ -105,5 +109,21 @@ public class util
 			Log.e( TAG(), "getCertFromUri( "+ uri.toString() +" ): wrong scheme or host");
 			return null;
 		}
+	}
+
+	public static String encodeTobase64(Bitmap image)
+	{
+		Bitmap immagex=image;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+		byte[] b = baos.toByteArray();
+		String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+		return imageEncoded;
+	}
+	public static Bitmap decodeBase64(String input)
+	{
+		byte[] decodedByte = Base64.decode(input, 0);
+		return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
 	}
 }
