@@ -1,17 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout	xmlns:android="http://schemas.android.com/apk/res/android"
+				android:orientation="vertical"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
-			  android:layout_width="match_parent"
-			  android:layout_height="wrap_content">
-	<TextView
-			android:id="@+id/chatMessageTextView"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:layout_margin="5dip"
-			android:paddingLeft="10dip"
-			android:text="Hello bubbles!"
-			android:textColor="@android:color/primary_text_light" />
+	<LinearLayout
+					android:orientation="vertical"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal">
 
+		<TextView	android:id="@+id/chatMessageBodyTextView"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="Each of us alone is worth nothing..."
+					android:background="@drawable/bubble_yellow_spaced"
+					android:textColor="@android:color/primary_text_light"
+					android:gravity="center"/>
+
+		<LinearLayout
+					android:orientation="horizontal"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="35dp"
+					android:layout_marginTop="-13dp"
+					android:layout_marginLeft="15dp"
+					android:gravity="right">
+
+			<TextView	android:id="@+id/chatMessageTimeTextView"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginRight="3dp"
+						android:text="23:59:59"/>
+
+			<TextView	android:id="@+id/chatMessageNickTextView"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Che Guevara"/>
+
+		</LinearLayout>
+	</LinearLayout>
 </LinearLayout>

@@ -23,7 +23,7 @@ public class Util
 {
 	public static final String URI_REG_EXP = "([a-z]+[0-9a-z\\.\\-\\+]*:\\/\\/)(\\S)+"; // Probably too permissive, but I never saw a false positive in many tests
 
-	public static String TAG() { return "util"; }
+	public static String TAG() { return "Util"; }
 	
 	// stolen from the internet
 	public static String byteArrayToHexString(byte[] b)

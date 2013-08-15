@@ -42,7 +42,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.retroshare.android.utils.HtmlBase64ImageGetter;
 import org.retroshare.android.utils.Util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -111,17 +113,22 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
+			_ChatMessage msg = messageList.get(position);
+
 			View view = convertView;
 			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
 
-			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageTextView);
-			_ChatMessage msg = messageList.get(position);
-
-			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green);
-			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow);
-
+			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
+			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green_spaced);
+			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow_spaced);
 			msgBodyView.setText(msg.getBody());
 			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), "");
+
+			TextView timeView = (TextView) view.findViewById(R.id.chatMessageTimeTextView);
+			timeView.setText(msg.getTime());
+
+			TextView nickView = (TextView) view.findViewById(R.id.chatMessageNickTextView);
+			nickView.setText(msg.getNick());
 
 			return view;
 		}
@@ -167,10 +174,10 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 	private class _ChatMessage
 	{
-		private Chat.ChatMessage msg;
 		private Spanned msgBody;
 		private boolean isMine;
-		private int time;
+		private String time;
+		private String nick;
 
 		/**
 		 * This is executed in the AsyncTask thread so we can do work here
@@ -178,36 +185,33 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		 */
 		public _ChatMessage(Chat.ChatMessage msg)
 		{
-			this.msg = msg;
-
 			Spanned spn = Html.fromHtml(msg.getMsg(), chatImageGetter, null);
 			msgBody = spn;
 
-			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(msg.getPeerNickname());
+			nick = msg.getPeerNickname();
 
-			time = msg.getSendTime();
-			if ( time == 0) time = msg.getRecvTime();
+			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(nick);
+
+			int iTime = msg.getSendTime();
+			if ( iTime == 0) iTime = msg.getRecvTime();
+			time = new SimpleDateFormat("HH:mm:ss").format(new Date(iTime * 1000));
 		}
 
 		/**
 		 * Those methods are called in the UI thread so should be faster as possible
 		 */
-		public String getNick() { return msg.getPeerNickname(); }
+		public String getNick() { return nick; }
 		public Spanned getBody() { return msgBody; }
 		public boolean isMine() { return isMine; }
-		public int getTime() { return time; }
+		public String getTime() { return time; }
 	}
 
 	@Override
 	public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
-		if(( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER ))
-		{
-			sendChatMsg(null);
-			return true;
-		}
-
-		return false;
+		boolean enterPressed = ( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER );
+		if(enterPressed) sendChatMsg(null);
+		return enterPressed;
 	}
 
 	private boolean recentlySentMessage = false;
