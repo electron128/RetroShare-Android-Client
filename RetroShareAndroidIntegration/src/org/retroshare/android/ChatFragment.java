@@ -70,6 +70,9 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		chatMessageList = (ListView)fv.findViewById(R.id.chatMessageList);
 		chatMessageList.setAdapter(adapter);
 		fv.findViewById(R.id.chatFragmentMessageEditText).setOnKeyListener(this);
+		View moreMessageDownIndicator = fv.findViewById(R.id.moreChatMessageDownImageView);
+		moreMessageDownIndicator.setVisibility(View.INVISIBLE);
+		chatMessageList.setScrollIndicators(null, moreMessageDownIndicator);
 		return fv;
 	}
 	@Override public void onAttach(Activity a)
@@ -109,7 +112,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 		private int lastShowedPosition = 0;
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
@@ -147,9 +150,15 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			@Override protected void onPostExecute(List<_ChatMessage> ml)
 			{
 				messageList = ml;
+				chatMessageList.setSelection(lastShowedPosition);
+				if(autoScrollSemaphore > 0)
+				{
+					lastShowedPosition = messageList.size() - 1;
+					chatMessageList.smoothScrollToPosition(lastShowedPosition);
+					chatMessageList.setSelection(lastShowedPosition);
+					--autoScrollSemaphore;
+				}
 				notifyObservers();
-				if(recentlySentMessage) lastShowedPosition = messageList.size()-1;
-				chatMessageList.smoothScrollToPosition(lastShowedPosition);
 			}
 		}
 
@@ -214,8 +223,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		return enterPressed;
 	}
 
-	private boolean recentlySentMessage = false;
-	public void sendChatMsg(View v)
+	private int autoScrollSemaphore = 0;
+	private void sendChatMsg(View v)
 	{
 		Log.d(TAG(), "sendChatMsg(View v)");
 
@@ -245,7 +254,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 				et.setText("");
 
-				recentlySentMessage = true;
+				autoScrollSemaphore = chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition();
 			}
 		}
 		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");

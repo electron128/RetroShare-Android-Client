@@ -27,4 +27,14 @@
 			  android:layout_above="@id/inputLayout"
 			  android:layout_alignParentTop="true"/>
 
+	<ImageView	android:id="@+id/moreChatMessageDownImageView"
+				android:layout_width="wrap_content"
+			  	android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:layout_below="@id/chatMessageList"
+				android:layout_marginTop="-20dp"
+				android:layout_marginRight="2dp"
+				android:src="@android:drawable/arrow_down_float"
+			/>
+
 </RelativeLayout>
