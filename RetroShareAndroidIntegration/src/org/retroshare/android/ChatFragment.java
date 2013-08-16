@@ -58,9 +58,12 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	interface ChatFragmentContainer { Chat.ChatId getChatId(ChatFragment f); }
 	private ChatFragmentContainer cfc;
 
+	private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 	private ChatMsgAdapter adapter = new ChatMsgAdapter();
 	private ListView chatMessageList;
 	private LayoutInflater mInflater;
+	private int lastShowedPosition = 0;
+	private int autoScrollSemaphore = 0;
 
 	private HtmlBase64ImageGetter chatImageGetter;
 
@@ -72,6 +75,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		fv.findViewById(R.id.chatFragmentMessageEditText).setOnKeyListener(this);
 		View moreMessageDownIndicator = fv.findViewById(R.id.moreChatMessageDownImageView);
 		moreMessageDownIndicator.setVisibility(View.INVISIBLE);
+		moreMessageDownIndicator.setOnClickListener(new GoDownButtonListener());
 		chatMessageList.setScrollIndicators(null, moreMessageDownIndicator);
 		return fv;
 	}
@@ -109,8 +113,6 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 	private class ChatMsgAdapter implements ListAdapter, RsChatService.ChatServiceListener
 	{
-		private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
-		private int lastShowedPosition = 0;
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
 		@Override
@@ -125,7 +127,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green_spaced);
 			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow_spaced);
 			msgBodyView.setText(msg.getBody());
-			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), "");
+			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), ""); // This must be executed on UI thread
 
 			TextView timeView = (TextView) view.findViewById(R.id.chatMessageTimeTextView);
 			timeView.setText(msg.getTime());
@@ -150,15 +152,18 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			@Override protected void onPostExecute(List<_ChatMessage> ml)
 			{
 				messageList = ml;
+
 				chatMessageList.setSelection(lastShowedPosition);
+
 				if(autoScrollSemaphore > 0)
 				{
-					lastShowedPosition = messageList.size() - 1;
-					chatMessageList.smoothScrollToPosition(lastShowedPosition);
-					chatMessageList.setSelection(lastShowedPosition);
+					lastShowedPosition = messageList.size()-1;
 					--autoScrollSemaphore;
 				}
+
 				notifyObservers();
+
+				chatMessageList.smoothScrollToPosition(lastShowedPosition);
 			}
 		}
 
@@ -223,7 +228,6 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		return enterPressed;
 	}
 
-	private int autoScrollSemaphore = 0;
 	private void sendChatMsg(View v)
 	{
 		Log.d(TAG(), "sendChatMsg(View v)");
@@ -254,11 +258,24 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 				et.setText("");
 
-				autoScrollSemaphore = chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition();
+				fillAutoScrollSemaphore();
 			}
 		}
 		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
+
+	private class GoDownButtonListener implements View.OnClickListener
+	{
+		public void onClick(View v)
+		{
+			lastShowedPosition = chatMessageList.getCount()-1;
+			chatMessageList.setSelection(lastShowedPosition);
+			chatMessageList.smoothScrollToPosition(lastShowedPosition);
+			fillAutoScrollSemaphore();
+		}
+	}
+
+	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition())-1); }
 
 	public ChatFragment() { super(); }
 }
