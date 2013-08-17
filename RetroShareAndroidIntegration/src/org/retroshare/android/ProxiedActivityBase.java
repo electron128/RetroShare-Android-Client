@@ -73,7 +73,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	 */
 	protected RsCtrlService getConnectedServer()
 	{
-		Log.d(TAG(), "getConnectedServer() -> " + serverName );
+//		Log.d(TAG(), "getConnectedServer() -> " + serverName );
 
 		if(isBound()) return rsProxy.activateServer(serverName);
 
@@ -84,12 +84,12 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service)
 	{
-		Log.d(TAG(), "onServiceConnected(ComponentName className, IBinder service)");
+//		Log.d(TAG(), "onServiceConnected(ComponentName className, IBinder service)");
 
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		setBound(true);
-        if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.UiThreadHandler();
+        if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
 		onServiceConnected();
         rsProxyConnectionProgressBar.setVisibility(View.GONE);
 	}
@@ -97,7 +97,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 	@Override
 	public void onServiceDisconnected(ComponentName arg0)
 	{
-		Log.d(TAG(), "onServiceDisconnected(" + arg0.toShortString() + ")" );
+//		Log.d(TAG(), "onServiceDisconnected(" + arg0.toShortString() + ")" );
 		setBound(false);
 	}
 
@@ -124,7 +124,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 
 	protected void _bindRsService()
 	{
-		Log.d(TAG(), "_bindRsService()");
+//		Log.d(TAG(), "_bindRsService()");
 
 		if(isBound()) return;
 
@@ -135,7 +135,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 
 	protected void _unBindRsService()
 	{
-		Log.d(TAG(), "_unBindRsService()");
+//		Log.d(TAG(), "_unBindRsService()");
 
 		if(isBound())
 		{

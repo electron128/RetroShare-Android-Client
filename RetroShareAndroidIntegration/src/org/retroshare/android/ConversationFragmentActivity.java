@@ -22,26 +22,25 @@ package org.retroshare.android;
 
 import android.os.Bundle;
 
-import rsctrl.chat.Chat;
+import org.retroshare.android.RsConversationService.ConversationId;
 
-/**
- * @author G10h4ck
- */
-public class ConversationFragmentActivity extends ProxiedFragmentActivityBase implements ChatFragment.ChatFragmentContainer
+
+public class ConversationFragmentActivity extends ProxiedFragmentActivityBase implements ConversationFragment.ConversationFragmentContainer
 {
-	@Override
-	public Chat.ChatId getChatId(ChatFragment f)
-	{
-//		return Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId("ab85062d7142e2f756ee97bfdae319ef").build(); // blackcat
-//		return Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId("767fe0b937b86e0fa6ad33593eb3a196").build(); // cave laptop
-		return Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId("296dd05f154d3e1ccebb5aeabe164be4").build(); // Mine laptop
-//		return Chat.ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE).setChatId("463382d3d37c7ed4fb17ac9db9242e8c").build(); // Just Relay It
-	}
+	public final static String CONVERSATION_ID_EXTRA = "conversationID";
+
+	private ConversationId actualConversationId;
+
+	@Override /** Implements ConversationFragmentContainer */
+	public ConversationId getConversationId(ConversationFragment f) { return actualConversationId; }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+
+		actualConversationId = (ConversationId) getIntent().getSerializableExtra(CONVERSATION_ID_EXTRA);
+
 		setContentView(R.layout.factivity_conversation);
 	}
 }

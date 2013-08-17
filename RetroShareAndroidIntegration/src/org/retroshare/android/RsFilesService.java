@@ -21,9 +21,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class RsFilesService implements RsServiceInterface
 {
 	RsCtrlService mRsCtrlService;
-	UiThreadHandlerInterface mUiThreadHandler;
+	HandlerThreadInterface mUiThreadHandler;
 	
-	RsFilesService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsFilesService(RsCtrlService s, HandlerThreadInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;
@@ -37,7 +37,11 @@ public class RsFilesService implements RsServiceInterface
 	private Set<FilesServiceListener>mListeners = new HashSet<FilesServiceListener>();
 	public void registerListener(FilesServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(FilesServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable(){public void run(){for(FilesServiceListener l:mListeners) l.update();}}); }
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToHandlerThread(new Runnable() {
+		public void run() {
+			for (FilesServiceListener l : mListeners) l.update();
+		}
+	}); }
 	
 	List<Files.FileTransfer> transfersUp   = new ArrayList<Files.FileTransfer>();
 	public List<Files.FileTransfer> getTransfersUp() { return transfersUp; }

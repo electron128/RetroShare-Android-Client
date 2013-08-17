@@ -26,9 +26,9 @@ public class RsSearchService implements RsServiceInterface
 {
 	
 	RsCtrlService mRsCtrlService;
-	UiThreadHandlerInterface mUiThreadHandler;
+	HandlerThreadInterface mUiThreadHandler;
 	
-	RsSearchService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsSearchService(RsCtrlService s, HandlerThreadInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;
@@ -39,7 +39,15 @@ public class RsSearchService implements RsServiceInterface
 	private Set<SearchServiceListener>mListeners=new HashSet<SearchServiceListener>();
 	public void registerListener(SearchServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(SearchServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(SearchServiceListener l:mListeners){ l.update(); }; }}); }
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToHandlerThread(new Runnable() {
+		@Override
+		public void run() {
+			for (SearchServiceListener l : mListeners) {
+				l.update();
+			}
+			;
+		}
+	}); }
 
 	@Override
 	public void handleMessage(RsMessage m) {}

@@ -1,5 +1,7 @@
 package org.retroshare.android;
 
+import android.content.Context;
+
 import net.lag.jaramiko.AuthenticationFailedException;
 import net.lag.jaramiko.BadSignatureException;
 import net.lag.jaramiko.Channel;
@@ -37,8 +39,8 @@ public class RsCtrlService implements Runnable
 
 	private static final boolean DEBUG = true;
 
-	public static final int MAGIC_CODE = 0x137f0001;
-	public static final int RESPONSE = (0x01<<24);
+	private static final int MAGIC_CODE = 0x137f0001;
+	@Deprecated public static final int RESPONSE = (0x01<<24);
 
 	private static final int CONNECTION_TIMEOUT_ms = 3000;
 
@@ -92,8 +94,13 @@ public class RsCtrlService implements Runnable
 	private Set<RsCtrlServiceListener> mListeners = new HashSet<RsCtrlServiceListener>();
 	public void registerListener(RsCtrlServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(RsCtrlServiceListener l){ mListeners.remove(l); }
-	private UiThreadHandlerInterface mUiThreadHandler;
-	private void _notifyListeners(final ConnectionEvent ce) { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run(){ for(RsCtrlServiceListener l:mListeners) l.onConnectionStateChanged(ce); } } ); }
+	private HandlerThreadInterface mUiThreadHandler;
+	private void _notifyListeners(final ConnectionEvent ce) { if(mUiThreadHandler != null) mUiThreadHandler.postToHandlerThread(new Runnable() {
+		@Override
+		public void run() {
+			for (RsCtrlServiceListener l : mListeners) l.onConnectionStateChanged(ce);
+		}
+	}); }
 
 	public enum ConnectState{ ONLINE, OFFLINE }
 	public enum ConnectAction{ CONNECT, DISCONNECT, NONE }
@@ -185,12 +192,13 @@ public class RsCtrlService implements Runnable
 	public RsPeersService mRsPeersService;
 	public RsFilesService mRsFilesService;
 	public RsSearchService mRsSearchService;
+	public RsConversationService mRsConversationService;
 
 	/**
 	 * Initialize the RetroShare Control Service
 	 * @param h reference to ui thread handler to post notification to GUI when we have something ready
 	 */
-	public RsCtrlService(UiThreadHandlerInterface h)
+	public RsCtrlService(HandlerThreadInterface h, Context context)
 	{
 		mUiThreadHandler = h;
 		mThread = new Thread(this);
@@ -208,6 +216,9 @@ public class RsCtrlService implements Runnable
 		
 		mRsSearchService = new RsSearchService(this, mUiThreadHandler);
 		Services.add(mRsSearchService);
+
+		mRsConversationService = new RsConversationService(this, mUiThreadHandler, context);
+		Services.add(mRsConversationService);
 		
 		// preload own Name, needed for Chat
 		mRsPeersService.getOwnPerson();
@@ -349,7 +360,14 @@ public class RsCtrlService implements Runnable
 						}
 
 						// tell every service about the message
-						mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(RsServiceInterface service:Services) { service.handleMessage(msg); }}});
+						mUiThreadHandler.postToHandlerThread(new Runnable() {
+							@Override
+							public void run() {
+								for (RsServiceInterface service : Services) {
+									service.handleMessage(msg);
+								}
+							}
+						});
 					}
 				}
 			}

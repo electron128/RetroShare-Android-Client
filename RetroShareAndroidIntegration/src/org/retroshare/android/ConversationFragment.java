@@ -50,16 +50,20 @@ import java.util.regex.Pattern;
 
 import rsctrl.chat.Chat;
 
-/**
- * @author G10h4ck
- */
-public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListener
+import org.retroshare.android.RsConversationService.ConversationId;
+import org.retroshare.android.RsConversationService.PgpChatMessage;
+import org.retroshare.android.RsConversationService.PgpChatId;
+
+
+public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener
 {
-	interface ChatFragmentContainer { Chat.ChatId getChatId(ChatFragment f); }
-	private ChatFragmentContainer cfc;
+	interface ConversationFragmentContainer { ConversationId getConversationId(ConversationFragment f); }
+	private ConversationFragmentContainer cfc;
+
+	private RsConversationService mRsConversationService;
 
 	private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
-	private ChatMsgAdapter adapter = new ChatMsgAdapter();
+	private final ChatMsgAdapter adapter = new ChatMsgAdapter();
 	private ListView chatMessageList;
 	private LayoutInflater mInflater;
 	private int lastShowedPosition = 0;
@@ -83,35 +87,42 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 	{
 		super.onAttach(a);
 
-		try { cfc = (ChatFragmentContainer) a; }
+		try { cfc = (ConversationFragmentContainer) a; }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ChatFragmentContainer"); }
 
 		chatImageGetter = new HtmlBase64ImageGetter(getResources());
 		mInflater = a.getLayoutInflater();
+
 	}
 	@Override public void onResume()
 	{
 		super.onResume();
 		if(isBound())
 		{
-			RsChatService rsc = getConnectedServer().mRsChatService;
-			rsc.disableNotificationForChat(cfc.getChatId(this));
-			rsc.registerListener(adapter);
+			ConversationId id = cfc.getConversationId(this);
+
+			RsConversationService rsc = getConnectedServer().mRsConversationService;
+			rsc.cancelNotificationForConversation(id);
+			rsc.disableNotificationForConversation(id);
+			rsc.registerRsConversationServiceListener(adapter);
 		}
 	}
 	@Override public void onPause()
 	{
 		if(isBound())
 		{
-			RsChatService rsc = getConnectedServer().mRsChatService;
-			rsc.unregisterListener(adapter);
-			rsc.enableNotificationForChat(cfc.getChatId(this));
+			mRsConversationService.unregisterRsConversationServiceListener(adapter);
+			mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
 		}
 		super.onPause();
 	}
-	@Override public void onServiceConnected() { if(isVisible()) getConnectedServer().mRsChatService.registerListener(adapter); }
+	@Override public void onServiceConnected()
+	{
+		mRsConversationService = getConnectedServer().mRsConversationService;
+		if(isVisible()) mRsConversationService.registerRsConversationServiceListener(adapter);
+	}
 
-	private class ChatMsgAdapter implements ListAdapter, RsChatService.ChatServiceListener
+	private class ChatMsgAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
 		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
 
@@ -124,7 +135,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
 
 			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
-			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green_spaced);
+			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green_spaced); // TODO: use a grey image + color filter instead of different resources, so we can use multicolor in group chat
 			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow_spaced);
 			msgBodyView.setText(msg.getBody());
 			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), ""); // This must be executed on UI thread
@@ -144,8 +155,8 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			protected List<_ChatMessage> doInBackground(Void... voids)
 			{
 				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
-				List<Chat.ChatMessage> msgs = new ArrayList<Chat.ChatMessage>(getConnectedServer().mRsChatService.getChatHistoryForChatId(cfc.getChatId(ChatFragment.this)));
-				for ( Chat.ChatMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
+				List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(cfc.getConversationId(ConversationFragment.this));
+				for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
 				return fmsg;
 			}
 
@@ -167,7 +178,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 			}
 		}
 
-		@Override public void update() { new UpdateMessagesAsyncTask().execute(null, null, null); }
+		@Override public void onConversationsUpdate() { new UpdateMessagesAsyncTask().execute(null, null, null); }
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
@@ -183,7 +194,7 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		/**
 		 * Notify data observer that fresh data are available
 		 */
-		public void notifyObservers() { for(DataSetObserver obs : observerList) { obs.onChanged(); }; }
+		public void notifyObservers() { for(DataSetObserver obs : observerList) obs.onChanged(); }
 	}
 
 	private class _ChatMessage
@@ -197,17 +208,18 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 		 * This is executed in the AsyncTask thread so we can do work here
 		 * @param msg
 		 */
-		public _ChatMessage(Chat.ChatMessage msg)
+		public _ChatMessage(RsConversationService.ConversationMessage msg)
 		{
-			Spanned spn = Html.fromHtml(msg.getMsg(), chatImageGetter, null);
+			Chat.ChatMessage cMsg = ((RsConversationService.PgpChatMessage) msg).getData();
+			Spanned spn = Html.fromHtml(cMsg.getMsg(), chatImageGetter, null);
 			msgBody = spn;
 
-			nick = msg.getPeerNickname();
+			nick = cMsg.getPeerNickname();
 
 			isMine = getConnectedServer().mRsPeersService.getOwnPerson().getName().equals(nick);
 
-			int iTime = msg.getSendTime();
-			if ( iTime == 0) iTime = msg.getRecvTime();
+			int iTime = cMsg.getSendTime();
+			if ( iTime == 0) iTime = cMsg.getRecvTime();
 			time = new SimpleDateFormat("HH:mm:ss").format(new Date(iTime * 1000));
 		}
 
@@ -239,22 +251,13 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 			if(inputText.length() > 0)
 			{
-				String msgText = StringEscapeUtils.escapeHtml(inputText);
+				String msgText;
+				if( inputText.equals("a") ) msgText = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>"; // Easter egg
+				else msgText = StringEscapeUtils.escapeHtml(inputText);
 
-				RsChatService chatService = getConnectedServer().mRsChatService;
-
-				//                                                                     TODO ask drBob to put long instead of int
-				Chat.ChatMessage.Builder msgBuilder = Chat.ChatMessage.newBuilder().setSendTime( (int)(System.currentTimeMillis()/1000L) );
-
-				if( msgText.equals("a") ) // Easter egg
-				{
-					String android = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>";
-					msgBuilder.setMsg(android);
-				}
-				else msgBuilder.setMsg(msgText);
-
-				msgBuilder.setId(cfc.getChatId(this));
-				chatService.sendChatMessage(msgBuilder.build());
+				PgpChatId id = (PgpChatId) cfc.getConversationId(this);
+				PgpChatMessage msg = new PgpChatMessage(id, msgText);
+				mRsConversationService.sendConversationMessage(msg);
 
 				et.setText("");
 
@@ -277,5 +280,5 @@ public class ChatFragment extends ProxiedFragmentBase implements View.OnKeyListe
 
 	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition())-1); }
 
-	public ChatFragment() { super(); }
+	public ConversationFragment() { super(); }
 }

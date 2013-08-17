@@ -29,7 +29,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * @author G10h4ck
  * This class is aimed to be inherited by Services that needs to communicate with RsService
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each service doesn't need to handle all this common stuff

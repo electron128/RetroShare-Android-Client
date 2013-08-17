@@ -21,20 +21,10 @@
 package org.retroshare.android;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
+
 
 /**
- * @author G10h4ck
  * This class is aimed to be inherited by Fragments that needs to communicate with RsService
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each fragment doesn't need to handle all this common stuff

@@ -13,7 +13,6 @@ import java.util.Set;
 import rsctrl.core.Core;
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
-import rsctrl.msgs.Msgs;
 import rsctrl.peers.Peers;
 import rsctrl.peers.Peers.RequestPeers;
 import rsctrl.peers.Peers.ResponsePeerList;
@@ -27,12 +26,12 @@ public class RsPeersService implements RsServiceInterface
 	private static final String TAG() { return "RsPeersService"; }
 
 	RsCtrlService mRsCtrlService;
-	UiThreadHandlerInterface mUiThreadHandler;
+	HandlerThreadInterface mUiThreadHandler;
 
     OwnIdReceivedHandler mOwnIdReceivedHandler;
     Thread mOwnIdReceivedHandlerThread;
 
-	RsPeersService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsPeersService(RsCtrlService s, HandlerThreadInterface u)
 	{
 		mRsCtrlService = s;
 		mUiThreadHandler = u;
@@ -48,7 +47,15 @@ public class RsPeersService implements RsServiceInterface
 	private Set<PeersServiceListener> mListeners = new HashSet<PeersServiceListener>();
 	public void registerListener(PeersServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(PeersServiceListener l) { mListeners.remove(l); }
-	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToUiThread(new Runnable() { @Override public void run() {for(PeersServiceListener l : mListeners) { l.update(); }; }}); }	}
+	private void _notifyListeners() { if(mUiThreadHandler != null) { mUiThreadHandler.postToHandlerThread(new Runnable() {
+		@Override
+		public void run() {
+			for (PeersServiceListener l : mListeners) {
+				l.update();
+			}
+			;
+		}
+	}); }	}
 
 	// TODO check if we can take more advantage of the fact we have peers in a map in PeersService clients
 	private Map<String, Person> mPersons = new HashMap<String, Person>(); // <String:PGP_ID, Person>

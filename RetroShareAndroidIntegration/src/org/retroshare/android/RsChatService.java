@@ -35,9 +35,9 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	public String TAG() { return "RsChatService"; }
 
 	RsCtrlService mRsCtrlService;
-	UiThreadHandlerInterface mUiThreadHandler;
+	HandlerThreadInterface mUiThreadHandler;
 
-	RsChatService(RsCtrlService s, UiThreadHandlerInterface u)
+	RsChatService(RsCtrlService s, HandlerThreadInterface u)
 	{
 		mRsCtrlService = s;
 		mRsCtrlService.registerListener(this);
@@ -52,7 +52,12 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	private Set<ChatServiceListener> mListeners = new WeakHashSet<ChatServiceListener>();
 	public void registerListener(ChatServiceListener l) { mListeners.add(l); }
 	public void unregisterListener(ChatServiceListener l){ mListeners.remove(l); }
-	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToUiThread( new Runnable() { @Override public void run() { for(ChatServiceListener l : mListeners) l.update(); }	} ); }
+	private void _notifyListeners() { if(mUiThreadHandler != null) mUiThreadHandler.postToHandlerThread(new Runnable() {
+		@Override
+		public void run() {
+			for (ChatServiceListener l : mListeners) l.update();
+		}
+	}); }
 	
 	private List<Chat.ChatLobbyInfo> mChatLobbies = new ArrayList<Chat.ChatLobbyInfo>();
 	private Map<ChatId,List<ChatMessage>> mChatHistory = new HashMap<ChatId,List<ChatMessage>>();
@@ -201,7 +206,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	{
 		RequestRegisterEvents.Builder reqb = RequestRegisterEvents.newBuilder();
 		reqb.setAction(RequestRegisterEvents.RegisterAction.REGISTER);
-		
+
     	RsMessage msg = new RsMessage();
     	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE;
     	msg.body = reqb.build().toByteArray();
@@ -240,7 +245,7 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 		//mRsCtrlService.mRsPeersService
 		
     	RsMessage msg = new RsMessage();
-    	msg.msgId = (Core.ExtensionId.CORE_VALUE<<24)|(Core.PackageId.CHAT_VALUE<<8)|Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE;
+    	msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE,Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE, false);
     	msg.body = RequestSendMessage.newBuilder().setMsg(m).build().toByteArray();
     	mRsCtrlService.sendMsg(msg);
     	

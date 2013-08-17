@@ -204,7 +204,6 @@ public class ChatActivity extends ProxiedActivityBase implements ChatServiceList
 			String msgText = et.getText().toString();
 			RsChatService chatService = getConnectedServer().mRsChatService;
 
-			//                                                                     TODO ask drBob to put long instead of int
 			ChatMessage.Builder msgBuilder = ChatMessage.newBuilder().setSendTime( (int)(System.currentTimeMillis()/1000L) );
 
 			if( msgText.equals("a") ) // Easter egg

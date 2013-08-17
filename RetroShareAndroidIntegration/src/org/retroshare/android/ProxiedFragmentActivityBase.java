@@ -93,7 +93,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		setBound(true);
-        if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.UiThreadHandler();
+        if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
 		onServiceConnected();
 		for(WeakReference<ProxiedFragmentBase> wf : proxiedFragList)
 		{

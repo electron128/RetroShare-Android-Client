@@ -6,7 +6,7 @@
 			  android:layout_height="match_parent">
 
 	<fragment	android:id="@+id/chatFragment"
-				android:name="org.retroshare.android.ChatFragment"
+				android:name="org.retroshare.android.ConversationFragment"
 				android:layout_height="match_parent"
 				android:layout_width="match_parent"/>
 </LinearLayout>

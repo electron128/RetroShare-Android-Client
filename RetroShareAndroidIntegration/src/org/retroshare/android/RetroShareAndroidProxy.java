@@ -52,7 +52,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 
 	private static final String DataPackBaseFileName = "RetroShareServers";
 
-    public UiThreadHandler mUiThreadHandler;
+    public HandlerThread mUiThreadHandler;
 
 	public static class RsBund
 	{
@@ -132,10 +132,10 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	public IBinder onBind(Intent arg0) { return mBinder; }
 	
 	// new new don't delete
-	public static class UiThreadHandler extends Handler implements UiThreadHandlerInterface
+	public static class HandlerThread extends Handler implements HandlerThreadInterface
 	{
 		@Override
-		public void postToUiThread(Runnable r) { post(r); }
+		public void postToHandlerThread(Runnable r) { post(r); }
 	}
 
 	@Override
@@ -272,7 +272,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 			if( bund == null)
 			{
 				Log.d(TAG, "_activateServer(String serverName) activating server");
-				RsCtrlService server = new RsCtrlService(mUiThreadHandler);
+				RsCtrlService server = new RsCtrlService(mUiThreadHandler, this);
 				server.setServerData(serverData);
 				server.registerListener(this);
 				bund = new RsBund(server, new NotifyService(server.mRsChatService, this, serverName));
