@@ -37,7 +37,6 @@ import java.util.List;
 
 
 /**
- * @author G10h4ck
  * This class is aimed to be inherited by FragmentActivityes that needs to communicate with RsService
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
@@ -77,7 +76,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	@Override
 	public RsCtrlService getConnectedServer()
 	{
-		Log.d(TAG(), "getConnectedServer() -> " + serverName );
+//		Log.d(TAG(), "getConnectedServer() -> " + serverName );
 
 		if(isBound()) return rsProxy.activateServer(serverName);
 
@@ -88,7 +87,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service)
 	{
-		Log.d(TAG(), "onServiceConnected(ComponentName className, IBinder service)");
+//		Log.d(TAG(), "onServiceConnected(ComponentName className, IBinder service)");
 
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
@@ -106,7 +105,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	@Override
 	public void onServiceDisconnected(ComponentName arg0)
 	{
-		Log.d(TAG(), "onServiceDisconnected(" + arg0.toShortString() + ")" );
+//		Log.d(TAG(), "onServiceDisconnected(" + arg0.toShortString() + ")" );
 		setBound(false);
 	}
 
@@ -133,7 +132,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 
 	protected void _bindRsService()
 	{
-		Log.d(TAG(), "_bindRsService()");
+//		Log.d(TAG(), "_bindRsService()");
 
 		if(isBound()) return;
 
@@ -144,7 +143,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 
 	protected void _unBindRsService()
 	{
-		Log.d(TAG(), "_unBindRsService()");
+//		Log.d(TAG(), "_unBindRsService()");
 
 		if(isBound())
 		{

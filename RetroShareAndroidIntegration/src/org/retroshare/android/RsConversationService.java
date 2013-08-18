@@ -66,7 +66,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	/**
 	 * Conversation stuff
 	 */
-	public static enum ConversationKind { PGP_CHAT };
+	public static enum ConversationKind { PGP_CHAT, LOBBY_CHAT };
 	public static interface ConversationId extends Serializable
 	{
 		public ConversationKind getConversationKind();
@@ -303,6 +303,15 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		appendConversationMessageToHistoryMap(new PgpChatMessage(msg.getConversationId(), builderChatMessage.build()));
 	}
 
+	/**
+	 * LOBBY_CHAT stuff
+	 */
+	public static final class LobbyChatId implements ConversationId
+	{
+		@Override
+		public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
+	}
+
 	private final HandlerThreadInterface mHandlerThreadInterface;
 	private final RsCtrlService mRsCtrlService;
 	private final RsPeersService mRsPeerService;
@@ -321,7 +330,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 				return;
 			}
 
-			Log.wtf(TAG, "Message sending ended with status ->" + resp.getStatus().getMsg() + "<- code: " + String.valueOf(resp.getStatus().getCode().getNumber()));
+			Log.wtf(TAG, "Message sending ended with status code : " + String.valueOf(resp.getStatus().getCode().getNumber()) + "  and message: " + resp.getStatus().getMsg());
 		}
 	}
 }
