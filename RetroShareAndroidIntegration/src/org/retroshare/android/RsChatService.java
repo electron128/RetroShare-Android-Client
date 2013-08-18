@@ -242,8 +242,6 @@ public class RsChatService implements RsServiceInterface, RsCtrlService.RsCtrlSe
 	{
 		System.err.println("RsChatService: Sending Message:\n"+m);
 
-		//mRsCtrlService.mRsPeersService
-		
     	RsMessage msg = new RsMessage();
     	msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE,Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE, false);
     	msg.body = RequestSendMessage.newBuilder().setMsg(m).build().toByteArray();
