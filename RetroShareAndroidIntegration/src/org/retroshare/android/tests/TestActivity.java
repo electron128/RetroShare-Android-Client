@@ -73,4 +73,13 @@ public class TestActivity extends Activity
 		Intent i = new Intent(this, HtmlBase64ImageGetterTestActivity.class);
 		startActivity(i);
 	}
+
+	public void onButtonTestLobbyChatPressed(View v)
+	{
+		Intent i = new Intent(this, ConversationFragmentActivity.class);
+		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
+		//TODO: ERROR Invalid Lobby Id
+		i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, new RsConversationService.LobbyChatId("1234352133343458182"));
+		startActivity(i);
+	}
 }

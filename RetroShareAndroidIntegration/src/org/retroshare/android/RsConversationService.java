@@ -27,7 +27,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.text.Html;
 import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -94,7 +93,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					case PGP_CHAT:
 						return new PgpChatMessage((PgpChatId)id);
 					case LOBBY_CHAT:
-						return null; //TODO: implmenet LOBBY_CHATMAessage factory
+						return new LobbyChatMessage((LobbyChatId)id);
 					default :
 						return null;
 				}
@@ -128,6 +127,53 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			case PGP_CHAT:
 				sendPgpChatMessage((PgpChatMessage)msg);
 				break;
+			case LOBBY_CHAT:
+				sendLobbyChatMessage((LobbyChatMessage)msg);
+				break;
+		}
+	}
+	public void joinConversation(ConversationId id)
+	{
+		switch (id.getConversationKind())
+		{
+			case LOBBY_CHAT:
+			{
+				LobbyChatId lobbyChatId = (LobbyChatId) id;
+
+				RsMessage msg = new RsMessage();
+				msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE, false);
+
+				msg.body = Chat.RequestJoinOrLeaveLobby.newBuilder()
+						.setLobbyId(lobbyChatId.getChatId().getChatId())
+						.setAction(Chat.RequestJoinOrLeaveLobby.LobbyAction.JOIN_OR_ACCEPT)
+						.build()
+						.toByteArray();
+
+				mRsCtrlService.sendMsg(msg);
+				break;
+			}
+		}
+	}
+	public void leaveConversation(ConversationId id)
+	{
+		switch (id.getConversationKind())
+		{
+			case LOBBY_CHAT:
+			{
+				LobbyChatId lobbyChatId = (LobbyChatId) id;
+
+				RsMessage msg = new RsMessage();
+				msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestJoinOrLeaveLobby_VALUE, false);
+
+				msg.body = Chat.RequestJoinOrLeaveLobby.newBuilder()
+						.setLobbyId(lobbyChatId.getChatId().getChatId())
+						.setAction(Chat.RequestJoinOrLeaveLobby.LobbyAction.LEAVE_OR_DENY)
+						.build()
+						.toByteArray();
+
+				mRsCtrlService.sendMsg(msg);
+				break;
+			}
 		}
 	}
 
@@ -193,11 +239,12 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			try { resp = Chat.EventChatMessage.parseFrom(msg.body); }
 			catch (InvalidProtocolBufferException e) { return; }
 
-			Chat.ChatMessage cMsg = resp.getMsg();
+			ChatMessage cMsg = resp.getMsg();
 
 			switch (cMsg.getId().getChatType())
 			{
 				case TYPE_PRIVATE:
+				{
 					String locationId = cMsg.getId().getChatId();
 					Core.Person author = mRsPeerService.getPersonBySslId(locationId);
 					String authorNick = author.getName();
@@ -211,6 +258,16 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 							.build();
 					appendPgpChatMessageToHistory(new PgpChatMessage(pgpId, dataStoreMsg));
 					break;
+				}
+				case TYPE_LOBBY:
+				{
+					ChatMessage dataStoreMsg = ChatMessage
+							.newBuilder(cMsg)
+							.setRecvTime((int) (System.currentTimeMillis() / 1000L))
+							.build();
+					appendLobbyChatMessageToHistory(new LobbyChatMessage(new LobbyChatId(dataStoreMsg.getId().getChatId()),dataStoreMsg));
+					break;
+				}
 			}
 		}
 	}
@@ -274,35 +331,34 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		public PgpChatMessage(PgpChatId id)
 		{
 			mPgpChatId = id;
-			chatMessage = ChatMessage.newBuilder().buildPartial();
+			mChatMessage = ChatMessage.newBuilder().buildPartial();
 		}
 		public PgpChatMessage(PgpChatId id, ChatMessage cMsg)
 		{
 			mPgpChatId = id;
-			chatMessage = cMsg;
+			mChatMessage = cMsg;
 		}
 
 		@Override public PgpChatId getConversationId() { return mPgpChatId; }
-
-		@Override public String getAuthorString() { return chatMessage.getPeerNickname(); }
-		@Override public void setAuthorString(String author) { chatMessage = ChatMessage.newBuilder(chatMessage).setPeerNickname(author).buildPartial(); }
-		@Override public boolean hasAuthorString() { return chatMessage.hasPeerNickname(); }
-		@Override public String getMessageString() { return chatMessage.getMsg(); }
-		@Override public void setMessageString(String message) { chatMessage = ChatMessage.newBuilder(chatMessage).setMsg(message).buildPartial(); }
-		@Override public boolean hasMessageString() { return chatMessage.hasMsg(); }
+		@Override public String getAuthorString() { return mChatMessage.getPeerNickname(); }
+		@Override public void setAuthorString(String author) { mChatMessage = ChatMessage.newBuilder(mChatMessage).setPeerNickname(author).buildPartial(); }
+		@Override public boolean hasAuthorString() { return mChatMessage.hasPeerNickname(); }
+		@Override public String getMessageString() { return mChatMessage.getMsg(); }
+		@Override public void setMessageString(String message) { mChatMessage = ChatMessage.newBuilder(mChatMessage).setMsg(message).buildPartial(); }
+		@Override public boolean hasMessageString() { return mChatMessage.hasMsg(); }
 		@Override public String getDefaultTimeFormat() { return "HH:mm:ss"; }
-		@Override public boolean hasTime() { return (chatMessage.hasSendTime() || chatMessage.hasRecvTime()); }
-		@Override public void setTime(long time) { chatMessage = ChatMessage.newBuilder().setSendTime((int)(time/1000L)).buildPartial(); }
+		@Override public boolean hasTime() { return (mChatMessage.hasSendTime() || mChatMessage.hasRecvTime()); }
+		@Override public void setTime(long time) { mChatMessage = ChatMessage.newBuilder().setSendTime((int)(time/1000L)).buildPartial(); }
 		@Override public long getTime()
 		{
-			if(chatMessage.hasSendTime()) return (chatMessage.getSendTime() * 1000L);
-			return (chatMessage.getRecvTime()*1000L);
+			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
+			return (mChatMessage.getRecvTime()*1000L);
 		}
 
-		ChatMessage getData() { return chatMessage; }
+		ChatMessage getRawData() { return mChatMessage; }
 
-		private PgpChatId mPgpChatId;
-		private ChatMessage chatMessage;
+		private final PgpChatId mPgpChatId;
+		private ChatMessage mChatMessage;
 	}
 	private void appendPgpChatMessageToHistory(PgpChatMessage msg)
 	{
@@ -313,7 +369,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
 					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
 					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
-			ChatMessage cMsg = msg.getData();
+			ChatMessage cMsg = msg.getRawData();
 			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, cMsg.getPeerNickname(), cMsg.getMsg(), i, false );
 		}
 	}
@@ -324,7 +380,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		RequestSendMessage.Builder builderRequestSendMessage = RequestSendMessage.newBuilder();
 
-		ChatMessage.Builder builderChatMessage = ChatMessage.newBuilder(msg.getData())
+		ChatMessage.Builder builderChatMessage = ChatMessage.newBuilder(msg.getRawData())
 				.setSendTime((int)(System.currentTimeMillis()/1000L))
 				.setPeerNickname(mRsPeerService.getOwnPerson().getName());
 
@@ -350,8 +406,84 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	 */
 	public static final class LobbyChatId implements ConversationId
 	{
-		@Override
-		public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
+		@Override public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
+
+		public LobbyChatId(String lobbyIdString) { mChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_LOBBY).setChatId(lobbyIdString).build(); }
+
+		@Override public boolean equals(Object o)
+		{
+			LobbyChatId c1;
+			try { c1 = (LobbyChatId) o; }
+			catch (ClassCastException e) { return false; }
+
+			return ( mChatId.getChatId().equalsIgnoreCase(c1.getChatId().getChatId()) && (c1.getChatId().getChatType() == Chat.ChatType.TYPE_LOBBY));
+		}
+
+		@Override public int hashCode() { return (mChatId.getChatType().hashCode() ^ mChatId.getChatId().hashCode()); }
+
+		public ChatId getChatId(){ return mChatId; }
+
+		private final ChatId mChatId;
+	}
+	public static final class LobbyChatMessage implements ConversationMessage
+	{
+		public LobbyChatMessage(LobbyChatId chatId) { mLobbyChatId = chatId; mChatMessage = ChatMessage.newBuilder().buildPartial(); }
+		public LobbyChatMessage(LobbyChatId chatId, ChatMessage msg) { mLobbyChatId = chatId; mChatMessage = ChatMessage.newBuilder(msg).buildPartial(); }
+
+		@Override public LobbyChatId getConversationId() { return mLobbyChatId; }
+		@Override public String getAuthorString() { return mChatMessage.getPeerNickname(); }
+		@Override public void setAuthorString(String author) { mChatMessage = ChatMessage.newBuilder(mChatMessage).setPeerNickname(author).buildPartial(); }
+		@Override public boolean hasAuthorString() { return mChatMessage.hasPeerNickname(); }
+		@Override public String getMessageString() { return mChatMessage.getMsg(); }
+		@Override public void setMessageString(String message) { mChatMessage = ChatMessage.newBuilder(mChatMessage).setMsg(message).buildPartial(); }
+		@Override public boolean hasMessageString() { return mChatMessage.hasMsg(); }
+		@Override public String getDefaultTimeFormat() { return "HH:mm:ss"; }
+		@Override public boolean hasTime() { return (mChatMessage.hasSendTime() || mChatMessage.hasRecvTime()); }
+		@Override public void setTime(long time) { mChatMessage = ChatMessage.newBuilder().setSendTime((int)(time/1000L)).buildPartial(); }
+		@Override public long getTime()
+		{
+			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
+			return (mChatMessage.getRecvTime()*1000L);
+		}
+
+		public ChatMessage getRawData() { return mChatMessage; };
+
+		private final LobbyChatId mLobbyChatId;
+		private ChatMessage mChatMessage;
+	}
+	private void appendLobbyChatMessageToHistory(LobbyChatMessage msg)
+	{
+		LobbyChatId pId = msg.getConversationId();
+		appendConversationMessageToHistoryMap(msg);
+		if(notificationForConversationEnabled(pId))
+		{
+			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
+					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
+					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
+			ChatMessage cMsg = msg.getRawData();
+			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, cMsg.getPeerNickname(), cMsg.getMsg(), i, false );
+		}
+	}
+	private void sendLobbyChatMessage(LobbyChatMessage msg)
+	{
+		RsMessage rsMessage = new RsMessage();
+		rsMessage.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestSendMessage_VALUE, false);
+
+		ChatMessage chatMessage = ChatMessage.newBuilder(msg.getRawData())
+				.setSendTime((int)(System.currentTimeMillis()/1000L))
+				.setPeerNickname(mRsPeerService.getOwnPerson().getName())
+				.setId(msg.getConversationId().getChatId())
+				.build();
+
+		RequestSendMessage requestSendMessage = RequestSendMessage.newBuilder()
+				.setMsg(chatMessage)
+				.build();
+
+		rsMessage.body = requestSendMessage.toByteArray();
+
+		mRsCtrlService.sendMsg(rsMessage, new ResponseSendMessageHandler());
+
+		appendConversationMessageToHistoryMap(new LobbyChatMessage(msg.getConversationId(), chatMessage));
 	}
 
 	private final HandlerThreadInterface mHandlerThreadInterface;

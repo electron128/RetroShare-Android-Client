@@ -116,6 +116,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	@Override public void onServiceConnected()
 	{
 		mRsConversationService = getConnectedServer().mRsConversationService;
+		mRsConversationService.joinConversation(cfc.getConversationId(this)); // TODO: this should be moved in future 'ConversationListSomeThing'
 		if(isVisible()) mRsConversationService.registerRsConversationServiceListener(adapter);
 	}
 

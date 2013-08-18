@@ -13,12 +13,17 @@
 	<Button
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="Test Chat Fragment Activity"
+			android:text="Test HtmlBase64ImageGetter"
+			android:onClick="onButtonTestHtmlBase64ImageGetterPressed"/>
+	<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Test PGP_CHAT"
 			android:onClick="onButtonTestFragmentChatActivityPressed"/>
 	<Button
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:text="Test HtmlBase64ImageGetter"
-			android:onClick="onButtonTestHtmlBase64ImageGetterPressed"/>
+			android:text="Test LOBBY_CHAT"
+			android:onClick="onButtonTestLobbyChatPressed"/>
 
 </LinearLayout>
