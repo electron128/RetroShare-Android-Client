@@ -87,7 +87,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		}
 		conversationHistory.add(msg);
 		notifyRsConversationServiceListeners();
-		Log.wtf(TAG(), "conversationHistoryMap contains " + String.valueOf(conversationHistoryMap.keySet().size()) + " conversation");
 	}
 	public List<ConversationMessage> getConversationHistory(ConversationId id)
 	{
@@ -289,15 +288,16 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		ChatId.Builder builderChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE);
 
-		for(Core.Location l : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
+		for(Core.Location location : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
 		{
-			builderChatId.setChatId(l.getSslId());
-			builderChatMessage.setId(builderChatId.build());
-			builderRequestSendMessage.setMsg(builderChatMessage.build());
+			ChatId chatId = builderChatId.setChatId(location.getSslId()).build();
+			ChatMessage chatMessage = builderChatMessage.setId(chatId).build();
+			RequestSendMessage requestSendMessage = builderRequestSendMessage.setMsg(chatMessage).build();
 
-			rsMessage.body = builderRequestSendMessage.build().toByteArray();
+			rsMessage.body = requestSendMessage.toByteArray();
 
-			mRsCtrlService.sendMsg(rsMessage);
+			Log.wtf(TAG(), "Sending \"" + requestSendMessage.getMsg().getMsg() + "\" to " + location.getLocation() + " <" + requestSendMessage.getMsg().getId().getChatId() + ">" );
+			mRsCtrlService.sendMsg(rsMessage, new ResponseSendMessageHandler());
 		}
 
 		appendConversationMessageToHistoryMap(new PgpChatMessage(msg.getConversationId(), builderChatMessage.build()));
@@ -307,4 +307,21 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	private final RsCtrlService mRsCtrlService;
 	private final RsPeersService mRsPeerService;
 	private final Context mContext;
+
+	private static final class ResponseSendMessageHandler extends RsMessageHandler
+	{
+		private static final String TAG = "ResponseSendMessageHandler";
+		@Override public void rsHandleMsg(RsMessage msg)
+		{
+			Chat.ResponseSendMessage resp;
+			try { resp = Chat.ResponseSendMessage.parseFrom(msg.body); }
+			catch (InvalidProtocolBufferException e)
+			{
+				Log.e(TAG, "Received invalid ResponseSendMessage");
+				return;
+			}
+
+			Log.wtf(TAG, "Message sending ended with status ->" + resp.getStatus().getMsg() + "<- code: " + String.valueOf(resp.getStatus().getCode().getNumber()));
+		}
+	}
 }
