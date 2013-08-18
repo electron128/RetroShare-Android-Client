@@ -27,6 +27,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.text.Html;
 import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -49,7 +50,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import rsctrl.chat.Chat.ChatMessage;
 
 public class RsConversationService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener
 {
@@ -74,6 +74,32 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	public static interface ConversationMessage
 	{
 		public ConversationId getConversationId();
+		public String getAuthorString();
+		public void setAuthorString(String author);
+		public boolean hasAuthorString();
+		public String getMessageString();
+		public void setMessageString(String message);
+		public boolean hasMessageString();
+		public String getDefaultTimeFormat();
+		public long getTime();
+		public void setTime(long time);
+		public boolean hasTime();
+
+		public static final class Factory
+		{
+			public static ConversationMessage newConversationMessage(ConversationId id)
+			{
+				switch (id.getConversationKind())
+				{
+					case PGP_CHAT:
+						return new PgpChatMessage((PgpChatId)id);
+					case LOBBY_CHAT:
+						return null; //TODO: implmenet LOBBY_CHATMAessage factory
+					default :
+						return null;
+				}
+			}
+		}
 	}
 	private final Map<ConversationId, ArrayList<ConversationMessage>> conversationHistoryMap = new HashMap<ConversationId, ArrayList<ConversationMessage>>();
 	private void appendConversationMessageToHistoryMap(ConversationMessage msg)
@@ -245,10 +271,10 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	}
 	public static class PgpChatMessage implements ConversationMessage
 	{
-		public PgpChatMessage(PgpChatId id, String message)
+		public PgpChatMessage(PgpChatId id)
 		{
 			mPgpChatId = id;
-			chatMessage = ChatMessage.newBuilder().setMsg(message).buildPartial();
+			chatMessage = ChatMessage.newBuilder().buildPartial();
 		}
 		public PgpChatMessage(PgpChatId id, ChatMessage cMsg)
 		{
@@ -257,10 +283,26 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		}
 
 		@Override public PgpChatId getConversationId() { return mPgpChatId; }
-		public ChatMessage getData() { return chatMessage; }
 
-		private final PgpChatId mPgpChatId;
-		private final ChatMessage chatMessage;
+		@Override public String getAuthorString() { return chatMessage.getPeerNickname(); }
+		@Override public void setAuthorString(String author) { chatMessage = ChatMessage.newBuilder(chatMessage).setPeerNickname(author).buildPartial(); }
+		@Override public boolean hasAuthorString() { return chatMessage.hasPeerNickname(); }
+		@Override public String getMessageString() { return chatMessage.getMsg(); }
+		@Override public void setMessageString(String message) { chatMessage = ChatMessage.newBuilder(chatMessage).setMsg(message).buildPartial(); }
+		@Override public boolean hasMessageString() { return chatMessage.hasMsg(); }
+		@Override public String getDefaultTimeFormat() { return "HH:mm:ss"; }
+		@Override public boolean hasTime() { return (chatMessage.hasSendTime() || chatMessage.hasRecvTime()); }
+		@Override public void setTime(long time) { chatMessage = ChatMessage.newBuilder().setSendTime((int)(time/1000L)).buildPartial(); }
+		@Override public long getTime()
+		{
+			if(chatMessage.hasSendTime()) return (chatMessage.getSendTime() * 1000L);
+			return (chatMessage.getRecvTime()*1000L);
+		}
+
+		ChatMessage getData() { return chatMessage; }
+
+		private PgpChatId mPgpChatId;
+		private ChatMessage chatMessage;
 	}
 	private void appendPgpChatMessageToHistory(PgpChatMessage msg)
 	{
