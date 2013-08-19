@@ -192,7 +192,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		isInForeground = true;
 	}
 
-	protected List<WeakReference<ProxiedFragmentBase>> proxiedFragList = new ArrayList<WeakReference<ProxiedFragmentBase>>();
+	protected List<WeakReference<ProxiedFragmentBase>> proxiedFragList = new ArrayList<WeakReference<ProxiedFragmentBase>>(); // TODO: move this to WeakHashSet
 	@Override
 	public void onAttachFragment (Fragment fragment)
 	{

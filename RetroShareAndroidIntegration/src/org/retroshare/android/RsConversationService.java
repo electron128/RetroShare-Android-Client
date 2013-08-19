@@ -35,10 +35,13 @@ import rsctrl.chat.Chat;
 import rsctrl.chat.Chat.RequestSendMessage;
 import rsctrl.chat.Chat.ChatMessage;
 import rsctrl.chat.Chat.ChatId;
+import rsctrl.chat.Chat.ChatLobbyInfo;
+import rsctrl.chat.Chat.ResponseChatLobbies;
+import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.core.Core;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
-import org.retroshare.android.utils.WeakHashSet;
+//import org.retroshare.android.utils.WeakHashSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -69,6 +72,24 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	public static interface ConversationId extends Serializable
 	{
 		public ConversationKind getConversationKind();
+
+		public static class Factory
+		{
+			public static ConversationId getConversationId(Serializable s) throws ClassCastException
+			{
+				ConversationId cId = (ConversationId) s;
+
+				switch (cId.getConversationKind())
+				{
+					case PGP_CHAT:
+						return PgpChatId.Factory.getPgpChatId(s);
+					case LOBBY_CHAT:
+						return LobbyChatId.Factory.getLobbyChatId(s);
+				}
+
+				throw new ClassCastException("Unknown Conversation Kind");
+			}
+		}
 	}
 	public static interface ConversationMessage
 	{
@@ -111,6 +132,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			conversationHistoryMap.put(id, conversationHistory);
 		}
 		conversationHistory.add(msg);
+		Log.wtf(TAG(), "conversationHistoryMap.size() = " + String.valueOf(conversationHistoryMap.size()) + " conversationHistory.size() = " + String.valueOf(conversationHistory.size()) );
 		notifyRsConversationServiceListeners();
 	}
 	public List<ConversationMessage> getConversationHistory(ConversationId id)
@@ -185,7 +207,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		public void onConversationsUpdate(); // Add some data passing via some ConversationEvent or stuff like that to make room to more optimization ( for example we can pass just new messages instead of reload the entire list )
 	}
 	private final class RsConversationServiceUpdateListenerRunnable implements Runnable	{ @Override public void run() { for(RsConversationServiceListener listener : mRsConversationServiceListenersSet) listener.onConversationsUpdate(); } }
-	private final Set<RsConversationServiceListener> mRsConversationServiceListenersSet = new WeakHashSet<RsConversationServiceListener>();
+	private final Set<RsConversationServiceListener> mRsConversationServiceListenersSet = new HashSet<RsConversationServiceListener>();
 	public void registerRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.add(listener); }
 	public void unregisterRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.remove(listener); }
 	private void notifyRsConversationServiceListeners() { mHandlerThreadInterface.postToHandlerThread(new RsConversationServiceUpdateListenerRunnable()); }
@@ -227,12 +249,39 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			msg.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestRegisterEvents_VALUE, false);
 			msg.body = reqb.build().toByteArray();
 			mRsCtrlService.sendMsg(msg);
+
+			requestLobbiesListUpdate();
 		}
 	}
 
 	@Override /** Implements RsServiceInterface */
 	public void handleMessage(RsCtrlService.RsMessage msg)
 	{
+		Log.wtf(TAG(), "Parsing message with id " + String.valueOf(msg.msgId));
+
+		if( msg.msgId == RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE, true))
+		{
+//			Log.wtf(TAG(), "Parsing lobbies message reponse 1");
+
+			ResponseChatLobbies resp;
+			try { resp = Chat.ResponseChatLobbies.parseFrom(msg.body); }
+			catch (InvalidProtocolBufferException e) {return;}
+
+//			Log.wtf(TAG(), "Parsing lobbies message reponse 2");
+
+			if(resp.getLobbiesCount() > 0)
+			{
+//				Log.wtf(TAG(), "Parsing lobbies message reponse 3");
+				lobbiesRepository.clear();
+				for (ChatLobbyInfo lobby : resp.getLobbiesList()) lobbiesRepository.put(LobbyChatId.Factory.getLobbyChatId(lobby.getLobbyId()), lobby);
+			}
+
+//			Log.wtf(TAG(), "Parsing lobbies message reponse 4");
+			notifyRsConversationServiceListeners();
+
+			return;
+		}
+
 		if( msg.msgId == RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.ResponseMsgIds.MsgId_EventChatMessage_VALUE, true))
 		{
 			Chat.EventChatMessage resp;
@@ -250,7 +299,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					String authorNick = author.getName();
 					if(authorNick.equals(mRsPeerService.getOwnPerson().getName())) for(Core.Location location : author.getLocationsList()) if (location.getSslId().equals(locationId)) authorNick+=(" (" + location.getLocation() + ")"); // Append location name to nick if the author has the same nick of the user
 					String sPgpId = author.getGpgId();
-					PgpChatId pgpId = PgpChatId.PgpChatIdFactory.getPgpChatId(sPgpId);
+					PgpChatId pgpId = PgpChatId.Factory.getPgpChatId(sPgpId);
 					ChatMessage dataStoreMsg = ChatMessage
 							.newBuilder(cMsg)
 							.setPeerNickname(authorNick)
@@ -265,13 +314,13 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 							.newBuilder(cMsg)
 							.setRecvTime((int) (System.currentTimeMillis() / 1000L))
 							.build();
-					appendLobbyChatMessageToHistory(new LobbyChatMessage(new LobbyChatId(dataStoreMsg.getId().getChatId()),dataStoreMsg));
+					appendLobbyChatMessageToHistory(new LobbyChatMessage(LobbyChatId.Factory.getLobbyChatId(dataStoreMsg.getId().getChatId()), dataStoreMsg));
 					break;
 				}
 			}
+			return;
 		}
 	}
-
 
 	/**
 	 * PGP_CHAT stuff
@@ -293,7 +342,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		@Override public int hashCode() { return mPgpId.hashCode(); }
 
-		public static final class PgpChatIdFactory
+		public static final class Factory
 		{
 			public static PgpChatId getPgpChatId(String destinationPgpId)
 			{
@@ -303,7 +352,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					ret = new PgpChatId(destinationPgpId);
 					repository.put(destinationPgpId, ret);
 				}
-				Log.wtf("PgpChatIdFactory", "factory contains " + String.valueOf(repository.size()) + " PgpId");
 				return ret;
 			}
 
@@ -381,7 +429,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		RequestSendMessage.Builder builderRequestSendMessage = RequestSendMessage.newBuilder();
 
 		ChatMessage.Builder builderChatMessage = ChatMessage.newBuilder(msg.getRawData())
-				.setSendTime((int)(System.currentTimeMillis()/1000L))
+				.setSendTime((int) (System.currentTimeMillis() / 1000L))
 				.setPeerNickname(mRsPeerService.getOwnPerson().getName());
 
 		ChatId.Builder builderChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE);
@@ -407,9 +455,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	public static final class LobbyChatId implements ConversationId
 	{
 		@Override public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
-
-		public LobbyChatId(String lobbyIdString) { mChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_LOBBY).setChatId(lobbyIdString).build(); }
-
 		@Override public boolean equals(Object o)
 		{
 			LobbyChatId c1;
@@ -418,11 +463,39 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 			return ( mChatId.getChatId().equalsIgnoreCase(c1.getChatId().getChatId()) && (c1.getChatId().getChatType() == Chat.ChatType.TYPE_LOBBY));
 		}
-
-		@Override public int hashCode() { return (mChatId.getChatType().hashCode() ^ mChatId.getChatId().hashCode()); }
-
+		@Override public int hashCode() { return mChatId.getChatId().hashCode(); }
 		public ChatId getChatId(){ return mChatId; }
 
+		public final static class Factory
+		{
+			public static LobbyChatId getLobbyChatId(String lobbyIdString)
+			{
+				LobbyChatId ret = repository.get(lobbyIdString);
+				if(ret == null)
+				{
+					ret = new LobbyChatId(lobbyIdString);
+					repository.put(lobbyIdString, ret);
+				}
+				return ret;
+			}
+
+			public static LobbyChatId getLobbyChatId(Serializable s) throws ClassCastException
+			{
+				LobbyChatId param = (LobbyChatId) s;
+				String lobbyId = param.getChatId().getChatId();
+				LobbyChatId ret = repository.get(lobbyId);
+				if(ret == null)
+				{
+					ret = param;
+					repository.put(lobbyId, ret);
+				}
+				return ret;
+			}
+
+			private static final Map<String, LobbyChatId> repository = new WeakHashMap<String, LobbyChatId>();
+		}
+
+		private LobbyChatId(String lobbyIdString) { mChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_LOBBY).setChatId(lobbyIdString).build(); }
 		private final ChatId mChatId;
 	}
 	public static final class LobbyChatMessage implements ConversationMessage
@@ -451,6 +524,19 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		private final LobbyChatId mLobbyChatId;
 		private ChatMessage mChatMessage;
 	}
+	public void requestLobbiesListUpdate()
+	{
+		RsMessage rsMessage = new RsMessage();
+		rsMessage.msgId = RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.RequestMsgIds.MsgId_RequestChatLobbies_VALUE, false);
+		rsMessage.body = RequestChatLobbies.newBuilder()
+				.setLobbySet(RequestChatLobbies.LobbySet.LOBBYSET_ALL)
+				.build()
+				.toByteArray();
+
+		mRsCtrlService.sendMsg(rsMessage);
+	}
+	public List<ChatLobbyInfo> getLobbiesList() { return new ArrayList<ChatLobbyInfo>(lobbiesRepository.values()); }
+	public ChatLobbyInfo getLobbyInfo(LobbyChatId id) { return lobbiesRepository.get(id); }
 	private void appendLobbyChatMessageToHistory(LobbyChatMessage msg)
 	{
 		LobbyChatId pId = msg.getConversationId();
@@ -485,7 +571,11 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		appendConversationMessageToHistoryMap(new LobbyChatMessage(msg.getConversationId(), chatMessage));
 	}
+	private final Map<LobbyChatId, Chat.ChatLobbyInfo> lobbiesRepository = new HashMap<LobbyChatId, ChatLobbyInfo>();
 
+	/**
+	 * Internal stuff
+	 */
 	private final HandlerThreadInterface mHandlerThreadInterface;
 	private final RsCtrlService mRsCtrlService;
 	private final RsPeersService mRsPeerService;

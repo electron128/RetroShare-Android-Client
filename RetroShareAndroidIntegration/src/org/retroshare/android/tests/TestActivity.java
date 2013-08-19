@@ -27,9 +27,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import org.retroshare.android.ConversationFragmentActivity;
+import org.retroshare.android.LobbiesListFragment;
+import org.retroshare.android.LobbiesListFragmentActivity;
 import org.retroshare.android.R;
 import org.retroshare.android.RsConversationService;
-import org.retroshare.android.RsConversationService.PgpChatId.PgpChatIdFactory;
 
 
 public class TestActivity extends Activity
@@ -64,7 +65,7 @@ public class TestActivity extends Activity
 	{
 		Intent i = new Intent(this, ConversationFragmentActivity.class);
 		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
-		i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, PgpChatIdFactory.getPgpChatId("F444EB20C713A5C0"));
+		i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, RsConversationService.PgpChatId.Factory.getPgpChatId("F444EB20C713A5C0"));
 		startActivity(i);
 	}
 
@@ -76,10 +77,8 @@ public class TestActivity extends Activity
 
 	public void onButtonTestLobbyChatPressed(View v)
 	{
-		Intent i = new Intent(this, ConversationFragmentActivity.class);
-		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
-		//TODO: ERROR Invalid Lobby Id
-		i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, new RsConversationService.LobbyChatId("1234352133343458182"));
+		Intent i = new Intent(this, LobbiesListFragmentActivity.class);
+		i.putExtra(LobbiesListFragmentActivity.SERVER_NAME_EXTRA, "testServer");
 		startActivity(i);
 	}
 }

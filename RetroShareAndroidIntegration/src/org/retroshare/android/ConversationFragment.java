@@ -45,11 +45,14 @@ import org.retroshare.android.utils.Util;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.retroshare.android.RsConversationService.ConversationId;
 import org.retroshare.android.RsConversationService.ConversationMessage;
+//import org.retroshare.android.utils.WeakHashSet;
 
 
 public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener
@@ -60,7 +63,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	private RsConversationService mRsConversationService;
 
 	private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
-	private final ChatMsgAdapter adapter = new ChatMsgAdapter();
+	private final ConversationAdapter adapter = new ConversationAdapter();
 	private ListView chatMessageList;
 	private LayoutInflater mInflater;
 	private int lastShowedPosition = 0;
@@ -101,29 +104,24 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			RsConversationService rsc = getConnectedServer().mRsConversationService;
 			rsc.cancelNotificationForConversation(id);
 			rsc.disableNotificationForConversation(id);
-			rsc.registerRsConversationServiceListener(adapter);
 		}
 	}
 	@Override public void onPause()
 	{
-		if(isBound())
-		{
-			mRsConversationService.unregisterRsConversationServiceListener(adapter);
-			mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
-		}
+		if(isBound()) mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
 		super.onPause();
 	}
 	@Override public void onServiceConnected()
 	{
 		mRsConversationService = getConnectedServer().mRsConversationService;
-		mRsConversationService.joinConversation(cfc.getConversationId(this)); // TODO: this should be moved in future 'ConversationListSomeThing'
-		if(isVisible()) mRsConversationService.registerRsConversationServiceListener(adapter);
+		super.onServiceConnected();
 	}
+	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(adapter); }
+	@Override public void unregisterRsServicesListeners() { mRsConversationService.unregisterRsConversationServiceListener(adapter); }
 
-	private class ChatMsgAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
+
+	private class ConversationAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
-		private List<DataSetObserver> observerList = new ArrayList<DataSetObserver>();
-
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
@@ -153,7 +151,14 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			protected List<_ChatMessage> doInBackground(Void... voids)
 			{
 				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
-				List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(cfc.getConversationId(ConversationFragment.this));
+				ConversationId id = cfc.getConversationId(ConversationFragment.this);
+				if(id.getConversationKind() == RsConversationService.ConversationKind.LOBBY_CHAT)
+				{
+					String lobbyId = ((RsConversationService.LobbyChatId) id).getChatId().getChatId();
+					Log.wtf(TAG(), "requesting conversationHistory for lobby " + lobbyId);
+				}
+				List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(id);
+				Log.wtf(TAG(), "-_- conversationHistory.size() = " + String.valueOf(msgs.size()));
 				for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
 				return fmsg;
 			}
@@ -178,8 +183,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 		@Override public void onConversationsUpdate() { new UpdateMessagesAsyncTask().execute(null, null, null); }
 		@Override public int getViewTypeCount() { return 1; }
-		@Override public void registerDataSetObserver(DataSetObserver observer) { observerList.add(observer); }
-		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
+		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
+		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
 		@Override public boolean areAllItemsEnabled() { return true; }
 		@Override public boolean isEnabled(int position) { return true; }
 		@Override public boolean hasStableIds() { return false; }
@@ -189,10 +194,12 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		@Override public long getItemId(int position) { return 0; }
 		@Override public Object getItem(int position) { return messageList.get(position); }
 
+		private Set<DataSetObserver> observerSet = new HashSet<DataSetObserver>();
+
 		/**
 		 * Notify data observer that fresh data are available
 		 */
-		public void notifyObservers() { for(DataSetObserver obs : observerList) obs.onChanged(); }
+		public void notifyObservers() { for(DataSetObserver obs : observerSet) obs.onChanged(); }
 	}
 
 	private class _ChatMessage

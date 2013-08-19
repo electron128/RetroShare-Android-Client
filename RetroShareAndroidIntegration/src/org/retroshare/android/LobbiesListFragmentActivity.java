@@ -22,25 +22,13 @@ package org.retroshare.android;
 
 import android.os.Bundle;
 
-import org.retroshare.android.RsConversationService.ConversationId;
 
-
-public class ConversationFragmentActivity extends ProxiedFragmentActivityBase implements ConversationFragment.ConversationFragmentContainer
+public class LobbiesListFragmentActivity extends ProxiedFragmentActivityBase
 {
-	public final static String CONVERSATION_ID_EXTRA = "conversationID";
-
-	private ConversationId actualConversationId;
-
-	@Override /** Implements ConversationFragmentContainer */
-	public ConversationId getConversationId(ConversationFragment f) { return actualConversationId; }
-
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		actualConversationId = ConversationId.Factory.getConversationId(getIntent().getSerializableExtra(CONVERSATION_ID_EXTRA));
-
-		setContentView(R.layout.factivity_conversation);
+		setContentView(R.layout.factivity_lobbieslist);
 	}
 }

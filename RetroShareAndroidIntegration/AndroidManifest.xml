@@ -82,6 +82,7 @@
 		<activity android:name=".AddServerActivity" />
 		<activity android:name=".ServerChooserActivity" />
 		<activity android:name=".ConversationFragmentActivity" />
+		<activity android:name=".LobbiesListFragmentActivity" />
 
 		<!-- Android RetroShare Proxy BEGIN -->
 		<service android:name=".RetroShareAndroidProxy" />

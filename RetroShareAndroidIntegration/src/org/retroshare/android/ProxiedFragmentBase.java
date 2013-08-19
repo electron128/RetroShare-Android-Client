@@ -34,10 +34,46 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 {
 	public String TAG() { return "ProxiedFragmentBase"; }
 
-	private ProxiedInterface pxIf;
+	/**
+	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
+	 */
+	protected void onServiceConnected()
+	{
+		if(isUserVisible()) registerRsServicesListeners();
+	}
 
-	@Override
-	public void onAttach(Activity a)
+	/**
+	 * @return true if it is visible to the user, false otherwise
+	 */
+	public boolean isUserVisible() { return (isVisible() && userVisible); }
+
+	/**
+	 * Fragment who need to register Rs*Listener should do it inside this method
+	 */
+	public void registerRsServicesListeners() {}
+
+	/**
+	 *
+	 * Fragment who need to unregister Rs*Listener should do it inside this method
+	 */
+	public void unregisterRsServicesListeners() {}
+
+	@Override public boolean isBound() { return pxIf.isBound(); }
+	@Override public RetroShareAndroidProxy getRsProxy() { return pxIf.getRsProxy();}
+	@Override public RsCtrlService getConnectedServer() { return pxIf.getConnectedServer(); }
+	@Override public void onPause()
+	{
+		userVisible = false;
+		if(isBound()) unregisterRsServicesListeners();
+		super.onPause();
+	}
+	@Override public void onResume()
+	{
+		super.onResume();
+		userVisible = true;
+		if(isBound()) registerRsServicesListeners();
+	}
+	@Override public void onAttach(Activity a)
 	{
 		super.onAttach(a);
 
@@ -45,13 +81,6 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ProxiedInterface"); }
 	}
 
-	/**
-	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
-	 */
-	protected void onServiceConnected()
-	{}
-
-	@Override public boolean isBound() { return pxIf.isBound(); }
-	@Override public RetroShareAndroidProxy getRsProxy() { return pxIf.getRsProxy();}
-	@Override public RsCtrlService getConnectedServer() { return pxIf.getConnectedServer(); }
+	private ProxiedInterface pxIf;
+	private boolean userVisible = false;
 }
