@@ -132,7 +132,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			conversationHistoryMap.put(id, conversationHistory);
 		}
 		conversationHistory.add(msg);
-		Log.wtf(TAG(), "conversationHistoryMap.size() = " + String.valueOf(conversationHistoryMap.size()) + " conversationHistory.size() = " + String.valueOf(conversationHistory.size()) );
+//		Log.wtf(TAG(), "conversationHistoryMap.size() = " + String.valueOf(conversationHistoryMap.size()) + " conversationHistory.size() = " + String.valueOf(conversationHistory.size()) );
 		notifyRsConversationServiceListeners();
 	}
 	public List<ConversationMessage> getConversationHistory(ConversationId id)
@@ -257,7 +257,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	@Override /** Implements RsServiceInterface */
 	public void handleMessage(RsCtrlService.RsMessage msg)
 	{
-		Log.wtf(TAG(), "Parsing message with id " + String.valueOf(msg.msgId));
+//		Log.wtf(TAG(), "Parsing message with id " + String.valueOf(msg.msgId));
 
 		if( msg.msgId == RsCtrlService.constructMsgId(Core.ExtensionId.CORE_VALUE, Core.PackageId.CHAT_VALUE, Chat.ResponseMsgIds.MsgId_ResponseChatLobbies_VALUE, true))
 		{

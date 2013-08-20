@@ -37,15 +37,12 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	/**
 	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
 	 */
-	protected void onServiceConnected()
-	{
-		if(isUserVisible()) registerRsServicesListeners();
-	}
+	protected void onServiceConnected() { if(isUserVisible()) registerRsServicesListeners(); }
 
 	/**
 	 * @return true if it is visible to the user, false otherwise
 	 */
-	public boolean isUserVisible() { return (isVisible() && userVisible); }
+	public boolean isUserVisible() { return notPaused; }
 
 	/**
 	 * Fragment who need to register Rs*Listener should do it inside this method
@@ -63,14 +60,14 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	@Override public RsCtrlService getConnectedServer() { return pxIf.getConnectedServer(); }
 	@Override public void onPause()
 	{
-		userVisible = false;
+		notPaused = false;
 		if(isBound()) unregisterRsServicesListeners();
 		super.onPause();
 	}
 	@Override public void onResume()
 	{
 		super.onResume();
-		userVisible = true;
+		notPaused = true;
 		if(isBound()) registerRsServicesListeners();
 	}
 	@Override public void onAttach(Activity a)
@@ -82,5 +79,5 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	}
 
 	private ProxiedInterface pxIf;
-	private boolean userVisible = false;
+	private boolean notPaused = false;
 }

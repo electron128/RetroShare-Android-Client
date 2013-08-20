@@ -52,11 +52,12 @@ import java.util.regex.Pattern;
 
 import org.retroshare.android.RsConversationService.ConversationId;
 import org.retroshare.android.RsConversationService.ConversationMessage;
-//import org.retroshare.android.utils.WeakHashSet;
 
 
 public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener
 {
+	@Override public String TAG() { return "ConversationFragment"; }
+
 	interface ConversationFragmentContainer { ConversationId getConversationId(ConversationFragment f); }
 	private ConversationFragmentContainer cfc;
 
@@ -100,10 +101,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		if(isBound())
 		{
 			ConversationId id = cfc.getConversationId(this);
-
-			RsConversationService rsc = getConnectedServer().mRsConversationService;
-			rsc.cancelNotificationForConversation(id);
-			rsc.disableNotificationForConversation(id);
+			mRsConversationService.cancelNotificationForConversation(id);
+			mRsConversationService.disableNotificationForConversation(id);
 		}
 	}
 	@Override public void onPause()
@@ -118,7 +117,6 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(adapter); }
 	@Override public void unregisterRsServicesListeners() { mRsConversationService.unregisterRsConversationServiceListener(adapter); }
-
 
 	private class ConversationAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
@@ -152,13 +150,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			{
 				List<_ChatMessage> fmsg = new ArrayList<_ChatMessage>();
 				ConversationId id = cfc.getConversationId(ConversationFragment.this);
-				if(id.getConversationKind() == RsConversationService.ConversationKind.LOBBY_CHAT)
-				{
-					String lobbyId = ((RsConversationService.LobbyChatId) id).getChatId().getChatId();
-					Log.wtf(TAG(), "requesting conversationHistory for lobby " + lobbyId);
-				}
 				List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(id);
-				Log.wtf(TAG(), "-_- conversationHistory.size() = " + String.valueOf(msgs.size()));
 				for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ChatMessage(msg));
 				return fmsg;
 			}
