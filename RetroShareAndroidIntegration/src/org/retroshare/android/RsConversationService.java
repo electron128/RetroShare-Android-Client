@@ -41,7 +41,6 @@ import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.core.Core;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
-//import org.retroshare.android.utils.WeakHashSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;

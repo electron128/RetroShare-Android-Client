@@ -37,6 +37,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -131,7 +133,12 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 
 		private final class UpdateLobbiesListAsyncTask extends AsyncTask<Void, Void, List<Chat.ChatLobbyInfo>>
 		{
-			@Override protected List<Chat.ChatLobbyInfo> doInBackground(Void... voids) { return mRsConversationService.getLobbiesList(); }
+			@Override protected List<Chat.ChatLobbyInfo> doInBackground(Void... voids)
+			{
+				List<Chat.ChatLobbyInfo> ret = mRsConversationService.getLobbiesList();
+				Collections.sort(ret, new AlphabeticalLobbiesComparator());
+				return ret;
+			}
 			@Override protected void onPostExecute(List<Chat.ChatLobbyInfo> ml)
 			{
 				lobbiesList = ml;
@@ -139,7 +146,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 			}
 		}
 
-		private final Set<DataSetObserver> observerSet = new HashSet<DataSetObserver>(); //TODO: it is better to use WeakHashSet on first try it sometime raised NullPointer on notify...
+		private final Set<DataSetObserver> observerSet = new HashSet<DataSetObserver>();
 	}
 
 	private Handler mHandler;
@@ -153,4 +160,5 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 			mHandler.postAtTime(new RequestLobbiesListUpdateRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVAL);
 		}
 	}
+	private static final class AlphabeticalLobbiesComparator implements Comparator<Chat.ChatLobbyInfo> { @Override public int compare(Chat.ChatLobbyInfo c1, Chat.ChatLobbyInfo c2) { return c1.getLobbyName().compareToIgnoreCase(c2.getLobbyName()); } }
 }
