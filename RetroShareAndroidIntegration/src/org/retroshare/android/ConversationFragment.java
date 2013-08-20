@@ -22,7 +22,12 @@ package org.retroshare.android;
 
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -42,6 +47,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.retroshare.android.utils.HtmlBase64ImageGetter;
 import org.retroshare.android.utils.Util;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,14 +81,37 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View fv = inflater.inflate(R.layout.chat_fragment, container);
+		View fv = inflater.inflate(R.layout.conversation_fragment, container);
+
+		/**
+		 * Message List
+		 */
 		chatMessageList = (ListView)fv.findViewById(R.id.chatMessageList);
 		chatMessageList.setAdapter(adapter);
-		fv.findViewById(R.id.chatFragmentMessageEditText).setOnKeyListener(this);
+
+		/**
+		 * New message editor
+		 */
+		View inputTextView = fv.findViewById(R.id.chatFragmentMessageEditText);
+		inputTextView.setOnKeyListener(this);
+		inputTextView.setOnLongClickListener(new OnShowSendExtraLongClickListener());
+
+		/**
+		 * More item down indicator
+		 */
 		View moreMessageDownIndicator = fv.findViewById(R.id.moreChatMessageDownImageView);
 		moreMessageDownIndicator.setVisibility(View.INVISIBLE);
 		moreMessageDownIndicator.setOnClickListener(new GoDownButtonListener());
 		chatMessageList.setScrollIndicators(null, moreMessageDownIndicator);
+
+		/**
+		 * Send Extra menu
+		 */
+		sendExtraMenu = fv.findViewById(R.id.sendExtraLayout);
+		sendExtraMenu.setVisibility(View.INVISIBLE);
+		sendExtraMenu.findViewById(R.id.sendImageButton).setOnClickListener(new OnAddImageClickListener());
+		sendExtraMenu.findViewById(R.id.sendFileButton).setVisibility(View.GONE);
+
 		return fv;
 	}
 	@Override public void onAttach(Activity a)
@@ -272,6 +302,57 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 
 	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition())-1); }
+
+
+	private View sendExtraMenu;
+	private final class OnShowSendExtraLongClickListener implements View.OnLongClickListener { @Override public boolean onLongClick(View view) { sendExtraMenu.setVisibility(View.VISIBLE); return true; } }
+	private final static int SELECT_IMAGE_INTENT_REQUEST_CODE = 1;
+	private final class OnAddImageClickListener implements View.OnClickListener
+	{
+		@Override public void onClick(View view)
+		{
+			sendExtraMenu.setVisibility(View.INVISIBLE);
+
+			Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+			photoPickerIntent.setType("image/*");
+			startActivityForResult(photoPickerIntent, SELECT_IMAGE_INTENT_REQUEST_CODE);
+		}
+	}
+	@Override public void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if(resultCode != Activity.RESULT_OK) return;
+
+		switch (requestCode)
+		{
+			case SELECT_IMAGE_INTENT_REQUEST_CODE:
+			{
+				// TODO use an async task to do this big work
+				// http://stackoverflow.com/questions/6158819/scaling-images-in-android-causes-outofmemory-exception
+				// http://developer.android.com/reference/android/graphics/BitmapFactory.Options.html#inSampleSize
+				Uri imageUri = data.getData();
+				ContentResolver contentResolver = getActivity().getContentResolver();
+
+				InputStream imageStream;
+				try { imageStream = contentResolver.openInputStream(imageUri); }
+				catch (FileNotFoundException e) {return;}
+				Bitmap bitmapImage = Util.downScaleIfBiggerThenMaxDimension(BitmapFactory.decodeStream(imageStream), 100);
+
+				String messageBody = new String();
+				messageBody += "<img src=\"data:";
+				messageBody += contentResolver.getType(imageUri);
+				messageBody += ";base64,";
+				messageBody += Util.encodeTobase64(bitmapImage);
+				messageBody += "\"/>";
+
+				ConversationId id = cfc.getConversationId(this);
+				ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
+				msg.setMessageString(messageBody);
+				mRsConversationService.sendConversationMessage(msg);
+
+				break;
+			}
+		}
+	}
 
 	public ConversationFragment() { super(); }
 }

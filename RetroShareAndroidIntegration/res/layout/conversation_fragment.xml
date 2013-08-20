@@ -36,5 +36,29 @@
 				android:layout_marginRight="2dp"
 				android:src="@android:drawable/arrow_down_float"
 			/>
+	<LinearLayout	android:id="@+id/sendExtraLayout"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:gravity="center"
+					android:visibility="visible"
+					android:layout_above="@id/inputLayout"
+					android:layout_marginBottom="15dp">
+
+		<ImageButton	android:id="@+id/sendImageButton"
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:layout_margin="5dp"
+						android:padding="12dp"
+						android:src="@drawable/add_image"/>
+
+		<ImageButton	android:id="@+id/sendFileButton"
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:layout_margin="5dp"
+						android:padding="12dp"
+						android:src="@drawable/add_share"/>
+
+	</LinearLayout>
 
 </RelativeLayout>

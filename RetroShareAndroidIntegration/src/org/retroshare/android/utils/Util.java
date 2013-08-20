@@ -128,4 +128,18 @@ public class Util
 		byte[] decodedByte = Base64.decode(input, 0);
 		return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
 	}
+	public static Bitmap downScaleIfBiggerThenMaxDimension(Bitmap input, int maxDimension)
+	{
+		Bitmap ret = input;
+		int h = input.getHeight();
+		int w = input.getWidth();
+		if( h > maxDimension || w > maxDimension)
+		{
+			int scaleRatio;
+			if( h > w ) scaleRatio = maxDimension/h;
+			else scaleRatio = maxDimension/w;
+			ret = Bitmap.createScaledBitmap(input, w*scaleRatio, h*scaleRatio, false);
+		}
+		return ret;
+	}
 }
