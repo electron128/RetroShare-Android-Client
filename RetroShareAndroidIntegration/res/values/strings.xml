@@ -10,7 +10,8 @@
     <string name="edit">Edit</string>
 	<string name="save">Save</string>
 	<string name="delete">Delete</string>
-    <string name="leave_lobby">leave lobby</string>
+    <string name="leave_lobby">Leave lobby</string>
+	<string name="join_lobby">Join lobby</string>
     <string name="send_chat">send chat</string>
     <string name="insert_message_here">insert message here</string>
     <string name="peers">peers</string>

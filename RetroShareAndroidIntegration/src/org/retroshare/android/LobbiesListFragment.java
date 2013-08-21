@@ -28,7 +28,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -64,6 +66,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		lobbiesListView = (ListView) fv.findViewById(R.id.lobbiesList);
 		lobbiesListView.setAdapter(lobbiesListAdapter);
 		lobbiesListView.setOnItemClickListener(lobbiesListAdapter);
+		registerForContextMenu(lobbiesListView);
 
 		return fv;
 	}
@@ -81,6 +84,17 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 	}
 	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(lobbiesListAdapter); }
 	@Override public void unregisterRsServicesListeners() { mRsConversationService.unregisterRsConversationServiceListener(lobbiesListAdapter); }
+	@Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+	{
+		super.onCreateContextMenu(menu, v, menuInfo);
+		getActivity().getMenuInflater().inflate(R.menu.lobbies_list_context_menu, menu);
+		int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
+		boolean joined = lobbiesList.get(position).getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED);
+		MenuItem joinItem = menu.findItem(R.id.join_lobby).setVisible(!joined);
+		MenuItem leaveItem = menu.findItem(R.id.leave_lobby).setVisible(joined);
+		if(joined) leaveItem.setOnMenuItemClickListener(new LeaveLobbyMenuItemClickListener(position));
+		else joinItem.setOnMenuItemClickListener(new JoinLobbyMenuItemClickListener(position));
+	}
 
 	private class LobbiesListAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener, AdapterView.OnItemClickListener
 	{
@@ -94,11 +108,13 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 
 			TextView nameTextView =  (TextView) lv.findViewById(R.id.lobbyNameTextView);
 			nameTextView.setText(lobbyInfo.getLobbyName());
+			if(lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED))
+				nameTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+			else
+				nameTextView.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
 
 			TextView peerCountTextView = (TextView) lv.findViewById(R.id.lobbyParticipantsNumberTextView);
 			peerCountTextView.setText("(" + String.valueOf(lobbyInfo.getNoPeers()) + ")");
-
-			// TODO make a difference between joined lobbies and not
 
 			return lv;
 		}
@@ -124,8 +140,9 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		@Override
 		public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
 		{
-			RsConversationService.LobbyChatId id = RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(i).getLobbyId());
-			mRsConversationService.joinConversation(id);
+			Chat.ChatLobbyInfo lobbyInfo = lobbiesList.get(i);
+			RsConversationService.LobbyChatId id = RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbyInfo.getLobbyId());
+			if(!lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED)) mRsConversationService.joinConversation(id);
 			Intent intent = new Intent();
 			intent.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, id);
 			((ProxiedFragmentActivityBase)getActivity()).startActivity(ConversationFragmentActivity.class, intent);
@@ -161,4 +178,26 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		}
 	}
 	private static final class AlphabeticalLobbiesComparator implements Comparator<Chat.ChatLobbyInfo> { @Override public int compare(Chat.ChatLobbyInfo c1, Chat.ChatLobbyInfo c2) { return c1.getLobbyName().compareToIgnoreCase(c2.getLobbyName()); } }
+	private final class JoinLobbyMenuItemClickListener implements MenuItem.OnMenuItemClickListener
+	{
+		private final int position;
+		public JoinLobbyMenuItemClickListener(int position) { this.position = position; }
+		@Override public boolean onMenuItemClick(MenuItem menuItem)
+		{
+			mRsConversationService.joinConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			new RequestLobbiesListUpdateRunnable().run();
+			return true;
+		}
+	}
+	private final class LeaveLobbyMenuItemClickListener implements MenuItem.OnMenuItemClickListener
+	{
+		private final int position;
+		public LeaveLobbyMenuItemClickListener(int position) { this.position = position; }
+		@Override public boolean onMenuItemClick(MenuItem menuItem)
+		{
+			mRsConversationService.leaveConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			new RequestLobbiesListUpdateRunnable().run();
+			return true;
+		}
+	}
 }
