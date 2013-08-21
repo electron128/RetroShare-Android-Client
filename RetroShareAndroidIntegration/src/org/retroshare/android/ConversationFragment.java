@@ -26,7 +26,6 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,7 +47,6 @@ import org.retroshare.android.utils.HtmlBase64ImageGetter;
 import org.retroshare.android.utils.Util;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +62,8 @@ import org.retroshare.android.RsConversationService.ConversationMessage;
 public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener
 {
 	@Override public String TAG() { return "ConversationFragment"; }
+
+	public static final int CONVERSATION_IMAGE_MAX_DIMENSION = 200;
 
 	interface ConversationFragmentContainer { ConversationId getConversationId(ConversationFragment f); }
 	private ConversationFragmentContainer cfc;
@@ -326,32 +326,33 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		{
 			case SELECT_IMAGE_INTENT_REQUEST_CODE:
 			{
-				// TODO use an async task to do this big work
-				// http://stackoverflow.com/questions/6158819/scaling-images-in-android-causes-outofmemory-exception
-				// http://developer.android.com/reference/android/graphics/BitmapFactory.Options.html#inSampleSize
-				Uri imageUri = data.getData();
-				ContentResolver contentResolver = getActivity().getContentResolver();
-
-				InputStream imageStream;
-				try { imageStream = contentResolver.openInputStream(imageUri); }
-				catch (FileNotFoundException e) {return;}
-				Bitmap bitmapImage = Util.downScaleIfBiggerThenMaxDimension(BitmapFactory.decodeStream(imageStream), 100);
-
-				String messageBody = new String();
-				messageBody += "<img src=\"data:";
-				messageBody += contentResolver.getType(imageUri);
-				messageBody += ";base64,";
-				messageBody += Util.encodeTobase64(bitmapImage);
-				messageBody += "\"/>";
-
-				ConversationId id = cfc.getConversationId(this);
-				ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
-				msg.setMessageString(messageBody);
-				mRsConversationService.sendConversationMessage(msg);
-
+				new SendImageAsyncTask().execute(data.getData());
 				break;
 			}
 		}
+	}
+	private final class SendImageAsyncTask extends AsyncTask<Uri, Void, ConversationMessage>
+	{
+		ContentResolver mContentResolver;
+		@Override public void onPreExecute() { mContentResolver = getActivity().getContentResolver(); }
+		@Override protected ConversationMessage doInBackground(Uri... uris)
+		{
+			Bitmap bitmapImage;
+			try { bitmapImage = Util.loadFittingBitmap(mContentResolver, uris[0], CONVERSATION_IMAGE_MAX_DIMENSION); }
+			catch (FileNotFoundException e) { return null; }
+
+			StringBuilder msgBodyBuilder = new StringBuilder(CONVERSATION_IMAGE_MAX_DIMENSION * CONVERSATION_IMAGE_MAX_DIMENSION);
+			msgBodyBuilder.append("<img src=\"data:image/png;base64,");
+			msgBodyBuilder.append(Util.encodeTobase64(bitmapImage, Bitmap.CompressFormat.PNG, 100)); bitmapImage.recycle(); // Mark the bitmap as garbage
+			msgBodyBuilder.append("\"/>");
+
+			ConversationId id = cfc.getConversationId(ConversationFragment.this);
+			ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
+			msg.setMessageString(msgBodyBuilder.toString());
+
+			return msg;
+		}
+		@Override public void onPostExecute(ConversationMessage msg) { if(msg != null) mRsConversationService.sendConversationMessage(msg); }
 	}
 
 	public ConversationFragment() { super(); }

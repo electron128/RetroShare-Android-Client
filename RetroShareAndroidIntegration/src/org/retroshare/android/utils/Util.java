@@ -1,5 +1,6 @@
 package org.retroshare.android.utils;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +19,7 @@ import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 
 public class Util
 {
@@ -113,33 +115,31 @@ public class Util
 		}
 	}
 
-	public static String encodeTobase64(Bitmap image)
+	public static String encodeTobase64(Bitmap image, Bitmap.CompressFormat format, int quality)
 	{
-		Bitmap immagex=image;
+		if(image == null) throw new NullPointerException("encodeTobase64 called with null argument");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		byte[] b = baos.toByteArray();
-		String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
-		return imageEncoded;
+		image.compress(format, quality, baos);
+		return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
 	}
 	public static Bitmap decodeBase64(String input)
 	{
 		byte[] decodedByte = Base64.decode(input, 0);
 		return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
 	}
-	public static Bitmap downScaleIfBiggerThenMaxDimension(Bitmap input, int maxDimension)
+	public static Bitmap loadFittingBitmap(ContentResolver contentResolver, Uri uri, int maxDimension) throws FileNotFoundException
 	{
-		Bitmap ret = input;
-		int h = input.getHeight();
-		int w = input.getWidth();
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeStream(contentResolver.openInputStream(uri), null, options);
+		int h = options.outHeight;
+		int w = options.outWidth;
 		if( h > maxDimension || w > maxDimension)
 		{
-			int scaleRatio;
-			if( h > w ) scaleRatio = maxDimension/h;
-			else scaleRatio = maxDimension/w;
-			ret = Bitmap.createScaledBitmap(input, w*scaleRatio, h*scaleRatio, false);
+			if( h > w ) options.inSampleSize = Math.round((float) h / (float) maxDimension);
+			else options.inSampleSize = Math.round((float) w / (float) maxDimension);
 		}
-		return ret;
+		options.inJustDecodeBounds = false;
+		return BitmapFactory.decodeStream(contentResolver.openInputStream(uri), null, options);
 	}
 }
