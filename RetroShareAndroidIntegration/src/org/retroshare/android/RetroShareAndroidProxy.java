@@ -57,16 +57,10 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 	public static class RsBund
 	{
 		RsCtrlService server;
-		NotifyService notifier;
 
-		RsBund(RsCtrlService serv, NotifyService notif)
-		{
-			server = serv;
-			notifier = notif;
-		}
+		RsBund(RsCtrlService serv) { server = serv; }
 
 		public RsCtrlService getServer() { return server; }
-		public NotifyService getNotifier() { return notifier;}
 	};
 	public Map<String, RsBund> serverBunds = new HashMap<String, RsBund>();
 
@@ -189,7 +183,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		Intent notificationIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(this, contentTitle,contentMessage, pendingIntent);
-		startForeground(NotificationIds.RS_SERVICE, notification);
+		startForeground(this.hashCode(), notification);
 	}
 
 	/**
@@ -275,7 +269,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 				RsCtrlService server = new RsCtrlService(mUiThreadHandler, this);
 				server.setServerData(serverData);
 				server.registerListener(this);
-				bund = new RsBund(server, new NotifyService(server.mRsChatService, this, serverName));
+				bund = new RsBund(server);
 				serverBunds.put(serverName, bund);
 			}
 
@@ -304,7 +298,6 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		bund.server.disconnect();
 		bund.server.unregisterListener(this);
 		bund.server.destroy();
-		bund.notifier.cancelAll();
 		serverBunds.remove(serverName);
 	}
 }

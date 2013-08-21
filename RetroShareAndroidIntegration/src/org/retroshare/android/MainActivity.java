@@ -134,7 +134,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		i.putExtra(PeersActivity.SHOW_ADD_FRIEND_BUTTON_EXTRA, true);
 		startActivity(PeersActivity.class, i);
 	};
-    public void showChatLobbies(View v) { startActivity(ChatLobbiesActivity.class); }
+    public void showChatLobbies(View v) { startActivity(LobbiesListFragmentActivity.class); }
     public void showFilesActivity(View v) { startActivity(FilesActivity.class); }
     public void showSearchActivity(View v) { startActivity(ListSearchesActivity.class); }
 	private void showAddServerActivity() { startActivity(AddServerActivity.class); }

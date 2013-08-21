@@ -55,9 +55,6 @@
 					android:name="android.support.PARENT_ACTIVITY"
 					android:value="org.retroshare.android.MainActivity" />
 		</activity>
-		<activity android:name=".ChatLobbiesActivity" android:label="@string/chat_lobbies"></activity>
-		<activity android:name=".ChatLobbyActivity"></activity>
-		<activity android:name=".ChatActivity" />
 		<activity android:name=".AddFriendMethodChooserActivity" />
 		<activity android:name=".PeerDetailsActivity">
 			<intent-filter>

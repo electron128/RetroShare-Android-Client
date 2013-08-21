@@ -194,7 +194,7 @@ public class FilesActivity extends ProxiedActivityBase
     		//Log.v("ChatLobbyListAdapterListener","Clicked on Item No:"+Integer.toString(position));
     		//Location loc=locationList.get(position);
     		
-    		//Intent i=new Intent(PeersActivity.this,ChatActivity.class);
+    		//Intent i=new Intent(PeersActivity.this,chatActivity.class);
     		//i.putExtra("ChatId", ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(loc.getSslId()).build().toByteArray());
     		//i.putExtra("ChatLobbyInfo", lobbyInfo.toByteArray());
     		//startActivity(i);
