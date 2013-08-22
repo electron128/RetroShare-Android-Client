@@ -35,6 +35,8 @@ import org.retroshare.android.RsConversationService;
 
 public class TestActivity extends Activity
 {
+	public static final String SERVER_NAME_TEST_VALUE = "testServer";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -64,7 +66,7 @@ public class TestActivity extends Activity
 	public void onButtonTestFragmentChatActivityPressed(View v)
 	{
 		Intent i = new Intent(this, ConversationFragmentActivity.class);
-		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, "testServer");
+		i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, SERVER_NAME_TEST_VALUE);
 		i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, RsConversationService.PgpChatId.Factory.getPgpChatId("F444EB20C713A5C0"));
 		startActivity(i);
 	}
@@ -78,7 +80,7 @@ public class TestActivity extends Activity
 	public void onButtonTestLobbyChatPressed(View v)
 	{
 		Intent i = new Intent(this, LobbiesListFragmentActivity.class);
-		i.putExtra(LobbiesListFragmentActivity.SERVER_NAME_EXTRA, "testServer");
+		i.putExtra(LobbiesListFragmentActivity.SERVER_NAME_EXTRA, SERVER_NAME_TEST_VALUE);
 		startActivity(i);
 	}
 }

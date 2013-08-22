@@ -128,12 +128,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	@Override public void onResume()
 	{
 		super.onResume();
-		if(isBound())
-		{
-			ConversationId id = cfc.getConversationId(this);
-			mRsConversationService.cancelNotificationForConversation(id);
-			mRsConversationService.disableNotificationForConversation(id);
-		}
+		onVisibleAndBound();
 	}
 	@Override public void onPause()
 	{
@@ -143,6 +138,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	@Override public void onServiceConnected()
 	{
 		mRsConversationService = getConnectedServer().mRsConversationService;
+		onVisibleAndBound();
 		super.onServiceConnected();
 	}
 	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(adapter); }
@@ -260,6 +256,17 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		boolean enterPressed = ( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER );
 		if(enterPressed) sendChatMsg(null);
 		return enterPressed;
+	}
+
+	private void onVisibleAndBound()
+	{
+		if(isUserVisible() && isBound())
+		{
+			ConversationId id = cfc.getConversationId(this);
+			mRsConversationService.cancelNotificationForConversation(id);
+			mRsConversationService.disableNotificationForConversation(id);
+			adapter.onConversationsUpdate();
+		}
 	}
 
 	private void sendChatMsg(View v)

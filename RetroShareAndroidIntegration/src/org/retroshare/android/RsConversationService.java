@@ -26,7 +26,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
+import android.text.Html;
 import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -42,7 +45,6 @@ import rsctrl.core.Core;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,28 +69,11 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	/**
 	 * Conversation stuff
 	 */
-	public static enum ConversationKind { PGP_CHAT, LOBBY_CHAT };
-	public static interface ConversationId extends Serializable
+	public static enum ConversationKind	{ PGP_CHAT, LOBBY_CHAT }
+	public static abstract class ConversationId implements Parcelable
 	{
-		public ConversationKind getConversationKind();
-
-		public static class Factory
-		{
-			public static ConversationId getConversationId(Serializable s) throws ClassCastException
-			{
-				ConversationId cId = (ConversationId) s;
-
-				switch (cId.getConversationKind())
-				{
-					case PGP_CHAT:
-						return PgpChatId.Factory.getPgpChatId(s);
-					case LOBBY_CHAT:
-						return LobbyChatId.Factory.getLobbyChatId(s);
-				}
-
-				throw new ClassCastException("Unknown Conversation Kind");
-			}
-		}
+		abstract public ConversationKind getConversationKind();
+		@Override public int describeContents() { return getConversationKind().ordinal(); }
 	}
 	public static interface ConversationMessage
 	{
@@ -220,7 +205,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	public void disableNotificationForConversation(ConversationId id) { notificationDisabledConversation.add(id); }
 	public void enableNotificationForConversation(ConversationId id) { notificationDisabledConversation.remove(id); }
 	private boolean notificationForConversationEnabled(ConversationId id) { return ! notificationDisabledConversation.contains(id); }
-	private void notifyAndroidAboutConversation(ConversationId id, int iconId, String title, String message, Intent action, boolean autoCancel)
+	private void notifyAndroidAboutConversation(ConversationId id, int iconId, CharSequence title, CharSequence message, Intent action, boolean autoCancel)
 	{
 		if(notificationForConversationEnabled(id))
 		{
@@ -324,11 +309,10 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	/**
 	 * PGP_CHAT stuff
 	 */
-	public static final class PgpChatId implements ConversationId
+	public static final class PgpChatId extends ConversationId
 	{
 		public String getDestPgpId() { return mPgpId; }
 		@Override public ConversationKind getConversationKind(){ return ConversationKind.PGP_CHAT; }
-
 		@Override public boolean equals(Object o)
 		{
 			if(o == null) return false;
@@ -338,8 +322,14 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 			return mPgpId.equalsIgnoreCase(c1.getDestPgpId());
 		}
-
 		@Override public int hashCode() { return mPgpId.hashCode(); }
+		@Override public void writeToParcel(Parcel parcel, int i) { parcel.writeString(mPgpId); }
+
+		public static final Parcelable.Creator<PgpChatId> CREATOR = new Parcelable.Creator<PgpChatId>()
+		{
+			public PgpChatId createFromParcel(Parcel in) { return PgpChatId.Factory.getPgpChatId(in.readString()); }
+			public PgpChatId[] newArray(int size) { return new PgpChatId[size]; }
+		};
 
 		public static final class Factory
 		{
@@ -353,20 +343,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 				}
 				return ret;
 			}
-
-			public static PgpChatId getPgpChatId(Serializable s) throws ClassCastException
-			{
-				PgpChatId param = (PgpChatId) s;
-				String pgpId = param.getDestPgpId();
-				PgpChatId ret = repository.get(pgpId);
-				if(ret == null)
-				{
-					ret = param;
-					repository.put(pgpId, ret);
-				}
-				return ret;
-			}
-
 			private static final Map<String, PgpChatId> repository = new WeakHashMap<String, PgpChatId>();
 		}
 
@@ -417,7 +393,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
 					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
 			ChatMessage cMsg = msg.getRawData();
-			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, cMsg.getPeerNickname(), cMsg.getMsg(), i, false );
+			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, (cMsg.getPeerNickname() + " " + mContext.getString(R.string.new_private_chat_message)), Html.fromHtml(cMsg.getMsg()), i, true );
 		}
 	}
 	private void sendPgpChatMessage(PgpChatMessage msg)
@@ -464,7 +440,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	/**
 	 * LOBBY_CHAT stuff
 	 */
-	public static final class LobbyChatId implements ConversationId
+	public static final class LobbyChatId extends ConversationId
 	{
 		@Override public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
 		@Override public boolean equals(Object o)
@@ -476,7 +452,15 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			return ( mChatId.getChatId().equalsIgnoreCase(c1.getChatId().getChatId()) && (c1.getChatId().getChatType() == Chat.ChatType.TYPE_LOBBY));
 		}
 		@Override public int hashCode() { return mChatId.getChatId().hashCode(); }
+		@Override public void writeToParcel(Parcel parcel, int i) { parcel.writeString(mChatId.getChatId()); }
+
 		public ChatId getChatId(){ return mChatId; }
+
+		public static final Parcelable.Creator<LobbyChatId> CREATOR = new Parcelable.Creator<LobbyChatId>()
+		{
+			public LobbyChatId createFromParcel(Parcel in) { return LobbyChatId.Factory.getLobbyChatId(in.readString()); }
+			public LobbyChatId[] newArray(int size) { return new LobbyChatId[size]; }
+		};
 
 		public final static class Factory
 		{
@@ -490,20 +474,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 				}
 				return ret;
 			}
-
-			public static LobbyChatId getLobbyChatId(Serializable s) throws ClassCastException
-			{
-				LobbyChatId param = (LobbyChatId) s;
-				String lobbyId = param.getChatId().getChatId();
-				LobbyChatId ret = repository.get(lobbyId);
-				if(ret == null)
-				{
-					ret = param;
-					repository.put(lobbyId, ret);
-				}
-				return ret;
-			}
-
 			private static final Map<String, LobbyChatId> repository = new WeakHashMap<String, LobbyChatId>();
 		}
 
@@ -559,7 +529,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
 					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
 			ChatMessage cMsg = msg.getRawData();
-			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, cMsg.getPeerNickname(), cMsg.getMsg(), i, false );
+			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, (getLobbyInfo(pId).getLobbyName() + " " + mContext.getString(R.string.new_lobby_chat_message) + " " + mContext.getString(R.string.from) + ": " + msg.getAuthorString() ), Html.fromHtml(cMsg.getMsg()), i, true );
 		}
 	}
 	private void sendLobbyChatMessage(LobbyChatMessage msg)

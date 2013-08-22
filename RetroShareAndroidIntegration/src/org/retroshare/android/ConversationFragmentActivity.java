@@ -39,8 +39,15 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase im
 	{
 		super.onCreate(savedInstanceState);
 
-		actualConversationId = ConversationId.Factory.getConversationId(getIntent().getSerializableExtra(CONVERSATION_ID_EXTRA));
+		actualConversationId = getIntent().getParcelableExtra(CONVERSATION_ID_EXTRA);
 
 		setContentView(R.layout.factivity_conversation);
+	}
+
+	@Override
+	public void onResume()
+	{
+		actualConversationId = getIntent().getParcelableExtra(CONVERSATION_ID_EXTRA); // this is the first not casually
+		super.onResume();
 	}
 }

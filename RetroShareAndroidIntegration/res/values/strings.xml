@@ -12,6 +12,7 @@
 	<string name="delete">Delete</string>
     <string name="leave_lobby">Leave lobby</string>
 	<string name="join_lobby">Join lobby</string>
+	<string name="show_details">Show details</string>
     <string name="send_chat">send chat</string>
     <string name="insert_message_here">insert message here</string>
     <string name="peers">peers</string>
@@ -42,9 +43,10 @@
     <string name="connection_error">connection error</string>
     <string name="connected">connected</string>
     <string name="not_connected">not connected</string>
-    <string name="new_message">new message</string>
-    <string name="new_private_chat_message">new private chat message</string>
-    <string name="new_lobby_chat_message">new lobby chat message</string>
+    <string name="new_message">New message</string>
+    <string name="new_private_chat_message">new private message</string>
+    <string name="new_lobby_chat_message">new lobby message</string>
+	<string name="from">from</string>
     <string name="topic">topic</string>
     <string name="bandwidth_up_down">bandwidth up/down</string>
     <string name="network_status">network status</string>

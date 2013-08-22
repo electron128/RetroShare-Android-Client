@@ -89,11 +89,10 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		super.onCreateContextMenu(menu, v, menuInfo);
 		getActivity().getMenuInflater().inflate(R.menu.lobbies_list_context_menu, menu);
 		int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
-		boolean joined = lobbiesList.get(position).getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED);
-		MenuItem joinItem = menu.findItem(R.id.join_lobby).setVisible(!joined);
-		MenuItem leaveItem = menu.findItem(R.id.leave_lobby).setVisible(joined);
-		if(joined) leaveItem.setOnMenuItemClickListener(new LeaveLobbyMenuItemClickListener(position));
-		else joinItem.setOnMenuItemClickListener(new JoinLobbyMenuItemClickListener(position));
+		Chat.ChatLobbyInfo info = lobbiesList.get(position);
+		boolean joined = info.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED);
+		menu.findItem(R.id.join_lobby_menu_item).setVisible(!joined).setOnMenuItemClickListener(new JoinLobbyMenuItemClickListener(position));
+		menu.findItem(R.id.leave_lobby_menu_item).setVisible(joined).setOnMenuItemClickListener(new LeaveLobbyMenuItemClickListener(position));
 	}
 
 	private class LobbiesListAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener, AdapterView.OnItemClickListener
