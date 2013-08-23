@@ -119,7 +119,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 			return lv;
 		}
 
-		@Override public void onConversationsUpdate() { new UpdateLobbiesListAsyncTask().execute(null, null, null); }
+		@Override public void onConversationsEvent(RsConversationService.ConversationEvent event) { if(event.getEventKind().equals(RsConversationService.ConversationEventKind.LOBBY_LIST_UPDATE)) new UpdateLobbiesListAsyncTask().execute(null, null, null); }
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
