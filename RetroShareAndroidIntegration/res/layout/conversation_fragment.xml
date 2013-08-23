@@ -45,20 +45,27 @@
 					android:layout_above="@id/inputLayout"
 					android:layout_marginBottom="15dp">
 
+		<!-- TODO: Use android styled icons -->
 		<ImageButton	android:id="@+id/sendImageButton"
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
 						android:layout_margin="5dp"
-						android:padding="12dp"
+						android:padding="13dp"
 						android:src="@drawable/add_image"/>
 
 		<ImageButton	android:id="@+id/sendFileButton"
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
 						android:layout_margin="5dp"
-						android:padding="12dp"
+						android:padding="13dp"
 						android:src="@drawable/add_share"/>
 
+		<ImageButton	android:id="@+id/showInfoImageButton"
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:layout_margin="5dp"
+						android:padding="2dp"
+						android:src="@android:drawable/ic_menu_info_details"/>
 	</LinearLayout>
 
 </RelativeLayout>

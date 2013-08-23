@@ -138,6 +138,18 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		if(history != null) ret.addAll(history);
 		return ret;
 	}
+	public ConversationInfo getConversationInfo(ConversationId id)
+	{
+		switch (id.getConversationKind())
+		{
+			case PGP_CHAT:
+				return new PgpChatInfo((PgpChatId)id);
+			case LOBBY_CHAT:
+				return new LobbyChatInfo((LobbyChatId)id);
+			default:
+				throw new ClassCastException("Attempted getConversationInfo(id) for ConversationId with unknown ConversationKind");
+		}
+	}
 	public void sendConversationMessage(ConversationMessage msg)
 	{
 		switch (msg.getConversationId().getConversationKind())

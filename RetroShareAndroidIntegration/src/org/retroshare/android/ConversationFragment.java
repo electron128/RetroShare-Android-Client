@@ -72,7 +72,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 	private List<_ChatMessage> messageList = new ArrayList<_ChatMessage>();
 	private final ConversationAdapter adapter = new ConversationAdapter();
-	private ListView chatMessageList;
+	private ListView conversationMessageListView;
 	private LayoutInflater mInflater;
 	private int lastShowedPosition = 0;
 	private int autoScrollSemaphore = 0;
@@ -86,8 +86,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		/**
 		 * Message List
 		 */
-		chatMessageList = (ListView)fv.findViewById(R.id.chatMessageList);
-		chatMessageList.setAdapter(adapter);
+		conversationMessageListView = (ListView)fv.findViewById(R.id.chatMessageList);
+		conversationMessageListView.setAdapter(adapter);
 
 		/**
 		 * New message editor
@@ -102,7 +102,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		View moreMessageDownIndicator = fv.findViewById(R.id.moreChatMessageDownImageView);
 		moreMessageDownIndicator.setVisibility(View.INVISIBLE);
 		moreMessageDownIndicator.setOnClickListener(new GoDownButtonListener());
-		chatMessageList.setScrollIndicators(null, moreMessageDownIndicator);
+		conversationMessageListView.setScrollIndicators(null, moreMessageDownIndicator);
 
 		/**
 		 * Send Extra menu
@@ -111,6 +111,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		sendExtraMenu.setVisibility(View.INVISIBLE);
 		sendExtraMenu.findViewById(R.id.sendImageButton).setOnClickListener(new OnAddImageClickListener());
 		sendExtraMenu.findViewById(R.id.sendFileButton).setVisibility(View.GONE);
+		sendExtraMenu.findViewById(R.id.showInfoImageButton).setOnClickListener(new ShowLobbyInfoLongClickListener());
 
 		return fv;
 	}
@@ -185,7 +186,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			{
 				messageList = ml;
 
-				chatMessageList.setSelection(lastShowedPosition);
+				conversationMessageListView.setSelection(lastShowedPosition);
 
 				if(autoScrollSemaphore > 0)
 				{
@@ -195,7 +196,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 				notifyObservers();
 
-				chatMessageList.smoothScrollToPosition(lastShowedPosition);
+				conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
 			}
 		}
 
@@ -301,14 +302,14 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	{
 		public void onClick(View v)
 		{
-			lastShowedPosition = chatMessageList.getCount()-1;
-			chatMessageList.setSelection(lastShowedPosition);
-			chatMessageList.smoothScrollToPosition(lastShowedPosition);
+			lastShowedPosition = conversationMessageListView.getCount()-1;
+			conversationMessageListView.setSelection(lastShowedPosition);
+			conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
 			fillAutoScrollSemaphore();
 		}
 	}
 
-	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (chatMessageList.getLastVisiblePosition() - chatMessageList.getFirstVisiblePosition())-1); }
+	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (conversationMessageListView.getLastVisiblePosition() - conversationMessageListView.getFirstVisiblePosition())-1); }
 
 
 	private View sendExtraMenu;
@@ -360,6 +361,18 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			return msg;
 		}
 		@Override public void onPostExecute(ConversationMessage msg) { if(msg != null) mRsConversationService.sendConversationMessage(msg); }
+	}
+	private final class ShowLobbyInfoLongClickListener implements View.OnClickListener
+	{
+		@Override public void onClick(View v)
+		{
+			RsConversationService.ConversationInfo info = mRsConversationService.getConversationInfo(cfc.getConversationId(ConversationFragment.this));
+			Bundle args = new Bundle(1);
+			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
+			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());
+			df.setArguments(args);
+			df.show(getFragmentManager(), "Conversation Details");
+		}
 	}
 
 	public ConversationFragment() { super(); }
