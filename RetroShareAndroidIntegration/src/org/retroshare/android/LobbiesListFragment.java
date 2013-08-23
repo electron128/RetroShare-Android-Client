@@ -93,6 +93,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		boolean joined = info.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED);
 		menu.findItem(R.id.join_lobby_menu_item).setVisible(!joined).setOnMenuItemClickListener(new JoinLobbyMenuItemClickListener(position));
 		menu.findItem(R.id.leave_lobby_menu_item).setVisible(joined).setOnMenuItemClickListener(new LeaveLobbyMenuItemClickListener(position));
+		menu.findItem(R.id.lobby_show_details_menu_item).setOnMenuItemClickListener(new ShowLobbyInfoMenuItemClickListener(position));
 	}
 
 	private class LobbiesListAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener, AdapterView.OnItemClickListener
@@ -196,6 +197,21 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		{
 			mRsConversationService.leaveConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
 			new RequestLobbiesListUpdateRunnable().run();
+			return true;
+		}
+	}
+	private final class ShowLobbyInfoMenuItemClickListener implements MenuItem.OnMenuItemClickListener
+	{
+		private final int position;
+		public ShowLobbyInfoMenuItemClickListener(int position) { this.position = position; }
+		@Override public boolean onMenuItemClick(MenuItem menuItem)
+		{
+			RsConversationService.LobbyChatInfo info = mRsConversationService.new LobbyChatInfo(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			Bundle args = new Bundle(1);
+			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
+			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());
+			df.setArguments(args);
+			df.show(getFragmentManager(), "Lobby Details");
 			return true;
 		}
 	}

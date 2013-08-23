@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="vertical"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+
+	<LinearLayout	android:id="@+id/conversation_info_privacy_layout"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal">
+
+		<TextView	android:text="@string/privacy"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					style="@android:style/TextAppearance.Large" />
+
+		<TextView	android:id="@+id/conversation_info_privacy"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:text="@string/_public"
+					style="@android:style/TextAppearance.Medium"/>
+	</LinearLayout>
+
+	<LinearLayout	android:id="@+id/conversation_info_title_layout"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+		<TextView
+					android:text="@string/title"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					style="@android:style/TextAppearance.Large" />
+
+		<TextView	android:id="@+id/conversation_info_title"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:text="Lobby name"
+					style="@android:style/TextAppearance.Medium"/>
+	</LinearLayout>
+
+	<LinearLayout	android:id="@+id/conversation_info_topic_layout"
+					 android:layout_width="match_parent"
+					 android:layout_height="wrap_content"
+					 android:orientation="vertical">
+		<TextView
+					android:text="@string/topic"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					style="@android:style/TextAppearance.Large"/>
+
+		<TextView	android:id="@+id/conversation_info_topic"
+					 android:layout_height="wrap_content"
+					 android:layout_width="wrap_content"
+					 android:text="Lobby topic"
+					 style="@android:style/TextAppearance.Medium"/>
+	</LinearLayout>
+
+	<LinearLayout	android:id="@+id/conversation_info_participants_layout"
+					 android:layout_width="match_parent"
+					 android:layout_height="wrap_content"
+					 android:orientation="vertical">
+		<TextView
+				android:text="@string/participants"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				style="@android:style/TextAppearance.Large"/>
+
+		<ListView	android:id="@+id/conversation_info_participants"
+					 android:layout_height="wrap_content"
+					 android:layout_width="wrap_content"
+					 android:text="Lobby name" />
+	</LinearLayout>
+
+</LinearLayout>

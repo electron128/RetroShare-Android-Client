@@ -56,6 +56,7 @@ import java.util.WeakHashMap;
 
 public class RsConversationService implements RsServiceInterface, RsCtrlService.RsCtrlServiceListener
 {
+	public String TAG() { return "RsConversationService"; }
 	public RsConversationService(RsCtrlService rsCtrlService, HandlerThreadInterface handlerThreadInterface, Context context)
 	{
 		mRsCtrlService = rsCtrlService;
@@ -64,7 +65,6 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		mContext = context;
 		mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
-	public String TAG() { return "RsConversationService"; }
 
 	/**
 	 * Conversation stuff
@@ -74,6 +74,18 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	{
 		abstract public ConversationKind getConversationKind();
 		@Override public int describeContents() { return getConversationKind().ordinal(); }
+	}
+	public static abstract class ConversationInfo implements Parcelable
+	{
+		@Override public int describeContents() { return getConversationId().getConversationKind().ordinal(); }
+		abstract public ConversationId getConversationId();
+		abstract public boolean hasTitle();
+		abstract public CharSequence getTitle();
+		abstract public boolean hasTopic();
+		abstract public CharSequence getTopic();
+		abstract public int getParticipantsCount();
+		abstract public List<CharSequence> getParticipantsNick();
+		abstract public boolean isPrivate();
 	}
 	public static interface ConversationMessage
 	{
@@ -349,6 +361,35 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		private PgpChatId(String destPgpId) { mPgpId = destPgpId; }
 		private final String mPgpId;
 	}
+	public final class PgpChatInfo extends ConversationInfo
+	{
+		public PgpChatInfo(PgpChatId id)
+		{
+			nicks.add(mRsPeerService.getOwnPerson().getName());
+			nicks.add(mRsPeerService.getPersonByPgpId(id.getDestPgpId()).getName());
+			pgpChatId = id;
+		};
+
+		@Override public ConversationId getConversationId() { return pgpChatId; }
+		@Override public int getParticipantsCount() { return 2; }
+		@Override public List<CharSequence> getParticipantsNick() { return new ArrayList<CharSequence>(nicks); }
+		@Override public boolean hasTitle() { return false; }
+		@Override public CharSequence getTitle() { return ""; }
+		@Override public boolean hasTopic() { return false; }
+		@Override public CharSequence getTopic() { return ""; }
+		@Override public boolean isPrivate() { return true; }
+
+		@Override public void writeToParcel(Parcel parcel, int i) { parcel.writeString(pgpChatId.getDestPgpId()); }
+
+		public final PgpChatInfo.Creator<PgpChatInfo> CREATOR = new Parcelable.Creator<PgpChatInfo>()
+		{
+			public PgpChatInfo createFromParcel(Parcel in) { return new PgpChatInfo(PgpChatId.Factory.getPgpChatId(in.readString())); }
+			public PgpChatInfo[] newArray(int size) { return new PgpChatInfo[size]; }
+		};
+
+		private final PgpChatId pgpChatId;
+		private final List<String> nicks = new ArrayList<String>();
+	}
 	public static class PgpChatMessage implements ConversationMessage
 	{
 		public PgpChatMessage(PgpChatId id)
@@ -479,6 +520,34 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		private LobbyChatId(String lobbyIdString) { mChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_LOBBY).setChatId(lobbyIdString).build(); }
 		private final ChatId mChatId;
+	}
+	public final class LobbyChatInfo extends ConversationInfo
+	{
+		public LobbyChatInfo(LobbyChatId id)
+		{
+			lobbyChatId = id;
+			chatLobbyInfo = getLobbyInfo(id);
+		}
+
+		@Override public ConversationId getConversationId() { return lobbyChatId; }
+		@Override public boolean hasTitle() { return (chatLobbyInfo.hasLobbyName() && (chatLobbyInfo.getLobbyName().length() > 0)); }
+		@Override public CharSequence getTitle() { return chatLobbyInfo.getLobbyName(); }
+		@Override public boolean hasTopic() { return (chatLobbyInfo.hasLobbyTopic() && (chatLobbyInfo.getLobbyTopic().length() > 0)); }
+		@Override public CharSequence getTopic() { return chatLobbyInfo.getLobbyTopic(); }
+		@Override public int getParticipantsCount() { return chatLobbyInfo.getNicknamesCount(); } // chatLobbyInfo.getNoPeers()
+		@Override public List<CharSequence> getParticipantsNick() { return new ArrayList<CharSequence>(chatLobbyInfo.getNicknamesList()); }
+		@Override public boolean isPrivate() { return (chatLobbyInfo.hasPrivacyLevel() && chatLobbyInfo.getPrivacyLevel().equals(Chat.LobbyPrivacyLevel.PRIVACY_PRIVATE)); }
+
+		@Override public void writeToParcel(Parcel parcel, int i) { parcel.writeString(lobbyChatId.getChatId().getChatId()); }
+
+		public final LobbyChatInfo.Creator<LobbyChatInfo> CREATOR = new Parcelable.Creator<LobbyChatInfo>()
+		{
+			public LobbyChatInfo createFromParcel(Parcel in) { return new LobbyChatInfo(LobbyChatId.Factory.getLobbyChatId(in.readString())); }
+			public LobbyChatInfo[] newArray(int size) { return new LobbyChatInfo[size]; }
+		};
+
+		private final LobbyChatId lobbyChatId;
+		private final ChatLobbyInfo chatLobbyInfo;
 	}
 	public static final class LobbyChatMessage implements ConversationMessage
 	{

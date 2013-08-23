@@ -9,6 +9,7 @@
     <string name="disconnect">Disconnect</string>
     <string name="edit">Edit</string>
 	<string name="save">Save</string>
+	<string name="title">Title:</string>
 	<string name="delete">Delete</string>
     <string name="leave_lobby">Leave lobby</string>
 	<string name="join_lobby">Join lobby</string>
@@ -46,8 +47,12 @@
     <string name="new_message">New message</string>
     <string name="new_private_chat_message">new private message</string>
     <string name="new_lobby_chat_message">new lobby message</string>
+	<string name="_public">Public</string>
+	<string name="_private">Private</string>
 	<string name="from">from</string>
-    <string name="topic">topic</string>
+    <string name="topic">Topic:</string>
+	<string name="privacy">Privacy:</string>
+	<string name="participants">Participants:</string>
     <string name="bandwidth_up_down">bandwidth up/down</string>
     <string name="network_status">network status</string>
     <string name="files">files</string>
