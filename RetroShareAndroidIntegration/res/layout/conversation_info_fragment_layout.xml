@@ -3,12 +3,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  android:orientation="vertical"
 			  android:layout_width="match_parent"
-			  android:layout_height="match_parent">
+			  android:layout_height="match_parent"
+			  android:layout_margin="3dp">
 
 	<LinearLayout	android:id="@+id/conversation_info_privacy_layout"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:orientation="horizontal"
+					android:gravity="center_vertical"
+					android:layout_margin="3dp">
 
 		<TextView	android:text="@string/privacy"
 					android:layout_height="wrap_content"
@@ -18,6 +21,7 @@
 		<TextView	android:id="@+id/conversation_info_privacy"
 					android:layout_height="wrap_content"
 					android:layout_width="wrap_content"
+					android:layout_marginLeft="4dp"
 					android:text="@string/_public"
 					style="@android:style/TextAppearance.Medium"/>
 	</LinearLayout>
@@ -25,7 +29,8 @@
 	<LinearLayout	android:id="@+id/conversation_info_title_layout"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:orientation="vertical">
+					android:orientation="vertical"
+					android:layout_margin="3dp">
 		<TextView
 					android:text="@string/title"
 					android:layout_height="wrap_content"
@@ -42,7 +47,8 @@
 	<LinearLayout	android:id="@+id/conversation_info_topic_layout"
 					 android:layout_width="match_parent"
 					 android:layout_height="wrap_content"
-					 android:orientation="vertical">
+					 android:orientation="vertical"
+					 android:layout_margin="3dp">
 		<TextView
 					android:text="@string/topic"
 					android:layout_height="wrap_content"
@@ -57,9 +63,10 @@
 	</LinearLayout>
 
 	<LinearLayout	android:id="@+id/conversation_info_participants_layout"
-					 android:layout_width="match_parent"
-					 android:layout_height="wrap_content"
-					 android:orientation="vertical">
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:layout_margin="3dp">
 		<TextView
 				android:text="@string/participants"
 				android:layout_height="wrap_content"
