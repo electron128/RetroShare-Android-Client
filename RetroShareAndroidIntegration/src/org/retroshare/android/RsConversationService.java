@@ -490,17 +490,14 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			/**
 			 * RANDOMICAL PROBLEMS
 			 * TODO: fix PGP_CHAT sending
-			 * Doing various trick in this line have demonstrated some strange cases
+			 * Doing various tests have demonstrated some strange cases
 			 * 1) Hardcoding sslid works but obviously send all messages to me
 			 * 2) Putting some if to check if sslid was equal to the one of mine online location before using it made it work but obviously only messages send to me were arriving
 			 * 3) Testing with friend with just one location seems works perfectly, missing friend with multiple location to test
-			 * SOME CONCLUSION seems that rs-core gets confused sending all those messages when some location of the destination friend are unreachable
+			 * 4) Sending message to me ( I have multiple location but just the one with rs-nogui and another one online at moment ) some times get delivered and sometimes not, totally randomically
 			 * The code is mature enough for merging but this bug in rs-core the core is preventing me from doing that
 			 */
 			ChatId chatId = builderChatId.setChatId(location.getSslId()).build();
-			/**
-			 * END RANDOMICAL PROBLEMS
-			 */
 			ChatMessage chatMessage = builderChatMessage.setId(chatId).build();
 			RequestSendMessage requestSendMessage = builderRequestSendMessage.setMsg(chatMessage).build();
 
