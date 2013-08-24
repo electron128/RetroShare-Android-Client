@@ -26,6 +26,8 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,6 +45,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.retroshare.android.utils.ColorHash;
 import org.retroshare.android.utils.HtmlBase64ImageGetter;
 import org.retroshare.android.utils.Util;
 
@@ -159,8 +162,13 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
 
 			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
-			if(msg.isMine()) msgBodyView.setBackgroundResource(R.drawable.bubble_green_spaced); // TODO: use a grey image + color filter instead of different resources, so we can use multicolor in group chat
-			else msgBodyView.setBackgroundResource(R.drawable.bubble_yellow_spaced);
+			Drawable background = getResources().getDrawable(R.drawable.bubble_colorizable);
+			int backgroundColor;
+			if(msg.isMine()) backgroundColor = 0xFFA8D324; // TODO: Make own color configurable
+			else backgroundColor = ColorHash.getObjectColor(msg.getNick());
+			background.setColorFilter(backgroundColor, PorterDuff.Mode.MULTIPLY);
+			msgBodyView.setBackgroundDrawable(background);
+			msgBodyView.setLinkTextColor(Util.opposeColor(backgroundColor));
 			msgBodyView.setText(msg.getBody());
 			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), ""); // This must be executed on UI thread
 
@@ -188,18 +196,21 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			@Override protected void onPostExecute(List<_ConversationMessage> ml)
 			{
 				messageList = ml;
-				notifyAdapterObserversAndAutoScroll();
+				conversationMessageListView.setSelection(lastShowedPosition);
+
+				if(autoScrollSemaphore > 0)
+				{
+					lastShowedPosition = messageList.size()-1;
+					--autoScrollSemaphore;
+				}
+
+				adapter.notifyObservers();
+
+				conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
 			}
 		}
 
-		@Override public void onConversationsEvent(ConversationEvent event)
-		{
-			if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE))
-			{
-				messageList.add(new _ConversationMessage(((NewMessageConversationEvent)event).getConversationMessage()));
-				notifyAdapterObserversAndAutoScroll();
-			}
-		}
+		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(cfc.getConversationId(ConversationFragment.this))) new ReloadMessagesHistoryAsyncTask().execute(null, null, null); }
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
@@ -310,20 +321,6 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 
 	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (conversationMessageListView.getLastVisiblePosition() - conversationMessageListView.getFirstVisiblePosition())-1); }
-	private void notifyAdapterObserversAndAutoScroll()
-	{
-		conversationMessageListView.setSelection(lastShowedPosition);
-
-		if(autoScrollSemaphore > 0)
-		{
-			lastShowedPosition = messageList.size()-1;
-			--autoScrollSemaphore;
-		}
-
-		adapter.notifyObservers();
-
-		conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
-	}
 
 	private View sendExtraMenu;
 	private final class OnShowSendExtraLongClickListener implements View.OnLongClickListener { @Override public boolean onLongClick(View view) { sendExtraMenu.setVisibility(View.VISIBLE); return true; } }

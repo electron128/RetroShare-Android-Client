@@ -14,7 +14,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:text="Each of us alone is worth nothing..."
-					android:background="@drawable/bubble_yellow_spaced"
+					android:background="@drawable/bubble_colorizable"
 					android:textColor="@android:color/primary_text_light"
 					android:gravity="center"/>
 

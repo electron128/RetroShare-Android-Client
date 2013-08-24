@@ -142,4 +142,15 @@ public class Util
 		options.inJustDecodeBounds = false;
 		return BitmapFactory.decodeStream(contentResolver.openInputStream(uri), null, options);
 	}
+
+	public static int opposeColor(int colorToInvert)
+	{
+		int RGBMAX = 255;
+		float[] hsv = new float[3];
+		float H;
+		Color.RGBToHSV( Color.red(colorToInvert),  RGBMAX - Color.green( colorToInvert), Color.blue(colorToInvert), hsv );
+		H = (float) (hsv[0] + 0.5);
+		if (H > 1) H -= 1;
+		return Color.HSVToColor(hsv);
+	}
 }
