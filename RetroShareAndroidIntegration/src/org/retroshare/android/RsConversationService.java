@@ -258,11 +258,14 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	{
 		if(notificationForConversationEnabled(id))
 		{
+			action.putExtra(ProxiedFragmentActivityBase.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name);
+			action.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			action.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			Notification notification = new NotificationCompat.Builder(mContext)
 					.setSmallIcon(iconId)
 					.setContentTitle(title)
 					.setContentText(message)
-					.setContentIntent(PendingIntent.getActivity(mContext, 0, action, 0))
+					.setContentIntent(PendingIntent.getActivity(mContext, 0, action, PendingIntent.FLAG_UPDATE_CURRENT))
 					.setAutoCancel(autoCancel)
 					.build();
 			mNotificationManager.notify(id.hashCode(), notification);

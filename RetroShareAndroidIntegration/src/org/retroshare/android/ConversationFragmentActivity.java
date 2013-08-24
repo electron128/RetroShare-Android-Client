@@ -20,6 +20,7 @@
 
 package org.retroshare.android;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import org.retroshare.android.RsConversationService.ConversationId;
@@ -38,16 +39,14 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase im
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		actualConversationId = getIntent().getParcelableExtra(CONVERSATION_ID_EXTRA);
-
+		onNewIntent(getIntent());
 		setContentView(R.layout.factivity_conversation);
 	}
 
 	@Override
-	public void onResume()
+	protected void onNewIntent(Intent intent)
 	{
-		actualConversationId = getIntent().getParcelableExtra(CONVERSATION_ID_EXTRA); // this is the first not casually
-		super.onResume();
+		super.onNewIntent(intent);
+		actualConversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA); // this is the first not casually
 	}
 }

@@ -21,7 +21,6 @@
 package org.retroshare.android;
 
 /**
- * @author G10h4ck
  * This interface should be implemented by Proxied Components
  */
 public interface ProxiedInterface
