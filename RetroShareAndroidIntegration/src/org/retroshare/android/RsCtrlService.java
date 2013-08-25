@@ -219,8 +219,8 @@ public class RsCtrlService implements Runnable
 		mRsPeersService.getOwnPerson();
 		// preload peers list, needed for chat notification
 		mRsPeersService.requestPersonsUpdate(Peers.RequestPeers.SetOption.ALL, Peers.RequestPeers.InfoOption.ALLINFO);
-		// preload chatobby list, because first request returns just an empty list
-		mRsChatService.updateChatLobbies();
+		// preload chatobbies list
+		mRsConversationService.requestLobbiesListUpdate();
 	}
 	
 	public void destroy(){ runThread=false;	}
