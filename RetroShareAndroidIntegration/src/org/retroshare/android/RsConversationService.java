@@ -488,26 +488,28 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		ChatId.Builder builderChatId = ChatId.newBuilder().setChatType(Chat.ChatType.TYPE_PRIVATE);
 
+		/**
+		 * WORK AROUND begin
+		 * Doing various tests have demonstrated some strange cases
+		 * Sending message to friend with multiple location and with a good part of them offline seems confusing the core causing messages some times get delivered and sometimes not, in a randomlike manner
+		 * Sending messages only to online locations seems avoid the problem
+		 * this snippet of code select only online location shouldn't be necessary so when the problem in the core get isolated and fixed we should remove this unnecessary part
+		 */
+		List<Core.Location> onlineLocations = new ArrayList<Core.Location>();
 		for(Core.Location location : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
+			if((location.getState() & Core.Location.StateFlags.CONNECTED_VALUE) == Core.Location.StateFlags.CONNECTED_VALUE)
+				onlineLocations.add(location);
+//		for(Core.Location location : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
+		for(Core.Location location : onlineLocations) /** WORK AROUND end */
 		{
-			/**
-			 * RANDOMICAL PROBLEMS
-			 * TODO: fix PGP_CHAT sending
-			 * Doing various tests have demonstrated some strange cases
-			 * 1) Hardcoding sslid works but obviously send all messages to me
-			 * 2) Putting some if to check if sslid was equal to the one of mine online location before using it made it work but obviously only messages send to me were arriving
-			 * 3) Testing with friend with just one location seems works perfectly, missing friend with multiple location to test
-			 * 4) Sending message to me ( I have multiple location but just the one with rs-nogui and another one online at moment ) some times get delivered and sometimes not, totally randomically
-			 * The code is mature enough for merging but this bug in rs-core the core is preventing me from doing that
-			 */
 			ChatId chatId = builderChatId.setChatId(location.getSslId()).build();
 			ChatMessage chatMessage = builderChatMessage.setId(chatId).build();
 			RequestSendMessage requestSendMessage = builderRequestSendMessage.setMsg(chatMessage).build();
 
 			rsMessage.body = requestSendMessage.toByteArray();
 
-			Log.wtf(TAG(), "Sending \"" + requestSendMessage.getMsg().getMsg() + "\" to " + location.getLocation() + " <" + requestSendMessage.getMsg().getId().getChatId() + ">" );
-			mRsCtrlService.sendMsg(rsMessage, new ResponseSendMessageHandler());
+//			Log.d(TAG(), "Sending \"" + requestSendMessage.getMsg().getMsg() + "\" to " + location.getLocation() + " <" + requestSendMessage.getMsg().getId().getChatId() + ">" );
+			mRsCtrlService.sendMsg(rsMessage);
 		}
 
 		appendConversationMessageToHistoryMap(new PgpChatMessage(msg.getConversationId(), builderChatMessage.build()));
@@ -653,7 +655,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		rsMessage.body = requestSendMessage.toByteArray();
 
-		mRsCtrlService.sendMsg(rsMessage, new ResponseSendMessageHandler());
+		mRsCtrlService.sendMsg(rsMessage);
 
 		appendConversationMessageToHistoryMap(new LobbyChatMessage(msg.getConversationId(), chatMessage));
 	}
