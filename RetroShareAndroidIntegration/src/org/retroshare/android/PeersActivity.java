@@ -23,7 +23,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.retroshare.android.RsChatService.ChatServiceListener;
 import org.retroshare.android.RsPeersService.PeersServiceListener;
 
 import java.util.ArrayList;
@@ -31,8 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import rsctrl.chat.Chat.ChatId;
-import rsctrl.chat.Chat.ChatType;
 import rsctrl.core.Core.Location;
 import rsctrl.core.Core.Person;
 import rsctrl.peers.Peers;
@@ -105,7 +102,7 @@ public class PeersActivity extends ProxiedActivityBase
 		super.onPause();
 	}
     
-    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener, PeersServiceListener, ChatServiceListener
+    private class PeersListAdapterListener implements ListAdapter, OnItemClickListener, OnItemLongClickListener, PeersServiceListener
 	{
 		public String TAG() { return "PeersListAdapterListener"; }
 
@@ -232,15 +229,7 @@ public class PeersActivity extends ProxiedActivityBase
 			{
 				person = p;
 
-				for ( Location l : p.getLocationsList())
-				{
-					isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
-
-					ChatId chatId = ChatId.newBuilder().setChatType(ChatType.TYPE_PRIVATE).setChatId(l.getSslId()).build();
-					RsChatService chatService = getConnectedServer().mRsChatService;
-					if ( chatService !=  null && chatService.getChatChanged().get(chatId) != null ) hasNewMessage = true ;
-					else { Log.e(TAG(), "getView(...) chatService is null"); }
-				}
+				for ( Location l : p.getLocationsList()) isOnline |= (l.getState() & Location.StateFlags.CONNECTED_VALUE) == Location.StateFlags.CONNECTED_VALUE;
 
 				if(isOnline) image = onLineImage;
 				else { image = offLineImage;}
@@ -294,7 +283,6 @@ public class PeersActivity extends ProxiedActivityBase
 
 		RsCtrlService server = getConnectedServer();
 		server.mRsPeersService.registerListener(adapter);
-		server.mRsChatService.registerListener(adapter);
 	}
 
 	private void _unregisterListeners()
@@ -305,7 +293,6 @@ public class PeersActivity extends ProxiedActivityBase
 
 		RsCtrlService server = getConnectedServer();
 		server.mRsPeersService.unregisterListener(adapter);
-		server.mRsChatService.unregisterListener(adapter);
 	}
 
 	public void onAddFriendsButtonPressed(View v) { startActivity(AddFriendMethodChooserActivity.class); }
