@@ -61,6 +61,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	public RsConversationService(RsCtrlService rsCtrlService, HandlerThreadInterface handlerThreadInterface, Context context)
 	{
 		mRsCtrlService = rsCtrlService;
+		mRsCtrlService.registerListener(this);
 		mRsPeerService = rsCtrlService.mRsPeersService;
 		mHandlerThreadInterface = handlerThreadInterface;
 		mContext = context;

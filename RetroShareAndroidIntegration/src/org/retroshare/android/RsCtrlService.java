@@ -183,7 +183,6 @@ public class RsCtrlService implements Runnable
 	/*************************************/
 
 	private Set<RsServiceInterface> Services = new HashSet<RsServiceInterface>();
-	public RsChatService mRsChatService;
 	public RsPeersService mRsPeersService;
 	public RsFilesService mRsFilesService;
 	public RsSearchService mRsSearchService;
@@ -199,9 +198,6 @@ public class RsCtrlService implements Runnable
 		mThread = new Thread(this);
 		runThread = true;
 		mThread.start();
-		
-		mRsChatService = new RsChatService(this, mUiThreadHandler);
-		Services.add(mRsChatService);
 		
 		mRsPeersService = new RsPeersService(this, mUiThreadHandler);
 		Services.add(mRsPeersService);
@@ -219,8 +215,6 @@ public class RsCtrlService implements Runnable
 		mRsPeersService.getOwnPerson();
 		// preload peers list, needed for chat notification
 		mRsPeersService.requestPersonsUpdate(Peers.RequestPeers.SetOption.ALL, Peers.RequestPeers.InfoOption.ALLINFO);
-		// preload chatobbies list
-		mRsConversationService.requestLobbiesListUpdate();
 	}
 	
 	public void destroy(){ runThread=false;	}

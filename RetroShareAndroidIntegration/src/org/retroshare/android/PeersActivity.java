@@ -174,7 +174,7 @@ public class PeersActivity extends ProxiedActivityBase
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerList.remove(observer); }
 		@Override public boolean areAllItemsEnabled() {return true;}
 		@Override public boolean isEnabled(int position) {return true;}
-		@Override public void update() // called by RsChatService and RsPeersService
+		@Override public void update() // called by RsPeersService
 		{
 			if(firstUpdate)
 			{
