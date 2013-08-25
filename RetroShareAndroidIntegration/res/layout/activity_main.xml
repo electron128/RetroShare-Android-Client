@@ -84,17 +84,15 @@
             </LinearLayout>
 
             <View
-                android:id="@+id/View01"
                 android:layout_width="wrap_content"
                 android:layout_height="2dp"
                 android:background="@android:drawable/divider_horizontal_bright" />
 
 
-            <LinearLayout
-                    android:id="@+id/peersClickContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="showPeers" >
+			<LinearLayout	android:id="@+id/peersClickContainer"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:onClick="showPeers" >
 
                 <ImageView
                     android:layout_width="32dp"

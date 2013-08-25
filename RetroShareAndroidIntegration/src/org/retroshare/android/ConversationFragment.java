@@ -116,7 +116,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		sendExtraMenu = fv.findViewById(R.id.sendExtraLayout);
 		sendExtraMenu.setVisibility(View.INVISIBLE);
 		sendExtraMenu.findViewById(R.id.sendImageButton).setOnClickListener(new OnAddImageClickListener());
-		sendExtraMenu.findViewById(R.id.sendFileButton).setVisibility(View.GONE);
+//		sendExtraMenu.findViewById(R.id.sendFileButton).setVisibility(View.GONE);
 		sendExtraMenu.findViewById(R.id.showInfoImageButton).setOnClickListener(new ShowLobbyInfoLongClickListener());
 
 		return fv;
@@ -162,7 +162,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
 
 			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
-			Drawable background = getResources().getDrawable(R.drawable.bubble_colorizable);
+			Drawable background = getResources().getDrawable(R.drawable.bubble_colorizable); // Doing this here can create problems?
 			int backgroundColor;
 			if(msg.isMine()) backgroundColor = 0xFFA8D324; // TODO: Make own color configurable
 			else backgroundColor = ColorHash.getObjectColor(msg.getNick());
