@@ -31,9 +31,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import org.retroshare.android.utils.WeakHashSet;
+import org.retroshare.android.utils.WeakListSet;
 
-import java.util.Set;
+import java.util.Collection;
 
 
 /**
@@ -94,7 +94,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		setBound(true);
         if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
 		onServiceConnected();
-		for(ProxiedFragmentBase pf : proxiedFragSet) pf.onServiceConnected();
+		for(ProxiedFragmentBase pf : proxiedFragCollection) pf.onServiceConnected();
         rsProxyConnectionProgressBar.setVisibility(View.GONE);
 	}
 
@@ -188,14 +188,14 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		isInForeground = true;
 	}
 
-	protected Set<ProxiedFragmentBase> proxiedFragSet = new WeakHashSet<ProxiedFragmentBase>();
+	protected Collection<ProxiedFragmentBase> proxiedFragCollection = new WeakListSet<ProxiedFragmentBase>();
 	@Override
 	public void onAttachFragment (Fragment fragment)
 	{
 		try
 		{
 			ProxiedFragmentBase pf = (ProxiedFragmentBase) fragment;
-			proxiedFragSet.add(pf);
+			proxiedFragCollection.add(pf);
 		}
 		catch (ClassCastException e) {}
 	}
