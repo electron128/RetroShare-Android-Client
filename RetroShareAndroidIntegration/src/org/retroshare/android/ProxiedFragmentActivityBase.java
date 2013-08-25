@@ -31,9 +31,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import org.retroshare.android.utils.WeakHashSet;
+
+import java.util.Set;
 
 
 /**
@@ -94,11 +94,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		setBound(true);
         if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
 		onServiceConnected();
-		for(WeakReference<ProxiedFragmentBase> wf : proxiedFragList)
-		{
-			ProxiedFragmentBase pf = wf.get();
-			if(pf != null) pf.onServiceConnected();
-		};
+		for(ProxiedFragmentBase pf : proxiedFragSet) pf.onServiceConnected();
         rsProxyConnectionProgressBar.setVisibility(View.GONE);
 	}
 
@@ -192,14 +188,14 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		isInForeground = true;
 	}
 
-	protected List<WeakReference<ProxiedFragmentBase>> proxiedFragList = new ArrayList<WeakReference<ProxiedFragmentBase>>(); // TODO: move this to WeakHashSet
+	protected Set<ProxiedFragmentBase> proxiedFragSet = new WeakHashSet<ProxiedFragmentBase>();
 	@Override
 	public void onAttachFragment (Fragment fragment)
 	{
 		try
 		{
 			ProxiedFragmentBase pf = (ProxiedFragmentBase) fragment;
-			proxiedFragList.add(new WeakReference(pf));
+			proxiedFragSet.add(pf);
 		}
 		catch (ClassCastException e) {}
 	}
