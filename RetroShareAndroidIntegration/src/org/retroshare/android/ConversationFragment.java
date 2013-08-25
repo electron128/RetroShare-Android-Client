@@ -74,8 +74,6 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	interface ConversationFragmentContainer { ConversationId getConversationId(ConversationFragment f); }
 	private ConversationFragmentContainer cfc;
 
-	private RsConversationService mRsConversationService;
-
 	private List<_ConversationMessage> messageList = new ArrayList<_ConversationMessage>();
 	private final ConversationAdapter adapter = new ConversationAdapter();
 	private ListView conversationMessageListView;
@@ -139,7 +137,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 	@Override public void onPause()
 	{
-		if(isBound()) mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
+		if(isBound()) getConnectedServer().mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
 		super.onPause();
 	}
 	@Override public void onServiceConnected()
@@ -147,8 +145,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		onVisibleAndBound();
 		super.onServiceConnected();
 	}
-	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(adapter); }
-	@Override public void unregisterRsServicesListeners() { mRsConversationService.unregisterRsConversationServiceListener(adapter); }
+	@Override public void registerRsServicesListeners() { getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter); }
+	@Override public void unregisterRsServicesListeners() { getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(adapter); }
 
 	private class ConversationAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
@@ -273,10 +271,10 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	{
 		if(isUserVisible() && isBound())
 		{
-			mRsConversationService = getConnectedServer().mRsConversationService;
+			RsConversationService rsConversationService = getConnectedServer().mRsConversationService;
 			ConversationId id = cfc.getConversationId(this);
-			mRsConversationService.cancelNotificationForConversation(id);
-			mRsConversationService.disableNotificationForConversation(id);
+			rsConversationService.cancelNotificationForConversation(id);
+			rsConversationService.disableNotificationForConversation(id);
 			adapter.new ReloadMessagesHistoryAsyncTask().execute(null, null, null);
 		}
 	}
@@ -299,7 +297,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 				ConversationId id = cfc.getConversationId(this);
 				ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
 				msg.setMessageString(msgText);
-				mRsConversationService.sendConversationMessage(msg);
+				getConnectedServer().mRsConversationService.sendConversationMessage(msg);
 
 				et.setText("");
 
@@ -370,13 +368,13 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 			return msg;
 		}
-		@Override public void onPostExecute(ConversationMessage msg) { if(msg != null) mRsConversationService.sendConversationMessage(msg); }
+		@Override public void onPostExecute(ConversationMessage msg) { if(msg != null) getConnectedServer().mRsConversationService.sendConversationMessage(msg); }
 	}
 	private final class ShowLobbyInfoLongClickListener implements View.OnClickListener
 	{
 		@Override public void onClick(View v)
 		{
-			RsConversationService.ConversationInfo info = mRsConversationService.getConversationInfo(cfc.getConversationId(ConversationFragment.this));
+			RsConversationService.ConversationInfo info = getConnectedServer().mRsConversationService.getConversationInfo(cfc.getConversationId(ConversationFragment.this));
 			Bundle args = new Bundle(1);
 			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
 			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());
