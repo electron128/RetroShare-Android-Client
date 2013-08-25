@@ -144,7 +144,6 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 	@Override public void onServiceConnected()
 	{
-		mRsConversationService = getConnectedServer().mRsConversationService;
 		onVisibleAndBound();
 		super.onServiceConnected();
 	}
@@ -274,6 +273,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	{
 		if(isUserVisible() && isBound())
 		{
+			mRsConversationService = getConnectedServer().mRsConversationService;
 			ConversationId id = cfc.getConversationId(this);
 			mRsConversationService.cancelNotificationForConversation(id);
 			mRsConversationService.disableNotificationForConversation(id);
