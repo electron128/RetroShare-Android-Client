@@ -37,7 +37,7 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	/**
 	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
 	 */
-	protected void onServiceConnected() { if(isUserVisible()) registerRsServicesListeners(); }
+	protected void onServiceConnected() { registerRsServicesListeners(); }
 
 	/**
 	 * @return true if it is visible to the user, false otherwise
