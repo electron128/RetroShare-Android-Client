@@ -109,9 +109,9 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 			TextView nameTextView =  (TextView) lv.findViewById(R.id.lobbyNameTextView);
 			nameTextView.setText(lobbyInfo.getLobbyName());
 			if(lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED))
-				nameTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-			else
 				nameTextView.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+			else
+				nameTextView.setTextColor(getResources().getColor(android.R.color.secondary_text_dark));
 
 			TextView peerCountTextView = (TextView) lv.findViewById(R.id.lobbyParticipantsNumberTextView);
 			peerCountTextView.setText("(" + String.valueOf(lobbyInfo.getNoPeers()) + ")");
