@@ -38,7 +38,7 @@
 			</intent-filter>
 		</activity>
 		<!-- Test Activities BEGIN -->
-		<!---->
+		<!--++>
 		<activity android:name=".tests.TestActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -46,7 +46,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".tests.HtmlBase64ImageGetterTestActivity" />
-		<!---->
+		<!++-->
 		<!-- Test Activities END -->
 		<activity
 				android:name=".PeersActivity"
