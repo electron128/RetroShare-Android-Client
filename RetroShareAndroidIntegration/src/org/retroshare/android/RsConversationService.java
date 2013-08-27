@@ -46,6 +46,7 @@ import rsctrl.core.Core;
 import org.retroshare.android.RsCtrlService.RsMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,6 +90,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		abstract public List<CharSequence> getParticipantsNick();
 		abstract public boolean isPrivate();
 	}
+	public static enum ConversationMessageStatus { UNREAD, READ }
 	public static abstract class ConversationMessage implements Comparable<ConversationMessage>
 	{
 		abstract public ConversationId getConversationId();
@@ -102,6 +104,9 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		abstract public long getTime();
 		abstract public void setTime(long time);
 		abstract public boolean hasTime();
+		abstract public boolean hasStatus();
+		abstract public ConversationMessageStatus getStatus();
+		abstract public void setStatus(ConversationMessageStatus status);
 
 		@Override public int compareTo(ConversationMessage msg) { return (int)(getTime() - msg.getTime()); }
 
@@ -121,25 +126,11 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			}
 		}
 	}
-	private final Map<ConversationId, ArrayList<ConversationMessage>> conversationHistoryMap = new HashMap<ConversationId, ArrayList<ConversationMessage>>();
-	private void appendConversationMessageToHistoryMap(ConversationMessage msg)
-	{
-		ConversationId id = msg.getConversationId();
-		ArrayList conversationHistory = conversationHistoryMap.get(id);
-		if(conversationHistory == null)
-		{
-			conversationHistory = new ArrayList<ConversationMessage>();
-			conversationHistoryMap.put(id, conversationHistory);
-		}
-		conversationHistory.add(msg);
-		Collections.sort(conversationHistory);
-//		Log.wtf(TAG(), "conversationHistoryMap.size() = " + String.valueOf(conversationHistoryMap.size()) + " conversationHistory.size() = " + String.valueOf(conversationHistory.size()) );
-		notifyRsConversationServiceListeners(new NewMessageConversationEvent(msg));
-	}
+	private final Map<ConversationId, Collection<ConversationMessage>> conversationHistoryMap = new HashMap<ConversationId, Collection<ConversationMessage>>();
 	public List<ConversationMessage> getConversationHistory(ConversationId id)
 	{
 		List<ConversationMessage> ret = new ArrayList<ConversationMessage>();
-		List<ConversationMessage> history = conversationHistoryMap.get(id);
+		Collection<ConversationMessage> history = conversationHistoryMap.get(id);
 		if(history != null) ret.addAll(history);
 		return ret;
 	}
@@ -340,7 +331,9 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 							.setPeerNickname(authorNick)
 							.setRecvTime((int) (System.currentTimeMillis() / 1000L))
 							.build();
-					appendPgpChatMessageToHistory(new PgpChatMessage(pgpId, dataStoreMsg));
+					PgpChatMessage pgpChatMessage = new PgpChatMessage(pgpId, dataStoreMsg);
+					appendPgpChatMessageToHistory(pgpChatMessage);
+					notifyAndroidAboutPgpChatMsg(pgpChatMessage);
 					break;
 				}
 				case TYPE_LOBBY:
@@ -349,7 +342,9 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 							.newBuilder(cMsg)
 							.setRecvTime((int) (System.currentTimeMillis() / 1000L))
 							.build();
-					appendLobbyChatMessageToHistory(new LobbyChatMessage(LobbyChatId.Factory.getLobbyChatId(dataStoreMsg.getId().getChatId()), dataStoreMsg));
+					LobbyChatMessage lobbyChatMessage = new LobbyChatMessage(LobbyChatId.Factory.getLobbyChatId(dataStoreMsg.getId().getChatId()), dataStoreMsg);
+					appendLobbyChatMessageToHistory(lobbyChatMessage);
+					notifyAndroidAboutLobbyChatMessage(lobbyChatMessage);
 					break;
 				}
 			}
@@ -457,16 +452,34 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
 			return (mChatMessage.getRecvTime()*1000L);
 		}
+		@Override public boolean hasStatus() { return true; }
+		@Override public ConversationMessageStatus getStatus() { return mConversationMessageStatus; }
+		@Override public void setStatus(ConversationMessageStatus status) { mConversationMessageStatus = status; }
 
 		ChatMessage getRawData() { return mChatMessage; }
 
 		private final PgpChatId mPgpChatId;
 		private ChatMessage mChatMessage;
+		private ConversationMessageStatus mConversationMessageStatus = ConversationMessageStatus.UNREAD;
 	}
 	private void appendPgpChatMessageToHistory(PgpChatMessage msg)
 	{
 		PgpChatId pId = msg.getConversationId();
-		appendConversationMessageToHistoryMap(msg);
+
+		ArrayList conversationHistory = (ArrayList<ConversationMessage>) conversationHistoryMap.get(pId);
+		if(conversationHistory == null)
+		{
+			conversationHistory = new ArrayList<PgpChatMessage>();
+			conversationHistoryMap.put(pId, conversationHistory);
+		}
+		conversationHistory.add(msg);
+		Collections.sort(conversationHistory);
+
+		notifyRsConversationServiceListeners(new NewMessageConversationEvent(msg));
+	}
+	private void notifyAndroidAboutPgpChatMsg(PgpChatMessage msg)
+	{
+		PgpChatId pId = msg.getConversationId();
 		if(notificationForConversationEnabled(pId))
 		{
 			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
@@ -513,7 +526,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			mRsCtrlService.sendMsg(rsMessage);
 		}
 
-		appendConversationMessageToHistoryMap(new PgpChatMessage(msg.getConversationId(), builderChatMessage.build()));
+		appendPgpChatMessageToHistory(new PgpChatMessage(msg.getConversationId(), builderChatMessage.build()));
 	}
 
 	/**
@@ -607,11 +620,15 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
 			return (mChatMessage.getRecvTime()*1000L);
 		}
+		@Override public boolean hasStatus() { return true; }
+		@Override public ConversationMessageStatus getStatus() { return mConversationMessageStatus; }
+		@Override public void setStatus(ConversationMessageStatus status) { mConversationMessageStatus = status; }
 
 		public ChatMessage getRawData() { return mChatMessage; };
 
 		private final LobbyChatId mLobbyChatId;
 		private ChatMessage mChatMessage;
+		private ConversationMessageStatus mConversationMessageStatus = ConversationMessageStatus.UNREAD;
 	}
 	public void requestLobbiesListUpdate()
 	{
@@ -629,7 +646,21 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	private void appendLobbyChatMessageToHistory(LobbyChatMessage msg)
 	{
 		LobbyChatId pId = msg.getConversationId();
-		appendConversationMessageToHistoryMap(msg);
+
+		ArrayList conversationHistory = (ArrayList<ConversationMessage>) conversationHistoryMap.get(pId);
+		if(conversationHistory == null)
+		{
+			conversationHistory = new ArrayList<LobbyChatMessage>();
+			conversationHistoryMap.put(pId, conversationHistory);
+		}
+		conversationHistory.add(msg);
+		Collections.sort(conversationHistory);
+
+		notifyRsConversationServiceListeners(new NewMessageConversationEvent(msg));
+	}
+	private void notifyAndroidAboutLobbyChatMessage(LobbyChatMessage msg)
+	{
+		LobbyChatId pId = msg.getConversationId();
 		if(notificationForConversationEnabled(pId))
 		{
 			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
@@ -658,7 +689,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 
 		mRsCtrlService.sendMsg(rsMessage);
 
-		appendConversationMessageToHistoryMap(new LobbyChatMessage(msg.getConversationId(), chatMessage));
+		appendLobbyChatMessageToHistory(new LobbyChatMessage(msg.getConversationId(), chatMessage));
 	}
 	private final Map<LobbyChatId, Chat.ChatLobbyInfo> lobbiesRepository = new HashMap<LobbyChatId, ChatLobbyInfo>();
 
