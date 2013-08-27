@@ -51,7 +51,6 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 {
 	@Override public String TAG() { return "LobbiesListFragment"; }
 
-	private RsConversationService mRsConversationService;
 	private ListView lobbiesListView;
 	private LayoutInflater mInflater;
 
@@ -77,13 +76,12 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 	}
 	@Override public void onServiceConnected()
 	{
-		mRsConversationService = getConnectedServer().mRsConversationService;
 		if(mHandler == null) mHandler = new Handler();
 		mHandler.post(new RequestLobbiesListUpdateRunnable());
 		super.onServiceConnected();
 	}
-	@Override public void registerRsServicesListeners() { mRsConversationService.registerRsConversationServiceListener(lobbiesListAdapter); }
-	@Override public void unregisterRsServicesListeners() { mRsConversationService.unregisterRsConversationServiceListener(lobbiesListAdapter); }
+	@Override public void registerRsServicesListeners() { getConnectedServer().mRsConversationService.registerRsConversationServiceListener(lobbiesListAdapter); }
+	@Override public void unregisterRsServicesListeners() { getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(lobbiesListAdapter); }
 	@Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
 	{
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -142,7 +140,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		{
 			Chat.ChatLobbyInfo lobbyInfo = lobbiesList.get(i);
 			RsConversationService.LobbyChatId id = RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbyInfo.getLobbyId());
-			if(!lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED)) mRsConversationService.joinConversation(id);
+			if(!lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED)) getConnectedServer().mRsConversationService.joinConversation(id);
 			Intent intent = new Intent();
 			intent.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, id);
 			((ProxiedFragmentActivityBase)getActivity()).startActivity(ConversationFragmentActivity.class, intent);
@@ -152,14 +150,21 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		{
 			@Override protected List<Chat.ChatLobbyInfo> doInBackground(Void... voids)
 			{
-				List<Chat.ChatLobbyInfo> ret = mRsConversationService.getLobbiesList();
-				Collections.sort(ret, new AlphabeticalLobbiesComparator());
+				List<Chat.ChatLobbyInfo> ret = new ArrayList<Chat.ChatLobbyInfo>();
+				if(isBound()) try
+				{
+					ret = getConnectedServer().mRsConversationService.getLobbiesList();
+					Collections.sort(ret, new AlphabeticalLobbiesComparator());
+				} catch (RuntimeException e) {}
 				return ret;
 			}
 			@Override protected void onPostExecute(List<Chat.ChatLobbyInfo> ml)
 			{
-				lobbiesList = ml;
-				notifyObservers();
+				if(ml.size() > 0)
+				{
+					lobbiesList = ml;
+					notifyObservers();
+				}
 			}
 		}
 
@@ -167,13 +172,13 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 	}
 
 	private Handler mHandler;
-	private static final int UPDATE_INTERVAL = 3000;
+	private static final int UPDATE_INTERVAL = 2000;
 	private class RequestLobbiesListUpdateRunnable implements Runnable
 	{
 		@Override
 		public void run()
 		{
-			if(isUserVisible()) mRsConversationService.requestLobbiesListUpdate();
+			if(isUserVisible() && isBound()) getConnectedServer().mRsConversationService.requestLobbiesListUpdate();
 			mHandler.postAtTime(new RequestLobbiesListUpdateRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVAL);
 		}
 	}
@@ -184,7 +189,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		public JoinLobbyMenuItemClickListener(int position) { this.position = position; }
 		@Override public boolean onMenuItemClick(MenuItem menuItem)
 		{
-			mRsConversationService.joinConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			getConnectedServer().mRsConversationService.joinConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
 			new RequestLobbiesListUpdateRunnable().run();
 			return true;
 		}
@@ -195,7 +200,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		public LeaveLobbyMenuItemClickListener(int position) { this.position = position; }
 		@Override public boolean onMenuItemClick(MenuItem menuItem)
 		{
-			mRsConversationService.leaveConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			getConnectedServer().mRsConversationService.leaveConversation(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
 			new RequestLobbiesListUpdateRunnable().run();
 			return true;
 		}
@@ -206,7 +211,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		public ShowLobbyInfoMenuItemClickListener(int position) { this.position = position; }
 		@Override public boolean onMenuItemClick(MenuItem menuItem)
 		{
-			RsConversationService.LobbyChatInfo info = mRsConversationService.new LobbyChatInfo(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
+			RsConversationService.LobbyChatInfo info = getConnectedServer().mRsConversationService.new LobbyChatInfo(RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbiesList.get(position).getLobbyId()));
 			Bundle args = new Bundle(1);
 			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
 			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());

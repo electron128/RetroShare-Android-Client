@@ -172,8 +172,7 @@ public class FilesActivity extends ProxiedActivityBase
 		@Override
 		public void run()
 		{
-			RsCtrlService server = getConnectedServer();
-			if( isInForeground && isBound() && server.isOnline() ) { server.mRsFilesService.updateTransfers(mDirection); }
+			if(isInForeground && isBound()) try { getConnectedServer().mRsFilesService.updateTransfers(mDirection); } catch (RuntimeException e) {}
 			mHandler.postAtTime( new requestFilesRunnable(), SystemClock.uptimeMillis() + UPDATE_INTERVALL );
 		}
 	}
@@ -222,7 +221,7 @@ public class FilesActivity extends ProxiedActivityBase
 		public Object getItem(int position) { return transferList.get(position); }
 
 		@Override
-		public long getItemId(int position) { return 0; } // TODO Auto-generated method stub
+		public long getItemId(int position) { return 0; }
 
 		@Override
 		public int getItemViewType(int position) { return 0; }
@@ -265,7 +264,7 @@ public class FilesActivity extends ProxiedActivityBase
 		public int getViewTypeCount() { return 1; }
 
 		@Override
-		public boolean hasStableIds() { return false; } // TODO Auto-generated method stub
+		public boolean hasStableIds() { return false; }
 		
 		@Override
 		public boolean isEmpty() { return transferList.isEmpty(); }
@@ -282,10 +281,13 @@ public class FilesActivity extends ProxiedActivityBase
 		@Override
 		public void update()
 		{
-			RsCtrlService server = getConnectedServer();
-	        if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)) transferList = server.mRsFilesService.getTransfersDown();
-	        else transferList = server.mRsFilesService.getTransfersUp();
-	        
+			if(isBound())
+			{
+				RsCtrlService server = getConnectedServer();
+				if(mDirection.equals(Direction.DIRECTION_DOWNLOAD)) transferList = server.mRsFilesService.getTransfersDown();
+				else transferList = server.mRsFilesService.getTransfersUp();
+			}
+
     		for(DataSetObserver obs:observerList) obs.onChanged();
 		}
     }

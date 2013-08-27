@@ -147,11 +147,7 @@ public class ListSearchesActivity extends ProxiedActivityBase
 			return list.get(position);
 		}
 
-		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+		@Override public long getItemId(int position) { return 0; }
 
 		@Override
 		public int getItemViewType(int position) {
@@ -171,10 +167,7 @@ public class ListSearchesActivity extends ProxiedActivityBase
 		}
 
 		@Override
-		public boolean hasStableIds() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+		public boolean hasStableIds() { return false; }
 
 		@Override
 		public boolean isEmpty() {

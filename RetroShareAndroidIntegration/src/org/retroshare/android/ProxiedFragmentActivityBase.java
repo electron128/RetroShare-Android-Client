@@ -76,12 +76,8 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	@Override
 	public RsCtrlService getConnectedServer()
 	{
-//		Log.d(TAG(), "getConnectedServer() -> " + serverName );
-
 		if(isBound()) return rsProxy.activateServer(serverName);
-
-		Log.e(TAG(), "getConnectedServer() shouldn't be called before binding");
-		return null;
+		throw new RuntimeException(TAG() + " getConnectedServer() called before binding");
 	}
 
 	@Override

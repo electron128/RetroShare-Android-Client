@@ -42,21 +42,10 @@ public class AddDownloadActivity extends ProxiedActivityBase
     	
     	buttonDownload.setVisibility(View.GONE);
     	
-    	/*
-    	try {
-			mFile=File.parseFrom(getIntent().getByteArrayExtra("File"));
-		} catch (InvalidProtocolBufferException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
     	if(getIntent().hasExtra("File")){
             try{
             mFile = File.parseFrom(getIntent().getByteArrayExtra("File"));
-            }catch (InvalidProtocolBufferException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            }catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
         }else{
 	    	Uri uri = getIntent().getData();
 	    	mFile=File.newBuilder()
@@ -104,10 +93,7 @@ public class AddDownloadActivity extends ProxiedActivityBase
 			    		}else{
 			    			textViewResult.setText("nok");
 			    		}
-					} catch (InvalidProtocolBufferException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					} catch (InvalidProtocolBufferException e) { e.printStackTrace(); }
 				}
         		
         	});

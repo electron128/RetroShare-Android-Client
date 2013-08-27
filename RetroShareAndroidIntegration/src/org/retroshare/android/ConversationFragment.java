@@ -184,9 +184,12 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			protected List<_ConversationMessage> doInBackground(Void... voids)
 			{
 				List<_ConversationMessage> fmsg = new ArrayList<_ConversationMessage>();
-				ConversationId id = cfc.getConversationId(ConversationFragment.this);
-				List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(id);
-				for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ConversationMessage(msg));
+				if(isBound()) try
+				{
+					ConversationId id = cfc.getConversationId(ConversationFragment.this);
+					List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(id);
+					for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ConversationMessage(msg));
+				} catch (RuntimeException e) {}
 				return fmsg;
 			}
 
