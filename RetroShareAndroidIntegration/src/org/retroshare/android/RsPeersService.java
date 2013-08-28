@@ -96,7 +96,7 @@ public class RsPeersService implements RsServiceInterface
 	public Person getPersonBySslId(String sslId)
 	{
 		for( Person p : getPersons() ) for( Location l : p.getLocationsList() ) if ( l.getSslId().equals(sslId) ) return p;
-		return null;
+		throw new RuntimeException("There is no Person with a location matching sslId " + sslId);
 	}
 	private Person ownPerson;
 	public Person getOwnPerson()
