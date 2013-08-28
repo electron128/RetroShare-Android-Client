@@ -91,7 +91,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		abstract public boolean isPrivate();
 	}
 	public static enum ConversationMessageStatus { UNREAD, READ }
-	public static abstract class ConversationMessage implements Comparable<ConversationMessage>
+	public static abstract class ConversationMessage
 	{
 		abstract public ConversationId getConversationId();
 		abstract public String getAuthorString();
@@ -104,11 +104,9 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		abstract public long getTime();
 		abstract public void setTime(long time);
 		abstract public boolean hasTime();
-		abstract public boolean hasStatus();
-		abstract public ConversationMessageStatus getStatus();
-		abstract public void setStatus(ConversationMessageStatus status);
-
-		@Override public int compareTo(ConversationMessage msg) { return (int)(getTime() - msg.getTime()); }
+		public boolean hasStatus() { return false; }
+		public ConversationMessageStatus getStatus() { return ConversationMessageStatus.UNREAD; }
+		public void setStatus(ConversationMessageStatus status) {}
 
 		public static final class Factory
 		{
@@ -127,12 +125,21 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		}
 	}
 	private final Map<ConversationId, Collection<ConversationMessage>> conversationHistoryMap = new HashMap<ConversationId, Collection<ConversationMessage>>();
-	public List<ConversationMessage> getConversationHistory(ConversationId id)
+	public Collection<ConversationMessage> getConversationHistory(ConversationId id)
 	{
-		List<ConversationMessage> ret = new ArrayList<ConversationMessage>();
-		Collection<ConversationMessage> history = conversationHistoryMap.get(id);
-		if(history != null) ret.addAll(history);
-		return ret;
+		switch (id.getConversationKind())
+		{
+			case PGP_CHAT:
+			case LOBBY_CHAT:
+			{
+				List<ConversationMessage> ret = new ArrayList<ConversationMessage>();
+				Collection<ConversationMessage> history = conversationHistoryMap.get(id);
+				if(history != null) ret.addAll(history);
+				return ret;
+			}
+			default:
+				throw new RuntimeException("ConversationId id has unknown ConversationKind");
+		}
 	}
 	public ConversationInfo getConversationInfo(ConversationId id)
 	{
@@ -424,7 +431,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		private final PgpChatId pgpChatId;
 		private final List<String> nicks = new ArrayList<String>();
 	}
-	public static class PgpChatMessage extends ConversationMessage
+	public static class PgpChatMessage extends ConversationMessage implements Comparable<PgpChatMessage>
 	{
 		public PgpChatMessage(PgpChatId id)
 		{
@@ -452,9 +459,8 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
 			return (mChatMessage.getRecvTime()*1000L);
 		}
-		@Override public boolean hasStatus() { return true; }
-		@Override public ConversationMessageStatus getStatus() { return mConversationMessageStatus; }
-		@Override public void setStatus(ConversationMessageStatus status) { mConversationMessageStatus = status; }
+
+		@Override public int compareTo(PgpChatMessage msg) { return (int)(getTime() - msg.getTime()); }
 
 		ChatMessage getRawData() { return mChatMessage; }
 
@@ -513,6 +519,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		for(Core.Location location : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
 			if((location.getState() & Core.Location.StateFlags.CONNECTED_VALUE) == Core.Location.StateFlags.CONNECTED_VALUE)
 				onlineLocations.add(location);
+		if(onlineLocations.size() < 1) onlineLocations.addAll(mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList());
 //		for(Core.Location location : mRsPeerService.getPersonByPgpId(msg.mPgpChatId.getDestPgpId()).getLocationsList())
 		for(Core.Location location : onlineLocations) /** WORK AROUND end */
 		{
@@ -600,7 +607,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		private final LobbyChatId lobbyChatId;
 		private final ChatLobbyInfo chatLobbyInfo;
 	}
-	public static final class LobbyChatMessage extends ConversationMessage
+	public static final class LobbyChatMessage extends ConversationMessage implements Comparable<LobbyChatMessage>
 	{
 		public LobbyChatMessage(LobbyChatId chatId) { mLobbyChatId = chatId; mChatMessage = ChatMessage.newBuilder().buildPartial(); }
 		public LobbyChatMessage(LobbyChatId chatId, ChatMessage msg) { mLobbyChatId = chatId; mChatMessage = ChatMessage.newBuilder(msg).buildPartial(); }
@@ -620,9 +627,8 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 			if(mChatMessage.hasSendTime()) return (mChatMessage.getSendTime() * 1000L);
 			return (mChatMessage.getRecvTime()*1000L);
 		}
-		@Override public boolean hasStatus() { return true; }
-		@Override public ConversationMessageStatus getStatus() { return mConversationMessageStatus; }
-		@Override public void setStatus(ConversationMessageStatus status) { mConversationMessageStatus = status; }
+
+		@Override public int compareTo(LobbyChatMessage msg) { return (int)(getTime() - msg.getTime()); }
 
 		public ChatMessage getRawData() { return mChatMessage; };
 
@@ -667,7 +673,15 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
 					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
 			ChatMessage cMsg = msg.getRawData();
-			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, (getLobbyInfo(pId).getLobbyName() + " " + mContext.getString(R.string.new_lobby_chat_message) + " " + mContext.getString(R.string.from) + ": " + msg.getAuthorString() ), Html.fromHtml(cMsg.getMsg()), i, true );
+			notifyAndroidAboutConversation(
+					msg.getConversationId(),
+					R.drawable.chat_bubble,
+					(getLobbyInfo(pId).getLobbyName() + " " +
+							mContext.getString(R.string.new_lobby_chat_message) + " " +
+							mContext.getString(R.string.from) + ": " + msg.getAuthorString() ),
+					Html.fromHtml(cMsg.getMsg()),
+					i,
+					true );
 		}
 	}
 	private void sendLobbyChatMessage(LobbyChatMessage msg)
@@ -714,7 +728,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 				return;
 			}
 
-			Log.wtf(TAG, "Message sending ended with status code : " + String.valueOf(resp.getStatus().getCode().getNumber()) + "  and message: " + resp.getStatus().getMsg());
+			Log.d(TAG, "Message sending ended with status code : " + String.valueOf(resp.getStatus().getCode().getNumber()) + "  and message: " + resp.getStatus().getMsg());
 		}
 	}
 }

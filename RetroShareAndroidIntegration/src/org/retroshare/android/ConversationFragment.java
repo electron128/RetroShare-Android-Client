@@ -39,6 +39,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -65,7 +66,7 @@ import org.retroshare.android.RsConversationService.ConversationEventKind;
 import org.retroshare.android.RsConversationService.NewMessageConversationEvent;
 
 
-public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener
+public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener, ListView.OnScrollListener
 {
 	@Override public String TAG() { return "ConversationFragment"; }
 
@@ -78,8 +79,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	private final ConversationAdapter adapter = new ConversationAdapter();
 	private ListView conversationMessageListView;
 	private LayoutInflater mInflater;
-	private int lastShowedPosition = 0;
-	private int autoScrollSemaphore = 0;
+	private View moreMessageUpIndicator;
 
 	private HtmlBase64ImageGetter chatImageGetter;
 
@@ -101,12 +101,20 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		inputTextView.setOnLongClickListener(new OnShowSendExtraLongClickListener());
 
 		/**
-		 * More item down indicator
+		 * More items down indicator
 		 */
 		View moreMessageDownIndicator = fv.findViewById(R.id.moreChatMessageDownImageView);
 		moreMessageDownIndicator.setVisibility(View.INVISIBLE);
 		moreMessageDownIndicator.setOnClickListener(new GoDownButtonListener());
 		conversationMessageListView.setScrollIndicators(null, moreMessageDownIndicator);
+
+		/**
+		 * More items up indicator ( Logic is different from down one )
+		 */
+		moreMessageUpIndicator = fv.findViewById(R.id.moreChatMessageUpImageView);
+		moreMessageUpIndicator.setVisibility(View.INVISIBLE);
+		moreMessageUpIndicator.setOnClickListener(new GoUpButtonListener());
+		conversationMessageListView.setOnScrollListener(this);
 
 		/**
 		 * Send Extra menu
@@ -178,39 +186,46 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			return view;
 		}
 
-		private class ReloadMessagesHistoryAsyncTask extends AsyncTask<Void, Void, List<_ConversationMessage>>
+		private class ReloadMessagesHistoryAsyncTask extends AsyncTask<Integer, Void, ReloadMessagesHistoryAsyncTask.MsgsBund>
 		{
 			@Override
-			protected List<_ConversationMessage> doInBackground(Void... voids)
+			protected MsgsBund doInBackground(Integer... lastMineIntegers)
 			{
 				List<_ConversationMessage> fmsg = new ArrayList<_ConversationMessage>();
+				int lastMineIndex = lastMineIntegers[0];
+
 				if(isBound()) try
 				{
 					ConversationId id = cfc.getConversationId(ConversationFragment.this);
-					List<RsConversationService.ConversationMessage> msgs = getConnectedServer().mRsConversationService.getConversationHistory(id);
-					for ( RsConversationService.ConversationMessage msg : msgs ) fmsg.add(new _ConversationMessage(msg));
+					List<ConversationMessage> msgs = (List<ConversationMessage>) getConnectedServer().mRsConversationService.getConversationHistory(id);
+					for ( int i = 0; i < msgs.size(); ++i )
+					{
+						_ConversationMessage msg = new _ConversationMessage(msgs.get(i));
+						fmsg.add(msg);
+						if( (i > lastMineIndex) && msg.isMine() ) lastMineIndex = i;
+					}
 				} catch (RuntimeException e) {}
-				return fmsg;
+
+				return new MsgsBund(fmsg, lastMineIndex);
 			}
 
-			@Override protected void onPostExecute(List<_ConversationMessage> ml)
+			@Override protected void onPostExecute(MsgsBund mb)
 			{
-				messageList = ml;
-				conversationMessageListView.setSelection(lastShowedPosition);
-
-				if(autoScrollSemaphore > 0)
-				{
-					lastShowedPosition = messageList.size()-1;
-					--autoScrollSemaphore;
-				}
-
+				messageList = mb.messagesList;
+				lastMineMessageIndex = mb.lastMinePosition;
+				conversationMessageListView.setSelection(messageList.size()-1);
 				adapter.notifyObservers();
+			}
 
-				conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
+			public final class MsgsBund
+			{
+				public MsgsBund(List<_ConversationMessage> msgs, int lastMineIndex) { messagesList = msgs; lastMinePosition = lastMineIndex; };
+				public final List<_ConversationMessage> messagesList;
+				public final int lastMinePosition;
 			}
 		}
 
-		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(cfc.getConversationId(ConversationFragment.this))) new ReloadMessagesHistoryAsyncTask().execute(null, null, null); }
+		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(cfc.getConversationId(ConversationFragment.this))) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));}
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
@@ -278,14 +293,13 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			ConversationId id = cfc.getConversationId(this);
 			rsConversationService.cancelNotificationForConversation(id);
 			rsConversationService.disableNotificationForConversation(id);
-			adapter.new ReloadMessagesHistoryAsyncTask().execute(null, null, null);
+			lastMineMessageIndex = 0;
+			adapter.new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
 		}
 	}
 
 	private void sendChatMsg(View v)
 	{
-		Log.d(TAG(), "sendChatMsg(View v)");
-
 		if(isBound())
 		{
 			EditText et = (EditText) getActivity().findViewById(R.id.chatFragmentMessageEditText);
@@ -304,24 +318,22 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 				et.setText("");
 
-				fillAutoScrollSemaphore();
+				conversationMessageListView.smoothScrollToPosition(conversationMessageListView.getCount()-1);
 			}
 		}
 		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
 
-	private class GoDownButtonListener implements View.OnClickListener
-	{
-		public void onClick(View v)
-		{
-			lastShowedPosition = conversationMessageListView.getCount()-1;
-			conversationMessageListView.setSelection(lastShowedPosition);
-			conversationMessageListView.smoothScrollToPosition(lastShowedPosition);
-			fillAutoScrollSemaphore();
-		}
-	}
+	private class GoDownButtonListener implements View.OnClickListener { public void onClick(View v) { conversationMessageListView.smoothScrollToPosition(conversationMessageListView.getCount()-1); } }
+	private class GoUpButtonListener implements View.OnClickListener { public void onClick(View v) { conversationMessageListView.smoothScrollToPosition(lastMineMessageIndex); } }
 
-	private int fillAutoScrollSemaphore() { return (autoScrollSemaphore = (conversationMessageListView.getLastVisiblePosition() - conversationMessageListView.getFirstVisiblePosition())-1); }
+	private int lastMineMessageIndex = 0;
+	@Override public void onScrollStateChanged(AbsListView absListView, int i) {}
+	@Override public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+	{
+		if(lastMineMessageIndex < firstVisibleItem) moreMessageUpIndicator.setVisibility(View.VISIBLE);
+		else moreMessageUpIndicator.setVisibility(View.INVISIBLE);
+	}
 
 	private View sendExtraMenu;
 	private final class OnShowSendExtraLongClickListener implements View.OnLongClickListener { @Override public boolean onLongClick(View view) { sendExtraMenu.setVisibility(View.VISIBLE); return true; } }
