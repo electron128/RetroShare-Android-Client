@@ -70,7 +70,7 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     List<View> showIfNotConnected;
 	
     @Override
-    public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
+	public void onCreateBeforeConnectionInit(Bundle savedInstanceState)
     {
         setContentView(R.layout.activity_main);
 
@@ -119,6 +119,20 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     	super.onResume();
     	updateViews();
     }
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState)
+	{
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putString(SERVER_NAME_EXTRA, serverName);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState)
+	{
+		super.onRestoreInstanceState(savedInstanceState);
+		serverName = savedInstanceState.getString(SERVER_NAME_EXTRA);
+	}
 
     private void setVisibility(List<View> views, int visibility) { for (View v : views) v.setVisibility(visibility); }
 
