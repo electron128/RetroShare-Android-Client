@@ -57,7 +57,7 @@ public class RsCtrlService implements Runnable
 	private static final int MAGIC_CODE = 0x137f0001;
 	@Deprecated public static final int RESPONSE = (0x01<<24);
 
-	private static final int CONNECTION_TIMEOUT_ms = 3000;
+	private static final int CONNECTION_TIMEOUT_ms = 5000;
 
 	public static class RsMessage
 	{

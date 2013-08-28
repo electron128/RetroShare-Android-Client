@@ -286,36 +286,37 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
-        switch(id)
-        {
-            case DIALOG_PASSWORD:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.activity_login_dialog, null);
+		switch(id)
+		{
+			case DIALOG_PASSWORD:
+			{
+				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View view = inflater.inflate(R.layout.activity_login_dialog, null);
 
 
-                final EditText et = (EditText) view.findViewById(R.id.editTextPassword);
-                final CheckBox cbvp = (CheckBox) view.findViewById(R.id.checkBoxShowPassword);
-                cbvp.setOnClickListener(
-                        new View.OnClickListener()
-                        {
-                            @Override public void onClick(View v)
-                            {
-                                if(cbvp.isChecked()) et.setTransformationMethod(null);
-                                else et.setTransformationMethod(new PasswordTransformationMethod());
-                            }
-                        });
-                final CheckBox cbsp = (CheckBox) view.findViewById(R.id.checkBoxSavePassword);
-                builder.setView(view)
-                        .setTitle(R.string.enter_ssh_password)
-                        .setPositiveButton(
-                                getText(R.string.login),
-                                new DialogInterface.OnClickListener()
-                                {
-                                    @Override public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        serverData.password = et.getText().toString();
+				final EditText et = (EditText) view.findViewById(R.id.editTextPassword);
+				final CheckBox cbvp = (CheckBox) view.findViewById(R.id.checkBoxShowPassword);
+				cbvp.setOnClickListener(
+						new View.OnClickListener()
+						{
+							@Override public void onClick(View v)
+							{
+								if(cbvp.isChecked()) et.setTransformationMethod(null);
+								else et.setTransformationMethod(new PasswordTransformationMethod());
+							}
+						});
+				final CheckBox cbsp = (CheckBox) view.findViewById(R.id.checkBoxSavePassword);
+				builder.setView(view)
+						.setTitle(R.string.enter_ssh_password)
+						.setPositiveButton(
+								getText(R.string.login),
+								new DialogInterface.OnClickListener()
+								{
+									@Override public void onClick(DialogInterface dialog, int which)
+									{
+										serverData.password = et.getText().toString();
 										boolean savePwd = cbsp.isChecked();
 										if(savePwd ^ serverData.savePassword)
 										{
@@ -323,24 +324,31 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 											rsProxy.addServer(serverData);
 											rsProxy.saveData();
 										}
-                                        _connect();
-                                    }
-                                });
-                return builder.create();
+										_connect();
+									}
+								});
+				return builder.create();
+			}
+			case DIALOG_CONNECT:
+			{
+				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				ProgressDialog pd = new ProgressDialog(MainActivity.this);
+				pd.setMessage( getText(R.string.connecting_to) + serverData.hostname + ":" + serverData.port);
+				return pd;
+			}
 
-            case DIALOG_CONNECT:
-                ProgressDialog pd = new ProgressDialog(MainActivity.this);
-                pd.setMessage( getText(R.string.connecting_to) + serverData.hostname + ":" + serverData.port);
-                return pd;
-
-            case DIALOG_CONNECT_ERROR:
-                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-                builder2.setTitle(R.string.connection_error)
-                        .setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())
-                        .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} });
-                return builder2.create();
+			case DIALOG_CONNECT_ERROR:
+			{
+				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+				builder2.setTitle(R.string.connection_error)
+						.setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())
+						.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() { @Override public void onClick(DialogInterface dialog, int which) {} });
+				return builder2.create();
+			}
 
 			case DIALOG_TERMINATE_APP:
+			{
 				AlertDialog.Builder termDialog = new AlertDialog.Builder(this);
 				termDialog.setTitle(R.string.are_you_sure)
 						.setMessage(R.string.terminate_really)
@@ -356,9 +364,10 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 						})
 						.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener(){@Override public void onClick(DialogInterface dialogInterface, int i){}});
 				return termDialog.create();
-        }
+			}
+		}
 
-        return null;
+        throw new RuntimeException("onCreateDialog() called with wrong id or while unbound from service");
     }
 
     private void _connect()
