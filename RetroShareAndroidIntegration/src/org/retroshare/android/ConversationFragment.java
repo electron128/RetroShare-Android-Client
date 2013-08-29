@@ -83,6 +83,11 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 	private HtmlBase64ImageGetter chatImageGetter;
 
+	@Override public void onNewIntent(Intent i)
+	{
+		super.onNewIntent(i);
+		refreshConversation();
+	}
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View fv = inflater.inflate(R.layout.conversation_fragment, container);
@@ -141,7 +146,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	@Override public void onResume()
 	{
 		super.onResume();
-		onVisibleAndBound();
+		refreshConversation();
 	}
 	@Override public void onPause()
 	{
@@ -150,7 +155,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 	@Override public void onServiceConnected()
 	{
-		onVisibleAndBound();
+		refreshConversation();
 		super.onServiceConnected();
 	}
 	@Override public void registerRsServicesListeners() { getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter); }
@@ -285,7 +290,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		return enterPressed;
 	}
 
-	private void onVisibleAndBound()
+	private void refreshConversation()
 	{
 		if(isUserVisible() && isBound())
 		{

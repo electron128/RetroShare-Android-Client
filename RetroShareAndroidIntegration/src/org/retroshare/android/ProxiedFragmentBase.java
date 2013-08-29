@@ -57,7 +57,7 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 	public void unregisterRsServicesListeners() {}
 
 	@Override public boolean isBound() { return pxIf.isBound(); }
-	@Override public RetroShareAndroidProxy getRsProxy() { return pxIf.getRsProxy();}
+	@Override public RetroShareAndroidProxy getRsProxy() { return pxIf.getRsProxy(); }
 	@Override public RsCtrlService getConnectedServer() { return pxIf.getConnectedServer(); }
 	@Override public void onPause()
 	{

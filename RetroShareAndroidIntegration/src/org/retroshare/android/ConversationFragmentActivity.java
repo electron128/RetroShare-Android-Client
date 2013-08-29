@@ -31,22 +31,17 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase im
 	public final static String CONVERSATION_ID_EXTRA = "conversationID";
 
 	private ConversationId actualConversationId;
+	public ConversationId getConversationId(ConversationFragment f) /** Implements ConversationFragmentContainer */ { return actualConversationId; }
 
-	@Override /** Implements ConversationFragmentContainer */
-	public ConversationId getConversationId(ConversationFragment f) { return actualConversationId; }
-
-	@Override
-	public void onCreate(Bundle savedInstanceState)
+	@Override public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		onNewIntent(getIntent());
 		setContentView(R.layout.factivity_conversation);
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent)
+	@Override protected void onNewIntent(Intent intent)
 	{
+		actualConversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA); // It is important that this goes first
 		super.onNewIntent(intent);
-		actualConversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA); // this is the first not casually
 	}
 }

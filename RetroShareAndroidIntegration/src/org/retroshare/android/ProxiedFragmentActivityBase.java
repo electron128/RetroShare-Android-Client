@@ -56,7 +56,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
     {
         super.onCreate(savedInstanceState);
 
-		serverName = getIntent().getStringExtra(SERVER_NAME_EXTRA);
+		onNewIntent(getIntent());
         onCreateBeforeConnectionInit(savedInstanceState);
         _bindRsService();
     }
