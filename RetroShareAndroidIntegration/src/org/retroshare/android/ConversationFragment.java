@@ -123,7 +123,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		sendExtraMenu.setVisibility(View.INVISIBLE);
 		sendExtraMenu.findViewById(R.id.sendImageButton).setOnClickListener(new OnAddImageClickListener());
 //		sendExtraMenu.findViewById(R.id.sendFileButton).setVisibility(View.GONE);
-		sendExtraMenu.findViewById(R.id.showInfoImageButton).setOnClickListener(new ShowLobbyInfoLongClickListener());
+		sendExtraMenu.findViewById(R.id.showInfoImageButton).setOnClickListener(new ShowConversationInfoLongClickListener());
 
 		return fv;
 	}
@@ -385,7 +385,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		}
 		@Override public void onPostExecute(ConversationMessage msg) { if(msg != null) getConnectedServer().mRsConversationService.sendConversationMessage(msg); }
 	}
-	private final class ShowLobbyInfoLongClickListener implements View.OnClickListener
+	private static final String CONFERSATION_INFO_DIALOG_FRAGMENT_TAG = "org.retroshare.android.ConversationInfoDialogFragment";
+	private final class ShowConversationInfoLongClickListener implements View.OnClickListener
 	{
 		@Override public void onClick(View v)
 		{
@@ -394,7 +395,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
 			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());
 			df.setArguments(args);
-			df.show(getFragmentManager(), "Conversation Details");
+			df.show(getFragmentManager(), CONFERSATION_INFO_DIALOG_FRAGMENT_TAG);
 		}
 	}
 

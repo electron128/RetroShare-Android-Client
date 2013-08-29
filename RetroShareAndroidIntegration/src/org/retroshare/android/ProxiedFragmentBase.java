@@ -21,6 +21,7 @@
 package org.retroshare.android;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 
 
@@ -77,6 +78,7 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 		try { pxIf = ((ProxiedInterface) getActivity()); }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ProxiedInterface"); }
 	}
+	public void onNewIntent(Intent i) {}
 
 	private ProxiedInterface pxIf;
 	private boolean notPaused = false;

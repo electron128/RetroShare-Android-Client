@@ -106,6 +106,7 @@
 	<string name="missing_input">Please fill in all fields.</string>
 	<string name="login">Login</string>
 	<string name="connecting_to">Connecting to </string>
+	<string name="connecting_to_rsproxy">Connecting to Service</string>
 	<!-- RetroShare Android Proxy END-->
 
 	<!-- RetroShare QR Code BEGIN -->
