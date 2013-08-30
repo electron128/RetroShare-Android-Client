@@ -44,6 +44,7 @@ import rsctrl.chat.Chat.RequestChatLobbies;
 import rsctrl.core.Core;
 
 import org.retroshare.android.RsCtrlService.RsMessage;
+import org.retroshare.android.utils.WeakHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -239,7 +240,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		@Override public void run() { for(RsConversationServiceListener listener : mRsConversationServiceListenersSet) listener.onConversationsEvent(conversationEvent); }
 		private final ConversationEvent conversationEvent;
 	}
-	private final Set<RsConversationServiceListener> mRsConversationServiceListenersSet = new HashSet<RsConversationServiceListener>();
+	private final Set<RsConversationServiceListener> mRsConversationServiceListenersSet = new WeakHashSet<RsConversationServiceListener>();
 	public void registerRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.add(listener); }
 	public void unregisterRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.remove(listener); }
 	private void notifyRsConversationServiceListeners(ConversationEvent event) { mHandlerThreadInterface.postToHandlerThread(new RsConversationServiceUpdateListenerRunnable(event)); }
@@ -257,7 +258,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	{
 		if(notificationForConversationEnabled(id))
 		{
-			action.putExtra(ProxiedFragmentActivityBase.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name);
+			action.putExtra(RsClientInterface.SERVER_NAME_EXTRA_KEY, mRsCtrlService.getServerData().name);
 			action.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			action.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			Notification notification = new NotificationCompat.Builder(mContext)
@@ -489,8 +490,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		if(notificationForConversationEnabled(pId))
 		{
 			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
-					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
-					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
+					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA_KEY, pId);
 			ChatMessage cMsg = msg.getRawData();
 			notifyAndroidAboutConversation(msg.getConversationId(), R.drawable.chat_bubble, (cMsg.getPeerNickname() + " " + mContext.getString(R.string.new_private_chat_message)), Html.fromHtml(cMsg.getMsg()), i, true );
 		}
@@ -670,8 +670,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		if(notificationForConversationEnabled(pId))
 		{
 			Intent i = new Intent(mContext, ConversationFragmentActivity.class)
-					.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, mRsCtrlService.getServerData().name)
-					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, pId);
+					.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA_KEY, pId);
 			ChatMessage cMsg = msg.getRawData();
 			notifyAndroidAboutConversation(
 					msg.getConversationId(),

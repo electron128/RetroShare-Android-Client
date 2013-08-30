@@ -144,7 +144,7 @@ public class PeersActivity extends ProxiedActivityBase
 			if ( p.getRelation().equals(Person.Relationship.FRIEND) || p.getRelation().equals(Person.Relationship.YOURSELF) )
 			{
 				Intent i = new Intent(PeersActivity.this, ConversationFragmentActivity.class);
-				i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, RsConversationService.PgpChatId.Factory.getPgpChatId(p.getGpgId()));
+				i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA_KEY, RsConversationService.PgpChatId.Factory.getPgpChatId(p.getGpgId()));
 				startActivity(ConversationFragmentActivity.class, i);
 			}
     	}

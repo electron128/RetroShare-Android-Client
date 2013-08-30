@@ -21,17 +21,14 @@
 package org.retroshare.android;
 
 /**
- * This interface should be implemented by Proxied Components
+ * This interface should be implemented by components that needs to interact with rscore
  */
-public interface ProxiedInterface
+public interface RsClientInterface //TODO: find a better name for this interface
 {
+	public static final String SERVER_NAME_EXTRA_KEY = "org.retroshare.android.intent_extra_keys.serverName";
 	/**
-	 * @return True if the proxy is bound to the backend false otherwise
+	 * @returns The actual server if bound
+	 * @throws RuntimeException if is not bound
 	 */
-	public boolean isBound();
-
-	/**
-	 * @return RetroShare backend proxy
-	 */
-	public RetroShareAndroidProxy getRsProxy();
+	public RsCtrlService getConnectedServer();
 }

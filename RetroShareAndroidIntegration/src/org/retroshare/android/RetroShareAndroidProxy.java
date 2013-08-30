@@ -247,7 +247,7 @@ public class RetroShareAndroidProxy extends Service implements RsCtrlServiceList
 		_activateServer(serverName);
 		RsBund bund = serverBunds.get(serverName);
 		if(bund != null) return bund.server;
-		return null;
+		throw new RuntimeException(TAG + " activateServer(" + serverName + ") called for unkown server");
 	}
 
 	/**

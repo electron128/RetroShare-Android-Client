@@ -20,15 +20,35 @@
 
 package org.retroshare.android;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 
 public class LobbiesListFragmentActivity extends ProxiedFragmentActivityBase
 {
-	@Override
-	public void onCreate(Bundle savedInstanceState)
+	@Override public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.factivity_lobbieslist);
+
+		onNewIntent(getIntent());
+	}
+
+	@Override protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+
+		Bundle fragmentArgs = new Bundle(1);
+		fragmentArgs.putString(LobbiesListFragment.SERVER_NAME_EXTRA_KEY, serverName);
+
+		LobbiesListFragment lobbiesListFragment = new LobbiesListFragment();
+		lobbiesListFragment.setArguments(fragmentArgs);
+
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		fragmentTransaction.replace(R.id.lobbyListFragmentContainer, lobbiesListFragment);
+		fragmentTransaction.commit();
 	}
 }

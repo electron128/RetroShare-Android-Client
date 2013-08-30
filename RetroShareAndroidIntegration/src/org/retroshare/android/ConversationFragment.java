@@ -22,6 +22,7 @@ package org.retroshare.android;
 
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -31,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
@@ -66,14 +68,14 @@ import org.retroshare.android.RsConversationService.ConversationEventKind;
 import org.retroshare.android.RsConversationService.NewMessageConversationEvent;
 
 
-public class ConversationFragment extends ProxiedFragmentBase implements View.OnKeyListener, ListView.OnScrollListener
+public class ConversationFragment extends RsServiceClientFragmentBase implements View.OnKeyListener, ListView.OnScrollListener
 {
 	@Override public String TAG() { return "ConversationFragment"; }
 
+	public static final String CONVERSATION_ID_EXTRA_KEY = "org.retroshare.android.extra_keys.conversationID";
 	public static final int CONVERSATION_IMAGE_MAX_DIMENSION = 200;
 
-	interface ConversationFragmentContainer { ConversationId getConversationId(ConversationFragment f); }
-	private ConversationFragmentContainer cfc;
+	private ConversationId conversationId;
 
 	private List<_ConversationMessage> messageList = new ArrayList<_ConversationMessage>();
 	private final ConversationAdapter adapter = new ConversationAdapter();
@@ -83,14 +85,9 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 	private HtmlBase64ImageGetter chatImageGetter;
 
-	@Override public void onNewIntent(Intent i)
-	{
-		super.onNewIntent(i);
-		refreshConversation();
-	}
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View fv = inflater.inflate(R.layout.conversation_fragment, container);
+		View fv = inflater.inflate(R.layout.conversation_fragment, container, false);
 
 		/**
 		 * Message List
@@ -136,12 +133,12 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	{
 		super.onAttach(a);
 
-		try { cfc = (ConversationFragmentContainer) a; }
-		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ChatFragmentContainer"); }
+		final Bundle arguments = getArguments();
+		if(arguments.containsKey(CONVERSATION_ID_EXTRA_KEY)) conversationId = arguments.getParcelable(CONVERSATION_ID_EXTRA_KEY);
+		else throw new RuntimeException(TAG() + " need arguments contains valid value for " + ConversationFragment.CONVERSATION_ID_EXTRA_KEY);
 
 		chatImageGetter = new HtmlBase64ImageGetter(getResources());
 		mInflater = a.getLayoutInflater();
-
 	}
 	@Override public void onResume()
 	{
@@ -150,16 +147,24 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	}
 	@Override public void onPause()
 	{
-		if(isBound()) getConnectedServer().mRsConversationService.enableNotificationForConversation(cfc.getConversationId(this));
+		if(isBound()) getConnectedServer().mRsConversationService.enableNotificationForConversation(conversationId);
 		super.onPause();
 	}
-	@Override public void onServiceConnected()
+	@Override public void onServiceConnected(ComponentName className, IBinder service)
 	{
+		super.onServiceConnected(className, service);
 		refreshConversation();
-		super.onServiceConnected();
 	}
-	@Override public void registerRsServicesListeners() { getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter); }
-	@Override public void unregisterRsServicesListeners() { getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(adapter); }
+	@Override public void registerRsServicesListeners()
+	{
+		super.registerRsServicesListeners();
+		getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter);
+	}
+	@Override public void unregisterRsServicesListeners()
+	{
+		getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(adapter);
+		super.unregisterRsServicesListeners();
+	}
 
 	private class ConversationAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
@@ -201,8 +206,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 
 				if(isBound()) try
 				{
-					ConversationId id = cfc.getConversationId(ConversationFragment.this);
-					List<ConversationMessage> msgs = (List<ConversationMessage>) getConnectedServer().mRsConversationService.getConversationHistory(id);
+					List<ConversationMessage> msgs = (List<ConversationMessage>) getConnectedServer().mRsConversationService.getConversationHistory(conversationId);
 					for ( int i = 0; i < msgs.size(); ++i )
 					{
 						_ConversationMessage msg = new _ConversationMessage(msgs.get(i));
@@ -230,7 +234,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			}
 		}
 
-		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(cfc.getConversationId(ConversationFragment.this))) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));}
+		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));}
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
@@ -294,9 +298,8 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		if(isUserVisible() && isBound())
 		{
 			RsConversationService rsConversationService = getConnectedServer().mRsConversationService;
-			ConversationId id = cfc.getConversationId(this);
-			rsConversationService.cancelNotificationForConversation(id);
-			rsConversationService.disableNotificationForConversation(id);
+			rsConversationService.cancelNotificationForConversation(conversationId);
+			rsConversationService.disableNotificationForConversation(conversationId);
 			lastMineMessageIndex = 0;
 			adapter.new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
 		}
@@ -315,8 +318,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 				if( inputText.equals("a") ) msgText = "<span><span style=\"font-family:\'\';font-size:8.25pt;font-weight:400;font-style:normal;\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACzklEQVRIibVWS08TURQ+dzqFKZROpg+balsKpE1jiUSQh0gwggsTYhpZqgtjMHFjTFTcuNOd8hPc4MLEBcaFEIORhYaoSSVIRYkgEKChQCktbaXv62JKAXs7w4z128y55/F9d86dMzOABTG59BTjbLFoMh2d9j0XZgDhcOj34tz6SH6ZziQy2WR+ObUymEzHhBkQxhgE4fU9Uyl1vzZe+8MTO6kgAFSUHTGxp6zaTlrB1Bl6hMtFBIKx2bGZe4Hod2LUxDZ3OR9XMWaZAqthz4i3L5WJCdQzSu3FhkFdpbNYAlUsEIn73ny7mcrEWmvu1ujPFyY0227XGi7EU8ER7414akuywPjcw0Q6DAD6qnoNYy1M0KtdrKoaAGIJ/+f5J8V4yC3ais2+8PQAiJz/3jYRfbXtfUWZgRAiFswHRg/PDgBZnF7cfEfWJnoD0enDs+dKIuSSvRYtBEZ9oU82XbeZO+MPe+KpkCQBlVJrZBsXAm99oY82XZeZ6zggsBz8MOy9DgAIUb2NL8fnHvnDXyQJmLn2Bkvf8NQuyckhQ1U95Fu0FpnkDYyz69uTkqjzWNveRxL5ytuEMxB9eRwGeZKic1Aq/C8BDBkBgRK0CARahHFGHicCRaGzlC1CiODMCVCIIF4SkO6AuBOp2OXICejVrnxIrz4uj9Ogri8kofmLVXu2yzmwsjVerTtnYpvlCVi0nd3OgeUcScsBAQBwGN0Oo5u3EcjoEgIAu9Ft3yXhQX6KBL6xxaBTk0toore1tl9BlYd25qMJ/2b0B+/UMGau0g4Aq2FPMh3hnce40zTFaCvsTbZbRCqR35afa6/GZvp5+4T5WnvdAwAYmujdiHh55+XWMQ1jEWAQGTTRw8A4K5wgZ5IlPQCyBKSMvYhAuZLbs2n2LwMhqpzW/JOAhetwGC9RiDaxTa6jV3hnS80djcpKK1RttfeZfTsg4g/+D5MwF/zpFwAAAABJRU5ErkJggg==\"/></span></span>"; // Easter egg
 				else msgText = StringEscapeUtils.escapeHtml(inputText);
 
-				ConversationId id = cfc.getConversationId(this);
-				ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
+				ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(conversationId);
 				msg.setMessageString(msgText);
 				getConnectedServer().mRsConversationService.sendConversationMessage(msg);
 
@@ -381,8 +383,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 			msgBodyBuilder.append(Util.encodeTobase64(bitmapImage, Bitmap.CompressFormat.PNG, 100)); bitmapImage.recycle(); // Mark the bitmap as garbage
 			msgBodyBuilder.append("\"/>");
 
-			ConversationId id = cfc.getConversationId(ConversationFragment.this);
-			ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(id);
+			ConversationMessage msg = ConversationMessage.Factory.newConversationMessage(conversationId);
 			msg.setMessageString(msgBodyBuilder.toString());
 
 			return msg;
@@ -394,7 +395,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 	{
 		@Override public void onClick(View v)
 		{
-			RsConversationService.ConversationInfo info = getConnectedServer().mRsConversationService.getConversationInfo(cfc.getConversationId(ConversationFragment.this));
+			RsConversationService.ConversationInfo info = getConnectedServer().mRsConversationService.getConversationInfo(conversationId);
 			Bundle args = new Bundle(1);
 			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
 			ConversationInfoDialogFragment df = new ConversationInfoDialogFragment(getActivity());

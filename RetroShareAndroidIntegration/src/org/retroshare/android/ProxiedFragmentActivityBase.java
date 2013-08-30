@@ -39,7 +39,7 @@ import java.util.Collection;
  * provide out of the box almost all needed stuff to communicate with RsService
  * so each activity doesn't need to handle all this common stuff
  */
-public abstract class ProxiedFragmentActivityBase extends FragmentActivity implements ServiceConnection, ProxiedInterface
+public abstract class ProxiedFragmentActivityBase extends FragmentActivity implements ServiceConnection, ProxiedInterface, RsClientInterface
 {
     public String TAG() { return "ProxiedFragmentActivityBase"; }
 
@@ -80,27 +80,6 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	public boolean isForeground() { return isInForeground; }
 
 	/**
-	 * ProxiedFragment Stuff
-	 */
-	protected Collection<ProxiedFragmentBase> proxiedFragCollection = new WeakHashSet<ProxiedFragmentBase>();
-	@Override public void onAttachFragment(Fragment fragment)
-	{
-		super.onAttachFragment(fragment);
-		try
-		{
-			ProxiedFragmentBase pf = (ProxiedFragmentBase) fragment;
-			proxiedFragCollection.add(pf);
-		}
-		catch (ClassCastException e) {}
-	}
-	@Override protected void onNewIntent(Intent i)
-	{
-		super.onNewIntent(i);
-		if(i.hasExtra(SERVER_NAME_EXTRA)) serverName = i.getStringExtra(SERVER_NAME_EXTRA);
-		for(ProxiedFragmentBase pfb : proxiedFragCollection) pfb.onNewIntent(i);
-	}
-
-	/**
 	 * "Connecting to Service" dialog stuff
 	 */
 	protected static final String CONNECTING_TO_SERVIE_FRAGMENT_DIALOG_TAG = "org.retroshare.android.ConnectingToServiceFragmentDialog";
@@ -139,7 +118,7 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	 */
 	@Override public void startActivity(Intent i)
 	{
-		i.putExtra(SERVER_NAME_EXTRA, serverName);
+		i.putExtra(SERVER_NAME_EXTRA_KEY, serverName);
 		super.startActivity(i);
 	}
 
@@ -151,16 +130,12 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 	private boolean mBound = false;
 	protected void setBound(boolean v) { mBound = v; }
 	public boolean isBound() { return mBound; } /** Implements ProxiedInterface */
-	public static final String SERVER_NAME_EXTRA = "org.retroshare.android.intent_extra_keys.serverName";
-	protected String serverName;
 	public void onServiceConnected(ComponentName className, IBinder service) /** Implements ServiceConnection */
 	{
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		setBound(true);
 		if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
-		onServiceConnected();
-		for(ProxiedFragmentBase pf : proxiedFragCollection) pf.onServiceConnected();
 		if(isForeground()) hideConnectingToServiceFragmentDialog();
 	}
 	public void onServiceDisconnected(ComponentName arg0) /** Implements ServiceConnection */ { setBound(false); }
@@ -181,11 +156,18 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 			setBound(false);
 		}
 	}
+
+
 	/**
-	 * This method should be overridden by child classes that want to do something when connection to RetroShareAndroidProxy is available.
+	 * RsClientInterface stuff
 	 */
-	protected void onServiceConnected() {}
-	public RsCtrlService getConnectedServer() /** Implements ProxiedInterface */
+	protected String serverName;
+	@Override protected void onNewIntent(Intent i)
+	{
+		super.onNewIntent(i);
+		if(i.hasExtra(SERVER_NAME_EXTRA_KEY)) serverName = i.getStringExtra(SERVER_NAME_EXTRA_KEY);
+	}
+	public RsCtrlService getConnectedServer() /** Implements RsClientInterface */
 	{
 		if(isBound()) return rsProxy.activateServer(serverName);
 		throw new RuntimeException(TAG() + " getConnectedServer() called before binding");

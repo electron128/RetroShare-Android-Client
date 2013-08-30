@@ -22,11 +22,13 @@ package org.retroshare.android;
 
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.SystemClock;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -47,7 +49,7 @@ import java.util.Set;
 
 import rsctrl.chat.Chat;
 
-public class LobbiesListFragment extends ProxiedFragmentBase
+public class LobbiesListFragment extends RsServiceClientFragmentBase
 {
 	@Override public String TAG() { return "LobbiesListFragment"; }
 
@@ -61,7 +63,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 	{
 		lobbiesListAdapter = new LobbiesListAdapter();
 
-		View fv = inflater.inflate(R.layout.lobbies_list_fragment, container);
+		View fv = inflater.inflate(R.layout.lobbies_list_fragment, container, false);
 		lobbiesListView = (ListView) fv.findViewById(R.id.lobbiesList);
 		lobbiesListView.setAdapter(lobbiesListAdapter);
 		lobbiesListView.setOnItemClickListener(lobbiesListAdapter);
@@ -74,11 +76,11 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 		super.onAttach(a);
 		mInflater = a.getLayoutInflater();
 	}
-	@Override public void onServiceConnected()
+	@Override public void onServiceConnected(ComponentName className, IBinder service)
 	{
+		super.onServiceConnected(className, service);
 		if(mHandler == null) mHandler = new Handler();
 		mHandler.post(new RequestLobbiesListUpdateRunnable());
-		super.onServiceConnected();
 	}
 	@Override public void registerRsServicesListeners() { getConnectedServer().mRsConversationService.registerRsConversationServiceListener(lobbiesListAdapter); }
 	@Override public void unregisterRsServicesListeners() { getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(lobbiesListAdapter); }
@@ -142,7 +144,7 @@ public class LobbiesListFragment extends ProxiedFragmentBase
 			RsConversationService.LobbyChatId id = RsConversationService.LobbyChatId.Factory.getLobbyChatId(lobbyInfo.getLobbyId());
 			if(!lobbyInfo.getLobbyState().equals(Chat.ChatLobbyInfo.LobbyState.LOBBYSTATE_JOINED)) getConnectedServer().mRsConversationService.joinConversation(id);
 			Intent intent = new Intent();
-			intent.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, id);
+			intent.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA_KEY, id);
 			((ProxiedFragmentActivityBase)getActivity()).startActivity(ConversationFragmentActivity.class, intent);
 		}
 

@@ -5,8 +5,8 @@
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent">
 
-	<fragment	android:id="@+id/chatFragment"
-				android:name="org.retroshare.android.LobbiesListFragment"
-				android:layout_height="match_parent"
-				android:layout_width="match_parent"/>
+	<FrameLayout	android:id="@+id/lobbyListFragmentContainer"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+
 </LinearLayout>

@@ -53,8 +53,8 @@ public class ContactMethodChooserActivity extends Activity
 			pgpId = sp[2];
 
 			Intent i = new Intent(this, ConversationFragmentActivity.class);
-			i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA, serverName);
-			i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA, PgpChatId.Factory.getPgpChatId(pgpId));
+			i.putExtra(ConversationFragmentActivity.SERVER_NAME_EXTRA_KEY, serverName);
+			i.putExtra(ConversationFragmentActivity.CONVERSATION_ID_EXTRA_KEY, PgpChatId.Factory.getPgpChatId(pgpId));
 //			Log.d(TAG(), "Launching ConversationFragmentActivity with SERVER_NAME_EXTRA=" + serverName + ", for pgpid=" + pgpId );
 			startActivity(i);
 

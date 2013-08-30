@@ -22,26 +22,43 @@ package org.retroshare.android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 import org.retroshare.android.RsConversationService.ConversationId;
 
 
-public class ConversationFragmentActivity extends ProxiedFragmentActivityBase implements ConversationFragment.ConversationFragmentContainer
+public class ConversationFragmentActivity extends ProxiedFragmentActivityBase
 {
-	public final static String CONVERSATION_ID_EXTRA = "conversationID";
-
-	private ConversationId actualConversationId;
-	public ConversationId getConversationId(ConversationFragment f) /** Implements ConversationFragmentContainer */ { return actualConversationId; }
+	public static final String CONVERSATION_ID_EXTRA_KEY = ConversationFragment.CONVERSATION_ID_EXTRA_KEY;
 
 	@Override public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.factivity_conversation);
+
+		onNewIntent(getIntent());
 	}
 
 	@Override protected void onNewIntent(Intent intent)
 	{
-		actualConversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA); // It is important that this goes first
 		super.onNewIntent(intent);
+
+		final ConversationId conversationId;
+		if(intent.hasExtra(CONVERSATION_ID_EXTRA_KEY)) conversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA_KEY);
+		else throw new RuntimeException(TAG() + " need firing intent contains valid value for " + CONVERSATION_ID_EXTRA_KEY);
+
+		Bundle fragmentArgs = new Bundle(1);
+		fragmentArgs.putString(ConversationFragment.SERVER_NAME_EXTRA_KEY, serverName);
+		fragmentArgs.putParcelable(ConversationFragment.CONVERSATION_ID_EXTRA_KEY, conversationId);
+
+		ConversationFragment conversationFragment = new ConversationFragment();
+		conversationFragment.setArguments(fragmentArgs);
+
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		fragmentTransaction.replace(R.id.conversationFragmentContainer, conversationFragment);
+		fragmentTransaction.commit();
 	}
 }
