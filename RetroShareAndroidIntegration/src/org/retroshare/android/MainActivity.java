@@ -23,6 +23,7 @@ package org.retroshare.android;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import rsctrl.core.Core;
 import rsctrl.system.System.RequestSystemStatus;
@@ -290,7 +291,17 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 		{
 			case DIALOG_PASSWORD:
 			{
-				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				final RsServerData serverData;
+				try
+				{
+					Map<String,RsServerData> sd = rsProxy.getSavedServers();
+					serverData = sd.get(serverName);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					return null;
+				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				View view = inflater.inflate(R.layout.activity_login_dialog, null);
@@ -331,7 +342,17 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 			}
 			case DIALOG_CONNECT:
 			{
-				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				final RsServerData serverData;
+				try
+				{
+					Map<String,RsServerData> sd = rsProxy.getSavedServers();
+					serverData = sd.get(serverName);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					return null;
+				}
 				ProgressDialog pd = new ProgressDialog(MainActivity.this);
 				pd.setMessage( getText(R.string.connecting_to) + serverData.hostname + ":" + serverData.port);
 				return pd;
@@ -339,7 +360,17 @@ public class MainActivity extends ProxiedActivityBase implements RsCtrlServiceLi
 
 			case DIALOG_CONNECT_ERROR:
 			{
-				final RsServerData serverData = rsProxy.getSavedServers().get(serverName);
+				final RsServerData serverData;
+				try
+				{
+					Map<String,RsServerData> sd = rsProxy.getSavedServers();
+					serverData = sd.get(serverName);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					return null;
+				}
 				AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
 				builder2.setTitle(R.string.connection_error)
 						.setMessage(rsProxy.getActiveServers().get(serverData.name).getLastConnectionErrorString())

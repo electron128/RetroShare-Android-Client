@@ -78,7 +78,7 @@ public abstract class ProxiedFragmentBase extends Fragment implements ProxiedInt
 		try { pxIf = ((ProxiedInterface) getActivity()); }
 		catch (ClassCastException e) { throw new ClassCastException(a.toString() + " must implement ProxiedInterface"); }
 	}
-	public void onNewIntent(Intent i) {}
+	public void onNewIntent(Intent i) { if(isBound()) registerRsServicesListeners(); }
 
 	private ProxiedInterface pxIf;
 	private boolean notPaused = false;

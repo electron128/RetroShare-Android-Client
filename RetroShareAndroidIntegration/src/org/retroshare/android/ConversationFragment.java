@@ -282,8 +282,7 @@ public class ConversationFragment extends ProxiedFragmentBase implements View.On
 		private final String nick;
 	}
 
-	@Override
-	public boolean onKey(View v, int keyCode, KeyEvent event)
+	@Override public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
 		boolean enterPressed = ( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER );
 		if(enterPressed) sendChatMsg(null);
