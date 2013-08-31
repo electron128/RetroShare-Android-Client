@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 
 /**
@@ -72,12 +73,17 @@ public abstract class ProxiedFragmentBase extends Fragment implements ServiceCon
 	public boolean isBound() { return mBound; } /** Implements ProxiedInterface */
 	public void onServiceConnected(ComponentName className, IBinder service) /** Implements ServiceConnection */
 	{
+		Log.d(TAG(), "onServiceConnected()");
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		setBound(true);
 		if(rsProxy.mUiThreadHandler == null) rsProxy.mUiThreadHandler = new RetroShareAndroidProxy.HandlerThread();
 	}
-	public void onServiceDisconnected(ComponentName arg0) /** Implements ServiceConnection */ { setBound(false); }
+	public void onServiceDisconnected(ComponentName className) /** Implements ServiceConnection */
+	{
+		Log.d(TAG(), "onServiceDisconnected()");
+		setBound(false);
+	}
 	@Override public void onAttach(Activity a)
 	{
 		super.onAttach(a);

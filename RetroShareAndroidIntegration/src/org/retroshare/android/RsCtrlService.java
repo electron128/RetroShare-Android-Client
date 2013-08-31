@@ -52,7 +52,7 @@ public class RsCtrlService implements Runnable
 {
 	public String TAG() { return "RsCtrlService"; }
 
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private static final int MAGIC_CODE = 0x137f0001;
 	@Deprecated public static final int RESPONSE = (0x01<<24);
@@ -403,7 +403,7 @@ public class RsCtrlService implements Runnable
 				//System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport = new ClientTransport(mSocket);
 				// no more error here
-				System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
+				if(DEBUG)System.err.println("RsCtrlService._connect: mServerData.hostkey="+mServerData.hostkey);
 				mTransport.start(mServerData.hostkey, CONNECTION_TIMEOUT_ms);
 				if(newHostKey)
 				{
@@ -579,7 +579,7 @@ public class RsCtrlService implements Runnable
 						if(inbuf.getInt()==MAGIC_CODE){
 							inbuf=ByteBuffer.allocate(4);
 							inputState= InputState.HAVE_MAGIC_CODE;
-							System.out.println("received MAGIC_CODE");
+							if(DEBUG)System.out.println("received MAGIC_CODE");
 						}
 						else { System.out.println("Error: no MAGIC_CODE"); }
 					}
@@ -595,9 +595,12 @@ public class RsCtrlService implements Runnable
 						curMsgId=inbuf.getInt();
 						inbuf=ByteBuffer.allocate(4);
 						inputState= InputState.HAVE_MSG_ID;
-						System.out.print("received MSG_ID: ");
-						System.out.print(curMsgId);
-						System.out.println();
+						if(DEBUG)
+						{
+							System.out.print("received MSG_ID: ");
+							System.out.print(curMsgId);
+							System.out.println();
+						}
 					}
 					break;
 				case HAVE_MSG_ID:
@@ -611,9 +614,12 @@ public class RsCtrlService implements Runnable
 						curReqId=inbuf.getInt();
 						inbuf=ByteBuffer.allocate(4);
 						inputState= InputState.HAVE_REQ_ID;
-						System.out.print("received REQ_ID: ");
-						System.out.print(curReqId);
-						System.out.println();
+						if(DEBUG)
+						{
+							System.out.print("received REQ_ID: ");
+							System.out.print(curReqId);
+							System.out.println();
+						}
 					}
 					break;
 				case HAVE_REQ_ID:
@@ -627,9 +633,12 @@ public class RsCtrlService implements Runnable
 						curBodySize=inbuf.getInt();
 						inbuf=ByteBuffer.allocate(curBodySize);
 						inputState= InputState.HAVE_BODY_SIZE;
-						System.out.print("received BODY_SIZE: ");
-						System.out.print(curBodySize);
-						System.out.println();
+						if(DEBUG)
+						{
+							System.out.print("received BODY_SIZE: ");
+							System.out.print(curBodySize);
+							System.out.println();
+						}
 					}
 					break;
 				case HAVE_BODY_SIZE:
@@ -663,8 +672,9 @@ public class RsCtrlService implements Runnable
 						curBody=inbuf.array();
 						inbuf=ByteBuffer.allocate(4);
 						inputState= InputState.BEGIN;
-						if( curBodySize < 1000 ) System.out.println("received complete Body:\n"+ Util.byteArrayToHexString(curBody));
-						else { System.out.println("received complete Body: bigger than 1000Bytes"); }
+						if(DEBUG)
+							if( curBodySize < 1000 ) System.out.println("received complete Body:\n"+ Util.byteArrayToHexString(curBody));
+							else System.out.println("received complete Body: bigger than 1000Bytes");
 						return curMsgId;
 					}
 					break;

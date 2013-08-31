@@ -143,7 +143,7 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 	@Override public void onResume()
 	{
 		super.onResume();
-		refreshConversation();
+		initializeConversation();
 	}
 	@Override public void onPause()
 	{
@@ -153,7 +153,7 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 	@Override public void onServiceConnected(ComponentName className, IBinder service)
 	{
 		super.onServiceConnected(className, service);
-		refreshConversation();
+		initializeConversation();
 	}
 	@Override public void registerRsServicesListeners()
 	{
@@ -201,6 +201,8 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			@Override
 			protected MsgsBund doInBackground(Integer... lastMineIntegers)
 			{
+				Log.d(TAG(), "doInBackground(" + String.valueOf(lastMineIntegers[0])  + ")");
+
 				List<_ConversationMessage> fmsg = new ArrayList<_ConversationMessage>();
 				int lastMineIndex = lastMineIntegers[0];
 
@@ -222,8 +224,10 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			{
 				messageList = mb.messagesList;
 				lastMineMessageIndex = mb.lastMinePosition;
-				conversationMessageListView.setSelection(messageList.size()-1);
+				int lastPosition = messageList.size()-1;
+				conversationMessageListView.setSelection(lastPosition);
 				adapter.notifyObservers();
+				autoScrollTo(lastPosition, false);
 			}
 
 			public final class MsgsBund
@@ -234,7 +238,11 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			}
 		}
 
-		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));}
+		@Override public void onConversationsEvent(ConversationEvent event)
+		{
+			Log.d(TAG(), "onConversationsEvent(...)");
+			if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
+		}
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
@@ -293,7 +301,7 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 		return enterPressed;
 	}
 
-	private void refreshConversation()
+	private void initializeConversation()
 	{
 		if(isUserVisible() && isBound())
 		{
@@ -324,15 +332,17 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 
 				et.setText("");
 
-				conversationMessageListView.smoothScrollToPosition(conversationMessageListView.getCount()-1);
+				autoScrollTo(conversationMessageListView.getCount(), true);
 			}
 		}
 		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
 
-	private class GoDownButtonListener implements View.OnClickListener { public void onClick(View v) { conversationMessageListView.smoothScrollToPosition(conversationMessageListView.getCount()-1); } }
-	private class GoUpButtonListener implements View.OnClickListener { public void onClick(View v) { conversationMessageListView.smoothScrollToPosition(lastMineMessageIndex); } }
 
+	/**
+	 * Autoscroll stuff
+	 */
+	private boolean humanScrolled = false;
 	private int lastMineMessageIndex = 0;
 	@Override public void onScrollStateChanged(AbsListView absListView, int i) {}
 	@Override public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount)
@@ -340,7 +350,28 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 		if(lastMineMessageIndex < firstVisibleItem) moreMessageUpIndicator.setVisibility(View.VISIBLE);
 		else moreMessageUpIndicator.setVisibility(View.INVISIBLE);
 	}
+	private void autoScrollTo(int position, boolean resetHumanScrolled)
+	{
+		if(resetHumanScrolled) humanScrolled = false;
+		if(!humanScrolled)
+		{
+			conversationMessageListView.smoothScrollToPosition(position);
+			conversationMessageListView.setSelection(position);
+		}
+	}
+	private class GoDownButtonListener implements View.OnClickListener { public void onClick(View v) { autoScrollTo(conversationMessageListView.getCount()-1, true); } }
+	private class GoUpButtonListener implements View.OnClickListener
+	{
+		public void onClick(View v)
+		{
+			autoScrollTo(lastMineMessageIndex, true);
+			humanScrolled = true;
+		}
+	}
 
+	/**
+	 * ExtraMenu stuff
+	 */
 	private View sendExtraMenu;
 	private final class OnShowSendExtraLongClickListener implements View.OnLongClickListener { @Override public boolean onLongClick(View view) { sendExtraMenu.setVisibility(View.VISIBLE); return true; } }
 	private final static int SELECT_IMAGE_INTENT_REQUEST_CODE = 1;
@@ -403,6 +434,7 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			df.show(getFragmentManager(), CONFERSATION_INFO_DIALOG_FRAGMENT_TAG);
 		}
 	}
+
 
 	public ConversationFragment() { super(); }
 }

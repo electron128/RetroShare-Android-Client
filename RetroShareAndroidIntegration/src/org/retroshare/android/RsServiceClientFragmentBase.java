@@ -66,11 +66,11 @@ public class RsServiceClientFragmentBase extends ProxiedFragmentBase implements 
 		super.onServiceConnected(className, service);
 		registerRsServicesListeners();
 	}
-	@Override public void onServiceDisconnected(ComponentName className)
-	{
-		unregisterRsServicesListeners();
-		super.onServiceDisconnected(className);
-	}
+//	@Override public void onServiceDisconnected(ComponentName className)
+//	{
+//		unregisterRsServicesListeners();
+//		super.onServiceDisconnected(className);
+//	}
 
 	/**
 	 * Fragment that need to register Rs*Listener should do it inside this method
