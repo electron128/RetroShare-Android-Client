@@ -59,9 +59,9 @@ public abstract class ProxiedServiceBase extends Service implements ServiceConne
 	private void _bindRsService()
 	{
 		Intent intent = new Intent(this, RetroShareAndroidProxy.class);
-		bindService(intent, this, Context.BIND_AUTO_CREATE);
+		getApplicationContext().bindService(intent, this, Context.BIND_AUTO_CREATE);
 	}
-	private void _unBindRsService() { unbindService(this); }
+	private void _unBindRsService() { getApplicationContext().unbindService(this); }
 
 	/**
 	 * This method should be overridden by child classes that want to do something between Services.onCreate and connection initialization it is guaranteed to be executed before onServiceConnected

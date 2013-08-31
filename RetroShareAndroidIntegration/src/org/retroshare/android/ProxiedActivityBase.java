@@ -125,8 +125,8 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 		if(isBound()) return;
 
 		Intent intent = new Intent(this, RetroShareAndroidProxy.class);
-		startService(intent);
-		bindService(intent, this, 0);
+		getApplicationContext().startService(intent);
+		getApplicationContext().bindService(intent, this, 0);
 	}
 
 	protected void _unBindRsService()
@@ -135,7 +135,7 @@ public abstract class ProxiedActivityBase extends Activity implements ServiceCon
 
 		if(isBound())
 		{
-			unbindService(this);
+			getApplicationContext().unbindService(this);
 			setBound(false);
 		}
 	}

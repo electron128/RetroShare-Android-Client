@@ -144,15 +144,15 @@ public abstract class ProxiedFragmentActivityBase extends FragmentActivity imple
 		if(!isBound())
 		{
 			Intent intent = new Intent(this, RetroShareAndroidProxy.class);
-			startService(intent);
-			bindService(intent, this, 0);
+			getApplicationContext().startService(intent);
+			getApplicationContext().bindService(intent, this, 0);
 		}
 	}
 	protected void _unBindRsService()
 	{
 		if(isBound())
 		{
-			unbindService(this);
+			getApplicationContext().unbindService(this);
 			setBound(false);
 		}
 	}
