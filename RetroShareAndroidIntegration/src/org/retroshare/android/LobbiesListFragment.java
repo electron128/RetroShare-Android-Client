@@ -47,6 +47,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.retroshare.android.RsConversationService.RsConversationServiceListenerUniqueHandleFactory;
+
 import rsctrl.chat.Chat;
 
 public class LobbiesListFragment extends RsServiceClientFragmentBase
@@ -98,6 +100,11 @@ public class LobbiesListFragment extends RsServiceClientFragmentBase
 
 	private class LobbiesListAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener, AdapterView.OnItemClickListener
 	{
+		/** Implements RsConversationServiceListener */
+		private final Long handle = RsConversationServiceListenerUniqueHandleFactory.getNewUniqueHandle();
+		public Long getUniqueRsConversationServiceListenerHandle() { return handle; }
+		public void onConversationsEvent(RsConversationService.ConversationEvent event) { if(event.getEventKind().equals(RsConversationService.ConversationEventKind.LOBBY_LIST_UPDATE)) new UpdateLobbiesListAsyncTask().execute(null, null, null); }
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
@@ -118,8 +125,6 @@ public class LobbiesListFragment extends RsServiceClientFragmentBase
 
 			return lv;
 		}
-
-		@Override public void onConversationsEvent(RsConversationService.ConversationEvent event) { if(event.getEventKind().equals(RsConversationService.ConversationEventKind.LOBBY_LIST_UPDATE)) new UpdateLobbiesListAsyncTask().execute(null, null, null); }
 		@Override public int getViewTypeCount() { return 1; }
 		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
 		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }

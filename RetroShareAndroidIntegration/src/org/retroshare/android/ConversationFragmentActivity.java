@@ -41,6 +41,7 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase
 		onNewIntent(getIntent());
 	}
 
+	private ConversationId lastConversationId;
 	@Override protected void onNewIntent(Intent intent)
 	{
 		super.onNewIntent(intent);
@@ -49,16 +50,19 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase
 		if(intent.hasExtra(CONVERSATION_ID_EXTRA_KEY)) conversationId = intent.getParcelableExtra(CONVERSATION_ID_EXTRA_KEY);
 		else throw new RuntimeException(TAG() + " need firing intent contains valid value for " + CONVERSATION_ID_EXTRA_KEY);
 
-		Bundle fragmentArgs = new Bundle(1);
-		fragmentArgs.putString(ConversationFragment.SERVER_NAME_EXTRA_KEY, serverName);
-		fragmentArgs.putParcelable(ConversationFragment.CONVERSATION_ID_EXTRA_KEY, conversationId);
+		if(!conversationId.equals(lastConversationId))
+		{
+			Bundle fragmentArgs = new Bundle(1);
+			fragmentArgs.putString(ConversationFragment.SERVER_NAME_EXTRA_KEY, serverName);
+			fragmentArgs.putParcelable(ConversationFragment.CONVERSATION_ID_EXTRA_KEY, conversationId);
 
-		ConversationFragment conversationFragment = new ConversationFragment();
-		conversationFragment.setArguments(fragmentArgs);
+			ConversationFragment conversationFragment = new ConversationFragment();
+			conversationFragment.setArguments(fragmentArgs);
 
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		fragmentTransaction.replace(R.id.conversationFragmentContainer, conversationFragment);
-		fragmentTransaction.commit();
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.replace(R.id.conversationFragmentContainer, conversationFragment);
+			fragmentTransaction.commit();
+		}
 	}
 }

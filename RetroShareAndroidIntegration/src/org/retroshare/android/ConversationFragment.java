@@ -157,44 +157,20 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 	}
 	@Override public void registerRsServicesListeners()
 	{
+		Log.d(TAG(), "registerRsServicesListeners()");
 		super.registerRsServicesListeners();
 		getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter);
 	}
 	@Override public void unregisterRsServicesListeners()
 	{
+		Log.d(TAG(), "unregisterRsServicesListeners()");
 		getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(adapter);
 		super.unregisterRsServicesListeners();
 	}
 
 	private class ConversationAdapter implements ListAdapter, RsConversationService.RsConversationServiceListener
 	{
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			_ConversationMessage msg = messageList.get(position);
 
-			View view = convertView;
-			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
-
-			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
-			Drawable background = getResources().getDrawable(R.drawable.bubble_colorizable); // Doing this here can create problems?
-			int backgroundColor;
-			if(msg.isMine()) backgroundColor = 0xFFA8D324; // TODO: Make own color configurable
-			else backgroundColor = ColorHash.getObjectColor(msg.getNick());
-			background.setColorFilter(backgroundColor, PorterDuff.Mode.MULTIPLY);
-			msgBodyView.setBackgroundDrawable(background);
-			msgBodyView.setLinkTextColor(Util.opposeColor(backgroundColor));
-			msgBodyView.setText(msg.getBody());
-			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), ""); // This must be executed on UI thread
-
-			TextView timeView = (TextView) view.findViewById(R.id.chatMessageTimeTextView);
-			timeView.setText(msg.getTime());
-
-			TextView nickView = (TextView) view.findViewById(R.id.chatMessageNickTextView);
-			nickView.setText(msg.getNick());
-
-			return view;
-		}
 
 		private class ReloadMessagesHistoryAsyncTask extends AsyncTask<Integer, Void, ReloadMessagesHistoryAsyncTask.MsgsBund>
 		{
@@ -238,22 +214,53 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			}
 		}
 
+		/** Implements RsConversationServiceListener */
+		private final Long handle = RsConversationService.RsConversationServiceListenerUniqueHandleFactory.getNewUniqueHandle();
+		public Long getUniqueRsConversationServiceListenerHandle() { return handle; }
 		@Override public void onConversationsEvent(ConversationEvent event)
 		{
 			Log.d(TAG(), "onConversationsEvent(...)");
 			if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
 		}
-		@Override public int getViewTypeCount() { return 1; }
-		@Override public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
-		@Override public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
-		@Override public boolean areAllItemsEnabled() { return true; }
-		@Override public boolean isEnabled(int position) { return true; }
-		@Override public boolean hasStableIds() { return false; }
-		@Override public boolean isEmpty() { return messageList.isEmpty(); }
-		@Override public int getCount() { return messageList.size(); }
-		@Override public int getItemViewType(int position) { return 0; }
-		@Override public long getItemId(int position) { return 0; }
-		@Override public Object getItem(int position) { return messageList.get(position); }
+
+		/** Implements ListAdapter */
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			_ConversationMessage msg = messageList.get(position);
+
+			View view = convertView;
+			if (view == null) view = mInflater.inflate(R.layout.chat_message_item, parent, false);
+
+			TextView msgBodyView = (TextView) view.findViewById(R.id.chatMessageBodyTextView);
+			Drawable background = getResources().getDrawable(R.drawable.bubble_colorizable); // Doing this here can create problems?
+			int backgroundColor;
+			if(msg.isMine()) backgroundColor = 0xFFA8D324; // TODO: Make own color configurable
+			else backgroundColor = ColorHash.getObjectColor(msg.getNick());
+			background.setColorFilter(backgroundColor, PorterDuff.Mode.MULTIPLY);
+			msgBodyView.setBackgroundDrawable(background);
+			msgBodyView.setLinkTextColor(Util.opposeColor(backgroundColor));
+			msgBodyView.setText(msg.getBody());
+			Linkify.addLinks(msgBodyView, Pattern.compile(Util.URI_REG_EXP), ""); // This must be executed on UI thread
+
+			TextView timeView = (TextView) view.findViewById(R.id.chatMessageTimeTextView);
+			timeView.setText(msg.getTime());
+
+			TextView nickView = (TextView) view.findViewById(R.id.chatMessageNickTextView);
+			nickView.setText(msg.getNick());
+
+			return view;
+		}
+		public int getViewTypeCount() { return 1; }
+		public void registerDataSetObserver(DataSetObserver observer) { observerSet.add(observer); }
+		public void unregisterDataSetObserver(DataSetObserver observer) { observerSet.remove(observer); }
+		public boolean areAllItemsEnabled() { return true; }
+		public boolean isEnabled(int position) { return true; }
+		public boolean hasStableIds() { return false; }
+		public boolean isEmpty() { return messageList.isEmpty(); }
+		public int getCount() { return messageList.size(); }
+		public int getItemViewType(int position) { return 0; }
+		public long getItemId(int position) { return 0; }
+		public Object getItem(int position) { return messageList.get(position); }
 
 		private Set<DataSetObserver> observerSet = new HashSet<DataSetObserver>();
 
@@ -294,13 +301,6 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 		private final String nick;
 	}
 
-	@Override public boolean onKey(View v, int keyCode, KeyEvent event)
-	{
-		boolean enterPressed = ( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER );
-		if(enterPressed) sendChatMsg(null);
-		return enterPressed;
-	}
-
 	private void initializeConversation()
 	{
 		if(isUserVisible() && isBound())
@@ -312,6 +312,10 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			adapter.new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
 		}
 	}
+
+	/**
+	 * Message sending stuff
+	 */
 
 	private void sendChatMsg(View v)
 	{
@@ -337,7 +341,12 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 		}
 		else Log.e(TAG(), "sendChatMsg(View v) cannot send message without connection to rsProxy");
 	}
-
+	@Override public boolean onKey(View v, int keyCode, KeyEvent event)
+	{
+		boolean enterPressed = ( event.getAction() == KeyEvent.ACTION_DOWN ) & ( event.getKeyCode() == KeyEvent.KEYCODE_ENTER );
+		if(enterPressed) sendChatMsg(null);
+		return enterPressed;
+	}
 
 	/**
 	 * Autoscroll stuff

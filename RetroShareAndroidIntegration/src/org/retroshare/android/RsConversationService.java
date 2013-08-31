@@ -232,17 +232,49 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	}
 	public static interface RsConversationServiceListener
 	{
+		public Long getUniqueRsConversationServiceListenerHandle();
 		public void onConversationsEvent(ConversationEvent event);
+	}
+	public static class RsConversationServiceListenerUniqueHandleFactory
+	{
+		public static Long getNewUniqueHandle()
+		{
+			Long ret = new Long(System.currentTimeMillis());
+			while(repository.contains(ret)) ret = new Long(System.currentTimeMillis() + (long)ret.hashCode());
+			repository.add(ret);
+			return ret;
+		}
+		private static final Set<Long> repository = new WeakHashSet<Long>();
 	}
 	private final class RsConversationServiceUpdateListenerRunnable implements Runnable
 	{
 		public RsConversationServiceUpdateListenerRunnable(ConversationEvent event) { conversationEvent = event; }
-		@Override public void run() { for(RsConversationServiceListener listener : mRsConversationServiceListenersSet) listener.onConversationsEvent(conversationEvent); }
+		@Override public void run() { for(RsConversationServiceListener listener : mRsConversationServiceListenersSet.values()) listener.onConversationsEvent(conversationEvent); }
 		private final ConversationEvent conversationEvent;
 	}
-	private final Set<RsConversationServiceListener> mRsConversationServiceListenersSet = new WeakHashSet<RsConversationServiceListener>();
-	public void registerRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.add(listener); }
-	public void unregisterRsConversationServiceListener(RsConversationServiceListener listener) { mRsConversationServiceListenersSet.remove(listener); }
+	private final Map<Long, RsConversationServiceListener> mRsConversationServiceListenersSet = new WeakHashMap<Long, RsConversationServiceListener>();
+	public boolean registerRsConversationServiceListener(RsConversationServiceListener listener)
+	{
+		if(mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle()))
+		{
+//			Log.e(TAG(), "registerRsConversationServiceListener(...) not registering already registered listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
+			return false;
+		}
+//		Log.d(TAG(), "registerRsConversationServiceListener(...) registering listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
+		mRsConversationServiceListenersSet.put(listener.getUniqueRsConversationServiceListenerHandle(), listener);
+		return true;
+	}
+	public boolean unregisterRsConversationServiceListener(RsConversationServiceListener listener)
+	{
+		if(!mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle()))
+		{
+//			Log.e(TAG(), "unregisterRsConversationServiceListener(...) called for not registered listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()) );
+			return false;
+		}
+//		Log.d(TAG(), "unregisterRsConversationServiceListener(...) unregistering listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
+		mRsConversationServiceListenersSet.remove(listener);
+		return true;
+	}
 	private void notifyRsConversationServiceListeners(ConversationEvent event) { mHandlerThreadInterface.postToHandlerThread(new RsConversationServiceUpdateListenerRunnable(event)); }
 
 	/**
@@ -544,6 +576,8 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 		@Override public ConversationKind getConversationKind() { return ConversationKind.LOBBY_CHAT; }
 		@Override public boolean equals(Object o)
 		{
+			if(o == null) return false;
+
 			LobbyChatId c1;
 			try { c1 = (LobbyChatId) o; }
 			catch (ClassCastException e) { return false; }
