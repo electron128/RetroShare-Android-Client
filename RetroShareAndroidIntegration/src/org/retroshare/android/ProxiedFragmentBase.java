@@ -73,7 +73,6 @@ public abstract class ProxiedFragmentBase extends Fragment implements ServiceCon
 	public boolean isBound() { return mBound; } /** Implements ProxiedInterface */
 	public void onServiceConnected(ComponentName className, IBinder service) /** Implements ServiceConnection */
 	{
-		Log.d(TAG(), "onServiceConnected()");
 		RetroShareAndroidProxy.RsProxyBinder binder = (RetroShareAndroidProxy.RsProxyBinder) service;
 		rsProxy = binder.getService();
 		setBound(true);
@@ -81,7 +80,6 @@ public abstract class ProxiedFragmentBase extends Fragment implements ServiceCon
 	}
 	public void onServiceDisconnected(ComponentName className) /** Implements ServiceConnection */
 	{
-		Log.d(TAG(), "onServiceDisconnected()");
 		setBound(false);
 	}
 	@Override public void onAttach(Activity a)
