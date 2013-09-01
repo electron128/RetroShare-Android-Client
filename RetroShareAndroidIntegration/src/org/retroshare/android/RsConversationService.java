@@ -280,6 +280,7 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	{
 		if(notificationForConversationEnabled(id))
 		{
+			action.setAction(String.valueOf(id.hashCode() + System.currentTimeMillis())); // should put some unique suff as intent action to avoid intent recicle
 			action.putExtra(RsClientInterface.SERVER_NAME_EXTRA_KEY, mRsCtrlService.getServerData().name);
 			action.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			action.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
