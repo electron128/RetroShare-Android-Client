@@ -52,6 +52,8 @@ public class ConversationFragmentActivity extends ProxiedFragmentActivityBase
 
 		if(!conversationId.equals(lastConversationId))
 		{
+			lastConversationId = conversationId;
+
 			Bundle fragmentArgs = new Bundle(1);
 			fragmentArgs.putString(ConversationFragment.SERVER_NAME_EXTRA_KEY, serverName);
 			fragmentArgs.putParcelable(ConversationFragment.CONVERSATION_ID_EXTRA_KEY, conversationId);
