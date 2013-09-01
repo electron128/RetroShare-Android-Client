@@ -157,13 +157,11 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 	}
 	@Override public void registerRsServicesListeners()
 	{
-		Log.d(TAG(), "registerRsServicesListeners()");
 		super.registerRsServicesListeners();
 		getConnectedServer().mRsConversationService.registerRsConversationServiceListener(adapter);
 	}
 	@Override public void unregisterRsServicesListeners()
 	{
-		Log.d(TAG(), "unregisterRsServicesListeners()");
 		getConnectedServer().mRsConversationService.unregisterRsConversationServiceListener(adapter);
 		super.unregisterRsServicesListeners();
 	}
@@ -177,8 +175,6 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 			@Override
 			protected MsgsBund doInBackground(Integer... lastMineIntegers)
 			{
-				Log.d(TAG(), "doInBackground(" + String.valueOf(lastMineIntegers[0])  + ")");
-
 				List<_ConversationMessage> fmsg = new ArrayList<_ConversationMessage>();
 				int lastMineIndex = lastMineIntegers[0];
 
@@ -217,11 +213,7 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 		/** Implements RsConversationServiceListener */
 		private final Long handle = RsConversationService.RsConversationServiceListenerUniqueHandleFactory.getNewUniqueHandle();
 		public Long getUniqueRsConversationServiceListenerHandle() { return handle; }
-		@Override public void onConversationsEvent(ConversationEvent event)
-		{
-			Log.d(TAG(), "onConversationsEvent(...)");
-			if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex));
-		}
+		@Override public void onConversationsEvent(ConversationEvent event) { if(event.getEventKind().equals(ConversationEventKind.NEW_CONVERSATION_MESSAGE) && ((NewMessageConversationEvent)event).getConversationMessage().getConversationId().equals(conversationId)) new ReloadMessagesHistoryAsyncTask().execute(Integer.valueOf(lastMineMessageIndex)); }
 
 		/** Implements ListAdapter */
 		public View getView(int position, View convertView, ViewGroup parent)
