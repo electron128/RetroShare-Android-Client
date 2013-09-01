@@ -255,23 +255,13 @@ public class RsConversationService implements RsServiceInterface, RsCtrlService.
 	private final Map<Long, RsConversationServiceListener> mRsConversationServiceListenersSet = new WeakHashMap<Long, RsConversationServiceListener>();
 	public boolean registerRsConversationServiceListener(RsConversationServiceListener listener)
 	{
-		if(mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle()))
-		{
-//			Log.e(TAG(), "registerRsConversationServiceListener(...) not registering already registered listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
-			return false;
-		}
-//		Log.d(TAG(), "registerRsConversationServiceListener(...) registering listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
+		if(mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle())) return false;
 		mRsConversationServiceListenersSet.put(listener.getUniqueRsConversationServiceListenerHandle(), listener);
 		return true;
 	}
 	public boolean unregisterRsConversationServiceListener(RsConversationServiceListener listener)
 	{
-		if(!mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle()))
-		{
-//			Log.e(TAG(), "unregisterRsConversationServiceListener(...) called for not registered listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()) );
-			return false;
-		}
-//		Log.d(TAG(), "unregisterRsConversationServiceListener(...) unregistering listener with handle " + String.valueOf(listener.getUniqueRsConversationServiceListenerHandle()));
+		if(!mRsConversationServiceListenersSet.containsKey(listener.getUniqueRsConversationServiceListenerHandle())) return false;
 		mRsConversationServiceListenersSet.remove(listener);
 		return true;
 	}
