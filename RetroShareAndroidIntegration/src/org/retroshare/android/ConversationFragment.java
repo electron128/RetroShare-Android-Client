@@ -427,6 +427,8 @@ public class ConversationFragment extends RsServiceClientFragmentBase implements
 	{
 		@Override public void onClick(View v)
 		{
+			sendExtraMenu.setVisibility(View.INVISIBLE);
+
 			RsConversationService.ConversationInfo info = getConnectedServer().mRsConversationService.getConversationInfo(conversationId);
 			Bundle args = new Bundle(1);
 			args.putParcelable(ConversationInfoDialogFragment.CONVERSATION_INFO_EXTRA, info);
